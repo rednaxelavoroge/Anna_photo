@@ -27,7 +27,7 @@ export default function HomePage() {
             <p className="mt-6 max-w-lg text-sm leading-relaxed text-bg/75 md:text-base">
               {site.intro}
             </p>
-            <div className="mt-8 flex flex-wrap gap-6 text-xs tracking-[0.2em] uppercase">
+            <div className="mt-8 flex flex-wrap items-center gap-6 text-xs tracking-[0.2em] uppercase">
               <Link href="/portfolio" className="link-line">
                 Портфолио
               </Link>
@@ -35,6 +35,9 @@ export default function HomePage() {
                 Фототур
               </Link>
             </div>
+            <p className="mt-6 text-[10px] tracking-[0.18em] text-bg/45 uppercase">
+              Временное превью
+            </p>
           </div>
         </div>
       </SplitReveal>
@@ -49,13 +52,20 @@ export default function HomePage() {
               <Link
                 key={item.slug}
                 href={`/portfolio/${item.slug}`}
-                className="group bg-bg p-6"
+                className="group bg-bg"
               >
-                <p className="font-display text-2xl">{item.menu}</p>
-                <p className="mt-3 text-sm text-muted">{item.description}</p>
-                <span className="mt-6 inline-block text-xs tracking-[0.18em] uppercase">
-                  Открыть →
-                </span>
+                <div className="aspect-[4/5] overflow-hidden">
+                  <div className="tile-zoom h-full">
+                    <CoverArt slug={item.slug} title={item.menu} />
+                  </div>
+                </div>
+                <div className="p-6">
+                  <p className="font-display text-2xl">{item.menu}</p>
+                  <p className="mt-3 text-sm text-muted">{item.description}</p>
+                  <span className="mt-6 inline-block text-xs tracking-[0.18em] uppercase">
+                    Открыть →
+                  </span>
+                </div>
               </Link>
             ))}
           </div>

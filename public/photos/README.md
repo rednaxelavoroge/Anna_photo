@@ -1,6 +1,6 @@
 # Photos
 
-Grey CoverArt plates on the site are design samples. Put Anna’s selected files here only after she shortlists them. Do not import the old WordPress archive.
+`_preview/` holds a small temporary set of album thumbs from the live site for the design demo. Grey CoverArt plates appear only when no preview exists. Put Anna’s selected files in the folders below before launch. Do not import the old WordPress archive.
 
 ```
 public/photos/{category}/{album-slug}/01.jpg

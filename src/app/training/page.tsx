@@ -23,6 +23,10 @@ export default function TrainingPage() {
         {training.lead}
       </p>
 
+      <div className="relative mt-12 aspect-[16/10] max-w-4xl overflow-hidden bg-void">
+        <CoverArt slug="training" title={training.title} />
+      </div>
+
       <div className="mt-14 grid gap-px bg-line md:grid-cols-3">
         {training.formats.map((item) => (
           <div key={item.title} className="bg-bg p-6">
@@ -40,17 +44,12 @@ export default function TrainingPage() {
 
       <div className="mt-16 grid gap-px bg-line sm:grid-cols-2 lg:grid-cols-3">
         {workshops.map((item) => (
-          <article key={item.id} className="bg-bg">
-            <div className="aspect-[16/11] overflow-hidden">
-              <CoverArt slug={item.id} title={item.title} />
-            </div>
-            <div className="p-5">
-              <p className="eyebrow">
-                {String(item.n).padStart(2, "0")} · {item.year}
-              </p>
-              <h2 className="mt-3 font-display text-xl">{item.title}</h2>
-              <p className="mt-2 text-sm text-muted">{item.place}</p>
-            </div>
+          <article key={item.id} className="bg-bg p-5">
+            <p className="eyebrow">
+              {String(item.n).padStart(2, "0")} · {item.year}
+            </p>
+            <h2 className="mt-3 font-display text-xl">{item.title}</h2>
+            <p className="mt-2 text-sm text-muted">{item.place}</p>
           </article>
         ))}
       </div>

@@ -6,23 +6,22 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 const site = getSite();
+const DEMO_URL = "https://annamanasaryan-photo.vercel.app";
+const titleDefault = `${site.owner} — детский и семейный фотограф в Армении`;
+const descriptionDefault =
+  "Фотосессия новорождённых, детская и семейная съёмка в Армении. Воркшопы, travel и фототур в Ереван.";
 
 function resolveBaseUrl(): URL {
-  const explicit = process.env.NEXT_PUBLIC_SITE_URL;
-  if (explicit) return new URL(explicit);
-  const vercel = process.env.VERCEL_PROJECT_PRODUCTION_URL;
-  if (vercel) return new URL(`https://${vercel}`);
-  return new URL(site.domain);
+  return new URL(DEMO_URL);
 }
 
 export const metadata: Metadata = {
   metadataBase: resolveBaseUrl(),
   title: {
-    default: `${site.owner} — детский и семейный фотограф в Армении`,
+    default: titleDefault,
     template: `%s — ${site.brand}`,
   },
-  description:
-    "Фотосессия новорождённых, детская и семейная съёмка в Армении. Воркшопы, travel и фототур в Ереван.",
+  description: descriptionDefault,
   keywords: [
     "фотограф Армения",
     "детский фотограф Ереван",
@@ -32,9 +31,24 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "ru_RU",
+    url: DEMO_URL,
     siteName: site.brand,
-    title: `${site.owner} — фотограф`,
-    description: site.tagline,
+    title: titleDefault,
+    description: descriptionDefault,
+    images: [
+      {
+        url: "/og.jpg",
+        width: 1200,
+        height: 630,
+        alt: `${site.owner} — семейная фотосессия в Армении`,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: titleDefault,
+    description: descriptionDefault,
+    images: ["/og.jpg"],
   },
 };
 

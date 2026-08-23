@@ -1,4 +1,5 @@
 import { getPhotos as getPlaceholderPhotos, getBackstagePhotos as getPlaceholderBackstage, type Photo } from "@/lib/content";
+import { getPreviewCover } from "@/lib/preview";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -21,12 +22,28 @@ function readAlbumDir(segments: string[], altPrefix: string): Photo[] | null {
   }));
 }
 
+function previewAsAlbum(slug: string, alt: string): Photo[] | null {
+  const src = getPreviewCover(slug);
+  if (!src) return null;
+  return [
+    {
+      id: "preview-cover",
+      src,
+      alt,
+      width: 1600,
+      height: 1200,
+      featured: true,
+    },
+  ];
+}
+
 export function getPhotos(categorySlug: string, albumSlug?: string): Photo[] {
   const segments = albumSlug ? [categorySlug, albumSlug] : [categorySlug];
   const alt = albumSlug ? `${categorySlug} / ${albumSlug}` : categorySlug;
-  return readAlbumDir(segments, alt) ?? getPlaceholderPhotos(categorySlug, albumSlug);
+  const slug = albumSlug ? `${categorySlug}-${albumSlug}` : categorySlug;
+  return readAlbumDir(segments, alt) ?? previewAsAlbum(slug, alt) ?? getPlaceholderPhotos(categorySlug, albumSlug);
 }
 
 export function getBackstagePhotos(): Photo[] {
-  return readAlbumDir(["backstage"], "Бэкстейдж") ?? getPlaceholderBackstage();
+  return readAlbumDir(["backstage"], "Бэкстейдж") ?? previewAsAlbum("backstage", "Бэкстейдж") ?? getPlaceholderBackstage();
 }

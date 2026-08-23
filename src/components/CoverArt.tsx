@@ -1,3 +1,6 @@
+import { getPreviewCover } from "@/lib/preview";
+import Image from "next/image";
+
 function hash(value: string) {
   return [...value].reduce((sum, char) => sum + char.charCodeAt(0), 0);
 }
@@ -11,6 +14,22 @@ export function CoverArt({
   title: string;
   className?: string;
 }) {
+  const src = getPreviewCover(slug);
+  if (src) {
+    return (
+      <span className={`relative block h-full w-full overflow-hidden bg-void ${className}`}>
+        <Image
+          src={src}
+          alt={title}
+          fill
+          priority={slug === "home-hero"}
+          sizes="(max-width: 768px) 100vw, 50vw"
+          className="object-cover"
+        />
+      </span>
+    );
+  }
+
   const n = hash(slug);
   const lights = ["#1a1a1a", "#2b2b2b", "#3f3f3f", "#8a8a86", "#c8c8c4", "#ececea"];
   const a = lights[n % lights.length];

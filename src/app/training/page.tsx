@@ -1,0 +1,58 @@
+import { CoverArt } from "@/components/CoverArt";
+import { getSite, getWorkshops } from "@/lib/content";
+import type { Metadata } from "next";
+import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Обучение фотографии — 45 воркшопов",
+  description:
+    "Обучение фотографии в Армении: 45 проведённых воркшопов, направления и форматы. Фототур в Армению — отдельно, это не курс.",
+};
+
+export default function TrainingPage() {
+  const { training } = getSite();
+  const workshops = getWorkshops();
+
+  return (
+    <article className="px-5 pt-28 pb-24 md:px-8">
+      <p className="eyebrow">{training.eyebrow}</p>
+      <h1 className="mt-4 font-display text-4xl md:text-6xl">{training.title}</h1>
+      <p className="mt-4 font-display text-2xl text-muted md:text-3xl">{training.stat}</p>
+      <p className="mt-6 max-w-2xl text-sm leading-relaxed text-muted md:text-base">
+        {training.lead}
+      </p>
+
+      <div className="mt-14 grid gap-px bg-line md:grid-cols-3">
+        {training.formats.map((item) => (
+          <div key={item.title} className="bg-bg p-6">
+            <h2 className="font-display text-2xl">{item.title}</h2>
+            <p className="mt-3 text-sm leading-relaxed text-muted">{item.text}</p>
+          </div>
+        ))}
+      </div>
+
+      <p className="mt-8 text-sm">
+        <Link href="/phototour" className="link-line">
+          Фототур в Армению — для гостей, не для учеников →
+        </Link>
+      </p>
+
+      <div className="mt-16 grid gap-px bg-line sm:grid-cols-2 lg:grid-cols-3">
+        {workshops.map((item) => (
+          <article key={item.id} className="bg-bg">
+            <div className="aspect-[16/11] overflow-hidden">
+              <CoverArt slug={item.id} title={item.title} />
+            </div>
+            <div className="p-5">
+              <p className="eyebrow">
+                {String(item.n).padStart(2, "0")} · {item.year}
+              </p>
+              <h2 className="mt-3 font-display text-xl">{item.title}</h2>
+              <p className="mt-2 text-sm text-muted">{item.place}</p>
+            </div>
+          </article>
+        ))}
+      </div>
+    </article>
+  );
+}

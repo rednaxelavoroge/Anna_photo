@@ -15,16 +15,17 @@ export default function HomePage() {
   return (
     <>
       <SplitReveal wordLeft="АННА" wordRight="МАНАСАРЯН">
-        <div className="relative flex min-h-svh flex-col justify-end bg-void px-5 pb-16 text-bg md:px-12 md:pb-24">
-          <div className="absolute inset-0 opacity-50">
+        <div className="relative flex min-h-svh flex-col justify-end bg-paper px-5 pb-16 text-snow md:px-12 md:pb-24">
+          <div className="absolute inset-0">
             <CoverArt slug="home-hero" title={site.owner} />
           </div>
+          <div className="absolute inset-0 bg-gradient-to-t from-ink/55 via-ink/10 to-transparent" />
           <div className="relative max-w-2xl">
-            <p className="eyebrow text-bg/70">Фотограф · Ереван</p>
+            <p className="eyebrow text-snow/75">Фотограф · Ереван</p>
             <h1 className="mt-5 font-display text-4xl leading-[0.95] md:text-6xl">
               {site.tagline}
             </h1>
-            <p className="mt-6 max-w-lg text-sm leading-relaxed text-bg/75 md:text-base">
+            <p className="mt-6 max-w-lg text-sm leading-relaxed text-snow/80 md:text-base">
               {site.intro}
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-6 text-xs tracking-[0.2em] uppercase">
@@ -35,7 +36,7 @@ export default function HomePage() {
                 Фототур
               </Link>
             </div>
-            <p className="mt-6 text-[10px] tracking-[0.18em] text-bg/45 uppercase">
+            <p className="mt-6 text-[10px] tracking-[0.18em] text-snow/50 uppercase">
               Временное превью
             </p>
           </div>
@@ -44,28 +45,22 @@ export default function HomePage() {
 
       <MeetSections categories={meeting} />
 
-      <section className="border-t border-line bg-bg px-5 py-20 md:px-8">
+      <section className="border-t border-line bg-paper px-5 py-20 md:px-8">
         <div className="mx-auto max-w-[1500px]">
           <p className="eyebrow">Ещё альбомы</p>
-          <div className="mt-10 grid gap-px bg-line sm:grid-cols-2 lg:grid-cols-5">
+          <div className="mt-10 grid gap-[var(--frame-gap)] sm:grid-cols-2 lg:grid-cols-5">
             {rest.map((item) => (
               <Link
                 key={item.slug}
                 href={`/portfolio/${item.slug}`}
-                className="group bg-bg"
+                className="gallery-print group"
               >
-                <div className="aspect-[4/5] overflow-hidden">
+                <div className="aspect-[4/5] overflow-hidden bg-void">
                   <div className="tile-zoom h-full">
                     <CoverArt slug={item.slug} title={item.menu} />
                   </div>
                 </div>
-                <div className="p-6">
-                  <p className="font-display text-2xl">{item.menu}</p>
-                  <p className="mt-3 text-sm text-muted">{item.description}</p>
-                  <span className="mt-6 inline-block text-xs tracking-[0.18em] uppercase">
-                    Открыть →
-                  </span>
-                </div>
+                <span className="gallery-print-name">{item.menu}</span>
               </Link>
             ))}
           </div>

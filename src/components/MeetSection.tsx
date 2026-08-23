@@ -53,13 +53,13 @@ function MeetSection({
         <CoverArt slug={category.slug} title={category.menu} />
       </div>
       <div className="absolute inset-0 flex items-end p-5 opacity-0 transition-opacity duration-300 group-hover:opacity-100 md:p-8">
-        <span className="text-xs tracking-[0.22em] text-bg uppercase">Открыть →</span>
+        <span className="text-xs tracking-[0.22em] text-snow uppercase">Открыть →</span>
       </div>
     </Link>
   );
 
   const copy = (
-    <div className="flex h-full flex-col justify-center bg-bg px-5 py-10 md:px-12 lg:px-16">
+    <div className="flex h-full flex-col justify-center bg-paper px-5 py-10 md:px-12 lg:px-16">
       <p className="eyebrow">{number}</p>
       <h2 className="mt-4 max-w-md font-display text-3xl leading-[0.95] text-ink md:text-5xl">
         {category.menu}
@@ -88,7 +88,7 @@ function MeetSection({
   }
 
   return (
-    <section ref={sectionRef} className="relative h-[200svh] bg-bg">
+    <section ref={sectionRef} className="relative h-[200svh] bg-paper">
       <div className="sticky top-0 flex h-svh overflow-hidden">
         <motion.div
           style={{ x: leftX }}

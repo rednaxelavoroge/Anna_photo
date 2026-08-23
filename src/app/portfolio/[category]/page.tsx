@@ -54,22 +54,19 @@ export default async function CategoryPage({ params }: { params: Promise<Params>
       ) : null}
 
       {category.albums.length > 0 ? (
-        <div className="mt-16 grid gap-px bg-line md:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-16 grid gap-[var(--frame-gap)] md:grid-cols-2 lg:grid-cols-3">
           {category.albums.map((album) => (
             <Link
               key={album.slug}
               href={`/portfolio/${category.slug}/${album.slug}`}
-              className="group bg-bg"
+              className="gallery-print group"
             >
-              <div className="aspect-[4/5] overflow-hidden">
+              <div className="aspect-[4/5] overflow-hidden bg-void">
                 <div className="tile-zoom h-full">
                   <CoverArt slug={`${category.slug}-${album.slug}`} title={album.menu} />
                 </div>
               </div>
-              <div className="p-5">
-                <p className="font-display text-2xl">{album.menu}</p>
-                <p className="mt-2 text-sm text-muted">{album.title}</p>
-              </div>
+              <span className="gallery-print-name">{album.menu}</span>
             </Link>
           ))}
         </div>

@@ -2,25 +2,31 @@
 @import "./fonts.css";
 
 @theme {
-  --color-bg: #f3f3f1;
-  --color-surface: #ffffff;
-  --color-ink: #111111;
-  --color-muted: #6e6e6a;
-  --color-line: #d6d6d2;
-  --color-ash: #9c9c98;
-  --color-void: #0c0c0c;
+  --color-paper: #f3efe8;
+  --color-snow: #fffcf8;
+  --color-ink: #2c2824;
+  --color-stone: #a39e96;
+  --color-line: #d8d2c8;
+  --color-silver: #c9c4bb;
+  --color-bg: #f3efe8;
+  --color-surface: #fffcf8;
+  --color-muted: #a39e96;
+  --color-ash: #c9c4bb;
+  --color-void: #1a1815;
   --font-display: "Unbounded", system-ui, sans-serif;
   --font-sans: "Manrope", system-ui, sans-serif;
 }
 
 @layer base {
   :root {
-    --frame-gap: 10px;
+    --frame-gap: 14px;
+    --print-mat: 10px;
   }
 
   @media (min-width: 768px) {
     :root {
-      --frame-gap: 16px;
+      --frame-gap: 22px;
+      --print-mat: 14px;
     }
   }
 
@@ -30,7 +36,7 @@
   }
 
   body {
-    background-color: var(--color-bg);
+    background-color: var(--color-paper);
     color: var(--color-ink);
     font-family: var(--font-sans);
     font-weight: 400;
@@ -56,7 +62,7 @@
 
   ::selection {
     background: var(--color-ink);
-    color: var(--color-bg);
+    color: var(--color-snow);
   }
 
   :focus-visible {
@@ -81,14 +87,14 @@
     font-size: 0.625rem;
     letter-spacing: 0.28em;
     text-transform: uppercase;
-    color: var(--color-muted);
+    color: var(--color-stone);
     font-weight: 500;
   }
 
   .frame-columns {
     column-gap: var(--frame-gap);
     padding: var(--frame-gap);
-    background: var(--color-surface);
+    background: var(--color-paper);
   }
 
   .frame-columns > * {
@@ -103,7 +109,49 @@
 
   .group:hover .tile-zoom,
   .group:focus-visible .tile-zoom {
-    transform: scale(1.06);
+    transform: scale(1.04);
+  }
+
+  .gallery-print {
+    position: relative;
+    display: block;
+    width: 100%;
+    background: var(--color-snow);
+    padding: var(--print-mat);
+    box-shadow: 0 1px 0 color-mix(in srgb, var(--color-line) 70%, transparent);
+    transition:
+      background-color 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+      box-shadow 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .gallery-print:hover,
+  .gallery-print:focus-visible {
+    background-color: #e8e3da;
+    box-shadow: 0 1px 0 color-mix(in srgb, var(--color-silver) 90%, transparent);
+  }
+
+  .gallery-print-name {
+    position: absolute;
+    left: var(--print-mat);
+    right: var(--print-mat);
+    bottom: var(--print-mat);
+    padding: 0.7rem 0.85rem;
+    background: color-mix(in srgb, var(--color-snow) 88%, transparent);
+    color: var(--color-ink);
+    font-size: 0.68rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    opacity: 0;
+    transform: translateY(6px);
+    transition:
+      opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .gallery-print:hover .gallery-print-name,
+  .gallery-print:focus-visible .gallery-print-name {
+    opacity: 1;
+    transform: translateY(0);
   }
 
   .link-line {
@@ -131,7 +179,7 @@
 
   /* Full-screen mobile nav — solid paper, never glass/alpha. */
   .mobile-nav-panel {
-    background-color: #f3f3f1;
-    color: #111111;
+    background-color: #f3efe8;
+    color: #2c2824;
   }
 }

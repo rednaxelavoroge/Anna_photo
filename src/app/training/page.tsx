@@ -27,9 +27,9 @@ export default function TrainingPage() {
         <CoverArt slug="training" title={training.title} />
       </div>
 
-      <div className="mt-14 grid gap-px bg-line md:grid-cols-3">
+      <div className="mt-14 grid gap-[var(--frame-gap)] md:grid-cols-3">
         {training.formats.map((item) => (
-          <div key={item.title} className="bg-bg p-6">
+          <div key={item.title} className="bg-snow p-6">
             <h2 className="font-display text-2xl">{item.title}</h2>
             <p className="mt-3 text-sm leading-relaxed text-muted">{item.text}</p>
           </div>
@@ -42,9 +42,9 @@ export default function TrainingPage() {
         </Link>
       </p>
 
-      <div className="mt-16 grid gap-px bg-line sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-16 grid gap-[var(--frame-gap)] sm:grid-cols-2 lg:grid-cols-3">
         {workshops.map((item) => (
-          <article key={item.id} className="bg-bg p-5">
+          <article key={item.id} className="bg-snow p-5">
             <p className="eyebrow">
               {String(item.n).padStart(2, "0")} · {item.year}
             </p>

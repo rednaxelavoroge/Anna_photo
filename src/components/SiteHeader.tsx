@@ -2,7 +2,6 @@
 
 import { getSite } from "@/lib/content";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const NAV = [
@@ -16,10 +15,8 @@ const NAV = [
 
 export function SiteHeader() {
   const site = getSite();
-  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const onDark = pathname === "/";
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 16);
@@ -43,25 +40,19 @@ export function SiteHeader() {
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
-  const light = onDark && !scrolled && !open;
-
   return (
     <>
       <header
         className={`fixed inset-x-0 top-0 z-40 transition-colors duration-500 ${
-          open
-            ? "border-b border-line bg-bg"
-            : scrolled
-              ? "border-b border-line bg-bg/92 backdrop-blur-md"
-              : "bg-transparent"
+          open || scrolled
+            ? "border-b border-line bg-paper"
+            : "border-b border-transparent bg-paper/80"
         }`}
       >
         <div className="mx-auto flex max-w-[1500px] items-center justify-between px-5 py-5 md:px-8">
           <Link
             href="/"
-            className={`font-display text-sm tracking-[0.18em] uppercase md:text-base ${
-              light ? "text-bg" : "text-ink"
-            }`}
+            className="font-display text-sm tracking-[0.18em] text-ink uppercase md:text-base"
           >
             {site.brand}
           </Link>
@@ -71,7 +62,7 @@ export function SiteHeader() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`link-line ${light ? "text-bg/80 hover:text-bg" : "text-ink/75 hover:text-ink"}`}
+                className="link-line text-ink/70 hover:text-ink"
               >
                 {item.label}
               </Link>
@@ -81,7 +72,7 @@ export function SiteHeader() {
           <button
             type="button"
             onClick={() => setOpen(true)}
-            className={`lg:hidden ${light ? "text-bg" : "text-ink"}`}
+            className="text-ink lg:hidden"
             aria-expanded={open}
             aria-controls="mobile-nav"
           >
@@ -99,7 +90,7 @@ export function SiteHeader() {
           className="mobile-nav-panel fixed inset-0 z-[100] overflow-y-auto px-6 py-6"
         >
           <div className="flex items-center justify-between border-b border-line pb-5">
-            <span className="font-display tracking-[0.16em] uppercase text-ink">{site.brand}</span>
+            <span className="font-display tracking-[0.16em] text-ink uppercase">{site.brand}</span>
             <button type="button" onClick={() => setOpen(false)} aria-label="Закрыть меню" className="text-ink">
               <svg viewBox="0 0 24 24" className="h-6 w-6 stroke-current" fill="none" strokeWidth="1.4">
                 <path d="M6 18L18 6M6 6l12 12" />

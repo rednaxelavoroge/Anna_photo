@@ -58,20 +58,23 @@ export function AlbumGrid({
             key={photo.id}
             type="button"
             onClick={() => setOpen(index)}
-            className="group relative block w-full overflow-hidden bg-void"
+            className="gallery-print group"
           >
-            <div className="tile-zoom">
-              {photo.src ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={photo.src} alt={photo.alt} className="w-full" />
-              ) : (
-                <CoverArt
-                  slug={`${slug}-${photo.id}`}
-                  title={photo.alt}
-                  className={photo.height > photo.width ? "aspect-[3/4]" : "aspect-[4/3]"}
-                />
-              )}
+            <div className="overflow-hidden bg-void">
+              <div className="tile-zoom">
+                {photo.src ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={photo.src} alt={photo.alt} className="w-full" />
+                ) : (
+                  <CoverArt
+                    slug={`${slug}-${photo.id}`}
+                    title={photo.alt}
+                    className={photo.height > photo.width ? "aspect-[3/4]" : "aspect-[4/3]"}
+                  />
+                )}
+              </div>
             </div>
+            <span className="gallery-print-name">{photo.alt}</span>
           </button>
         ))}
       </div>

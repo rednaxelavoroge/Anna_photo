@@ -17,7 +17,7 @@ type SplitRevealProps = {
 // Unbounded 400 + tracking -0.05em: «МАНАСАРЯН» ≈ 7.68em. Size to that so the
 // longer word fills the half without kissing the viewport edge.
 const WORD_CLASS =
-  "inline-block whitespace-nowrap font-display leading-[0.78] tracking-[-0.05em] text-bg select-none text-[min(16svh,calc((50vw-1.5rem)/7.72))]";
+  "inline-block whitespace-nowrap font-display leading-[0.78] tracking-[-0.05em] text-ink select-none text-[min(16svh,calc((50vw-1.5rem)/7.72))]";
 
 export function SplitReveal({ wordLeft, wordRight, children }: SplitRevealProps) {
   const sectionRef = useRef<HTMLElement>(null);
@@ -75,7 +75,7 @@ export function SplitReveal({ wordLeft, wordRight, children }: SplitRevealProps)
 
   if (reduced) {
     return (
-      <section className="bg-void px-5 py-24 text-bg md:px-8">
+      <section className="bg-paper px-5 py-24 text-ink md:px-8">
         <p className="font-display text-4xl leading-none tracking-[-0.04em] md:text-6xl">
           {wordLeft} {wordRight}
         </p>
@@ -85,7 +85,7 @@ export function SplitReveal({ wordLeft, wordRight, children }: SplitRevealProps)
   }
 
   return (
-    <section ref={sectionRef} className="relative h-[165vh] bg-void">
+    <section ref={sectionRef} className="relative h-[165vh] bg-paper">
       <div className="sticky top-0 flex h-svh items-center overflow-hidden">
         <motion.div
           style={{ opacity: revealOpacity, scale: revealScale }}
@@ -98,7 +98,7 @@ export function SplitReveal({ wordLeft, wordRight, children }: SplitRevealProps)
           ref={leftPaneRef}
           aria-hidden="true"
           style={{ x: leftX }}
-          className="pointer-events-none absolute inset-y-0 left-0 flex w-1/2 items-center justify-end border-r border-white/10 bg-void pr-[0.08em] pl-[clamp(0.7rem,2.6vw,1.6rem)] will-change-transform"
+          className="pointer-events-none absolute inset-y-0 left-0 flex w-1/2 items-center justify-end border-r border-line bg-paper pr-[0.08em] pl-[clamp(0.7rem,2.6vw,1.6rem)] will-change-transform"
         >
           <motion.span
             style={{ scale: openScale, opacity: wordOpacity }}
@@ -114,7 +114,7 @@ export function SplitReveal({ wordLeft, wordRight, children }: SplitRevealProps)
           ref={rightPaneRef}
           aria-hidden="true"
           style={{ x: rightX }}
-          className="pointer-events-none absolute inset-y-0 right-0 flex w-1/2 items-center justify-start bg-void pl-[0.08em] pr-[clamp(0.7rem,2.6vw,1.6rem)] will-change-transform"
+          className="pointer-events-none absolute inset-y-0 right-0 flex w-1/2 items-center justify-start bg-paper pl-[0.08em] pr-[clamp(0.7rem,2.6vw,1.6rem)] will-change-transform"
         >
           <motion.span
             style={{ scale: openScale, opacity: wordOpacity }}

@@ -39,7 +39,7 @@ export function Lightbox({
 
   return (
     <div
-      className="fixed inset-0 z-[80] flex flex-col bg-void/96 text-bg"
+      className="fixed inset-0 z-[80] flex flex-col bg-ink/94 text-snow"
       role="dialog"
       aria-modal="true"
       aria-label="Просмотр кадра"

@@ -6,7 +6,7 @@ export function SiteFooter() {
   const categories = getCategories();
 
   return (
-    <footer className="border-t border-line bg-bg">
+    <footer className="border-t border-line bg-paper">
       <div className="mx-auto grid max-w-[1500px] gap-10 px-5 py-16 md:grid-cols-[1.2fr_1fr_1fr] md:px-8">
         <div>
           <p className="font-display text-xl tracking-tight">{site.brand}</p>

@@ -1,6 +1,7 @@
 import { AlbumGrid } from "@/components/AlbumGrid";
 import { CoverArt } from "@/components/CoverArt";
-import { getCategories, getCategory, getPhotos } from "@/lib/content";
+import { getCategories, getCategory } from "@/lib/content";
+import { getPhotos } from "@/lib/photos";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";

@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: "О фотографе Анне Манасарян",
   description:
     "Детский и семейный фотограф в Ереване. Новорождённые, дети, семьи, travel и обучение.",
+  keywords: ["фотограф Анна Манасарян", "детский фотограф Ереван", "семейный фотограф Армения"],
 };
 
 export default function AboutPage() {

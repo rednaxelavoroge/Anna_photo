@@ -5,6 +5,7 @@ export const metadata: Metadata = {
   title: "Контакты фотографа в Ереване",
   description:
     "Связаться с Анной Манасарян: WhatsApp, телефон в Армении и России, Instagram. Фотосессии в Ереване.",
+  keywords: ["фотограф Ереван контакты", "заказать фотосессию в Армении"],
 };
 
 export default function ContactsPage() {
@@ -13,7 +14,7 @@ export default function ContactsPage() {
   return (
     <article className="px-5 pt-28 pb-24 md:px-8">
       <p className="eyebrow">{contacts.city}</p>
-      <h1 className="mt-4 font-display text-4xl md:text-6xl">Контакты</h1>
+      <h1 className="mt-4 font-display text-4xl md:text-6xl">Контакты фотографа в Ереване</h1>
       <p className="mt-5 max-w-xl text-sm text-muted md:text-base">
         Напишите в WhatsApp — так быстрее всего обсудить съёмку, обучение или фототур.
       </p>

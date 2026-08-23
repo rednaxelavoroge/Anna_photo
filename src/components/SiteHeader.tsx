@@ -46,53 +46,62 @@ export function SiteHeader() {
   const light = onDark && !scrolled && !open;
 
   return (
-    <header
-      className={`fixed inset-x-0 top-0 z-40 transition-colors duration-500 ${
-        scrolled || open ? "border-b border-line bg-bg/92 backdrop-blur-md" : "bg-transparent"
-      }`}
-    >
-      <div className="mx-auto flex max-w-[1500px] items-center justify-between px-5 py-5 md:px-8">
-        <Link
-          href="/"
-          className={`font-display text-sm tracking-[0.18em] uppercase md:text-base ${
-            light ? "text-bg" : "text-ink"
-          }`}
-        >
-          {site.brand}
-        </Link>
+    <>
+      <header
+        className={`fixed inset-x-0 top-0 z-40 transition-colors duration-500 ${
+          open
+            ? "border-b border-line bg-bg"
+            : scrolled
+              ? "border-b border-line bg-bg/92 backdrop-blur-md"
+              : "bg-transparent"
+        }`}
+      >
+        <div className="mx-auto flex max-w-[1500px] items-center justify-between px-5 py-5 md:px-8">
+          <Link
+            href="/"
+            className={`font-display text-sm tracking-[0.18em] uppercase md:text-base ${
+              light ? "text-bg" : "text-ink"
+            }`}
+          >
+            {site.brand}
+          </Link>
 
-        <nav aria-label="Основная навигация" className="hidden items-center gap-8 text-[11px] tracking-[0.18em] uppercase lg:flex">
-          {NAV.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`link-line ${light ? "text-bg/80 hover:text-bg" : "text-ink/75 hover:text-ink"}`}
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
+          <nav aria-label="Основная навигация" className="hidden items-center gap-8 text-[11px] tracking-[0.18em] uppercase lg:flex">
+            {NAV.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`link-line ${light ? "text-bg/80 hover:text-bg" : "text-ink/75 hover:text-ink"}`}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
 
-        <button
-          type="button"
-          onClick={() => setOpen(true)}
-          className={`lg:hidden ${light ? "text-bg" : "text-ink"}`}
-          aria-expanded={open}
-          aria-controls="mobile-nav"
-        >
-          <span className="sr-only">Меню</span>
-          <svg viewBox="0 0 24 24" className="h-6 w-6 stroke-current" fill="none" strokeWidth="1.4">
-            <path d="M4 7h16M4 12h16M4 17h16" />
-          </svg>
-        </button>
-      </div>
+          <button
+            type="button"
+            onClick={() => setOpen(true)}
+            className={`lg:hidden ${light ? "text-bg" : "text-ink"}`}
+            aria-expanded={open}
+            aria-controls="mobile-nav"
+          >
+            <span className="sr-only">Меню</span>
+            <svg viewBox="0 0 24 24" className="h-6 w-6 stroke-current" fill="none" strokeWidth="1.4">
+              <path d="M4 7h16M4 12h16M4 17h16" />
+            </svg>
+          </button>
+        </div>
+      </header>
 
       {open ? (
-        <div id="mobile-nav" className="fixed inset-0 z-[100] bg-bg px-6 py-6">
+        <div
+          id="mobile-nav"
+          className="mobile-nav-panel fixed inset-0 z-[100] overflow-y-auto px-6 py-6"
+        >
           <div className="flex items-center justify-between border-b border-line pb-5">
-            <span className="font-display tracking-[0.16em] uppercase">{site.brand}</span>
-            <button type="button" onClick={() => setOpen(false)} aria-label="Закрыть меню">
-              <svg viewBox="0 0 24 24" className="h-6 w-6 stroke-ink" fill="none" strokeWidth="1.4">
+            <span className="font-display tracking-[0.16em] uppercase text-ink">{site.brand}</span>
+            <button type="button" onClick={() => setOpen(false)} aria-label="Закрыть меню" className="text-ink">
+              <svg viewBox="0 0 24 24" className="h-6 w-6 stroke-current" fill="none" strokeWidth="1.4">
                 <path d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
@@ -103,7 +112,7 @@ export function SiteHeader() {
                 key={item.href}
                 href={item.href}
                 onClick={() => setOpen(false)}
-                className="font-display text-3xl"
+                className="font-display text-3xl text-ink"
               >
                 {item.label}
               </Link>
@@ -111,6 +120,6 @@ export function SiteHeader() {
           </nav>
         </div>
       ) : null}
-    </header>
+    </>
   );
 }

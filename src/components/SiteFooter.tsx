@@ -16,15 +16,18 @@ export function SiteFooter() {
           <p className="eyebrow">Меню</p>
           <div className="mt-4 flex flex-col gap-2 text-sm">
             <Link href="/portfolio">Портфолио</Link>
+            <Link href="/backstage">Бэкстейджи</Link>
+            <Link href="/about">Обо мне</Link>
             <Link href="/training">Обучение</Link>
-            <Link href="/phototour">Фототур в Армению</Link>
+            <Link href="/reviews">Отзывы</Link>
             <Link href="/contacts">Контакты</Link>
+            <Link href="/phototour">Фототур в Армению</Link>
           </div>
         </div>
         <div>
           <p className="eyebrow">Альбомы</p>
           <div className="mt-4 flex flex-col gap-2 text-sm text-muted">
-            {categories.slice(0, 6).map((item) => (
+            {categories.map((item) => (
               <Link key={item.slug} href={`/portfolio/${item.slug}`}>
                 {item.menu}
               </Link>

@@ -128,4 +128,10 @@
   .link-line:focus-visible::after {
     transform: scaleX(1);
   }
+
+  /* Full-screen mobile nav — solid paper, never glass/alpha. */
+  .mobile-nav-panel {
+    background-color: #f3f3f1;
+    color: #111111;
+  }
 }

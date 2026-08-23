@@ -2,8 +2,9 @@ import { getReviews } from "@/lib/content";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Отзывы о фотографе",
+  title: "Отзывы о фотографе в Армении",
   description: "Отзывы семей и учеников о съёмках и воркшопах Анны Манасарян в Армении.",
+  keywords: ["отзывы фотограф Ереван", "отзывы детский фотограф Армения"],
 };
 
 export default function ReviewsPage() {
@@ -12,7 +13,7 @@ export default function ReviewsPage() {
   return (
     <article className="px-5 pt-28 pb-24 md:px-8">
       <p className="eyebrow">Голоса</p>
-      <h1 className="mt-4 font-display text-4xl md:text-6xl">Отзывы</h1>
+      <h1 className="mt-4 font-display text-4xl md:text-6xl">Отзывы о фотографе в Армении</h1>
       <div className="mt-14 grid gap-px bg-line md:grid-cols-2">
         {reviews.map((item) => (
           <blockquote key={item.id} className="bg-bg p-8">

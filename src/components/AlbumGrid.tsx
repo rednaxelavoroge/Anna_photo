@@ -28,7 +28,9 @@ export function AlbumGrid({
     <div>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4 px-1">
         <p className="text-xs tracking-[0.18em] text-muted uppercase">
-          {photos.length} кадров · альбом
+          {photos.every((photo) => !photo.src)
+            ? "Образцы ритма · не финальные кадры"
+            : `${photos.length} кадров · альбом`}
         </p>
         <div className="flex gap-4 text-xs tracking-[0.16em] uppercase">
           {(

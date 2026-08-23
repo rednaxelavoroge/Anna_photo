@@ -1,5 +1,6 @@
 import { AlbumGrid } from "@/components/AlbumGrid";
-import { getAlbum, getCategories, getCategory, getPhotos } from "@/lib/content";
+import { getAlbum, getCategories, getCategory } from "@/lib/content";
+import { getPhotos } from "@/lib/photos";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";

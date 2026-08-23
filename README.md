@@ -1,7 +1,8 @@
 # Anna Manasaryan — photography
 
 Сайт фотографа **annamanasaryan.com**. Next.js App Router, выкладка на Vercel.
-Фотографии кладём в репозиторий (`public/photos`), как на annamanasaryan.art.
+
+Серые пластины — временные образцы сетки, не финальные кадры. Старый WordPress не скачиваем. Когда Анна пришлёт короткий список, файлы кладём в `public/photos/{категория}/{альбом}`, как на annamanasaryan.art.
 
 Старый WordPress на Namecheap не трогаем: новый сайт живёт отдельно, папки не пересекаются.
 

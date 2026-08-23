@@ -61,8 +61,8 @@ export function getPhotos(categorySlug: string, albumSlug?: string): Photo[] {
     return {
       id: `${seed}-${index + 1}`,
       alt: albumSlug
-        ? `Кадр ${index + 1} — ${albumSlug}`
-        : `Кадр ${index + 1} — ${categorySlug}`,
+        ? `Образец ритма ${index + 1} — ${albumSlug}`
+        : `Образец ритма ${index + 1} — ${categorySlug}`,
       width: portrait ? 1200 : 1600,
       height: portrait ? 1600 : 1100,
       featured: index === 0,
@@ -74,7 +74,7 @@ export function getPhotos(categorySlug: string, albumSlug?: string): Photo[] {
 export function getBackstagePhotos(): Photo[] {
   return Array.from({ length: 18 }, (_, index) => ({
     id: `backstage-${index + 1}`,
-    alt: `Бэкстейдж ${index + 1}`,
+    alt: `Образец бэкстейджа ${index + 1}`,
     width: index % 2 === 0 ? 1600 : 1200,
     height: index % 2 === 0 ? 1100 : 1600,
     year: 2023 + (index % 3),

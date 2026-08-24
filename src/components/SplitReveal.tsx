@@ -73,7 +73,7 @@ export function SplitReveal({ wordLeft, wordRight, children }: SplitRevealProps)
 
     const fit = () => {
       const pane = Math.min(leftPane.clientWidth, rightPane.clientWidth);
-      const avail = Math.max(28, pane - 16);
+      const avail = Math.max(28, pane - 40);
       const probe = 180;
       for (const word of [leftWord, rightWord]) {
         word.style.maxWidth = "none";
@@ -81,7 +81,7 @@ export function SplitReveal({ wordLeft, wordRight, children }: SplitRevealProps)
         word.style.fontSize = `${probe}px`;
       }
       const widest = Math.max(leftWord.offsetWidth, rightWord.offsetWidth, 1);
-      const next = `${Math.max(16, probe * (avail / widest) * 0.96)}px`;
+      const next = `${Math.max(16, probe * (avail / widest) * 0.94)}px`;
       leftWord.style.fontSize = next;
       rightWord.style.fontSize = next;
     };
@@ -121,7 +121,7 @@ export function SplitReveal({ wordLeft, wordRight, children }: SplitRevealProps)
           aria-hidden="true"
           onClick={handleOpenClick}
           style={{ x: leftX }}
-          className="cursor-pointer absolute inset-y-0 left-0 z-20 flex w-1/2 items-center justify-end overflow-hidden border-r border-line bg-paper pr-[0.08em] pl-[0.45rem] will-change-transform sm:pl-[clamp(0.45rem,1.6vw,1.1rem)]"
+          className="cursor-pointer absolute inset-y-0 left-0 z-20 flex w-1/2 items-center justify-end overflow-hidden border-r border-line bg-paper pr-4 pl-3 will-change-transform sm:pr-8 md:pr-10"
         >
           <motion.span
             style={{ scale: openScale, opacity: wordOpacity }}
@@ -138,7 +138,7 @@ export function SplitReveal({ wordLeft, wordRight, children }: SplitRevealProps)
           aria-hidden="true"
           onClick={handleOpenClick}
           style={{ x: rightX }}
-          className="cursor-pointer absolute inset-y-0 right-0 z-20 flex w-1/2 items-center justify-start overflow-hidden bg-paper pl-[0.08em] pr-[0.45rem] will-change-transform sm:pr-[clamp(0.45rem,1.6vw,1.1rem)]"
+          className="cursor-pointer absolute inset-y-0 right-0 z-20 flex w-1/2 items-center justify-start overflow-hidden bg-paper pl-4 pr-3 will-change-transform sm:pl-8 md:pl-10"
         >
           <motion.span
             style={{ scale: openScale, opacity: wordOpacity }}

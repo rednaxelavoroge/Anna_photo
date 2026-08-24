@@ -34,26 +34,35 @@ export function SplitReveal({ wordLeft, wordRight, children }: SplitRevealProps)
   useEffect(() => {
     if (reduced) return;
     const control = animate(intro, 1, {
-      duration: 2.2,
-      delay: 0.85,
-      ease: [0.22, 1, 0.36, 1],
+      duration: 2.8,
+      delay: 3.2,
+      ease: [0.16, 1, 0.3, 1],
     });
     return () => control.stop();
   }, [intro, reduced]);
 
-  const scrollOpen = useTransform(scrollYProgress, [0.01, 0.45], [0, 1]);
+  const scrollOpen = useTransform(scrollYProgress, [0.01, 0.40], [0, 1]);
   const openAmount = useTransform([intro, scrollOpen], ([shown, scrolled]) =>
     Math.max(Number(shown), Number(scrolled)),
   );
   const leftX = useTransform(openAmount, [0, 1], ["0%", "-102%"]);
   const rightX = useTransform(openAmount, [0, 1], ["0%", "102%"]);
-  const revealOpacity = useTransform(openAmount, [0.08, 0.85], [0, 1]);
-  const revealScale = useTransform(openAmount, [0.08, 1], [0.95, 1]);
+  const revealOpacity = useTransform(openAmount, [0.05, 0.80], [0, 1]);
+  const revealScale = useTransform(openAmount, [0.05, 1], [0.94, 1]);
   const openScale = useTransform(openAmount, (progress) => {
     const remaining = Math.max(0, 1 - 0.95 * progress);
     return Math.min(1, Math.max(0, remaining));
   });
-  const wordOpacity = useTransform(openAmount, [0.65, 0.95], [1, 0]);
+  const wordOpacity = useTransform(openAmount, [0.60, 0.92], [1, 0]);
+  const hintOpacity = useTransform(openAmount, [0, 0.25], [1, 0]);
+
+  const handleOpenClick = () => {
+    if (reduced) return;
+    animate(intro, 1, {
+      duration: 2.0,
+      ease: [0.16, 1, 0.3, 1],
+    });
+  };
 
   useLayoutEffect(() => {
     const leftPane = leftPaneRef.current;
@@ -72,7 +81,7 @@ export function SplitReveal({ wordLeft, wordRight, children }: SplitRevealProps)
         word.style.fontSize = `${probe}px`;
       }
       const widest = Math.max(leftWord.offsetWidth, rightWord.offsetWidth, 1);
-      const next = `${Math.max(13, probe * (avail / widest) * 0.96)}px`;
+      const next = `${Math.max(16, probe * (avail / widest) * 0.96)}px`;
       leftWord.style.fontSize = next;
       rightWord.style.fontSize = next;
     };
@@ -110,8 +119,9 @@ export function SplitReveal({ wordLeft, wordRight, children }: SplitRevealProps)
         <motion.div
           ref={leftPaneRef}
           aria-hidden="true"
+          onClick={handleOpenClick}
           style={{ x: leftX }}
-          className="pointer-events-none absolute inset-y-0 left-0 flex w-1/2 items-center justify-end overflow-hidden border-r border-line bg-paper pr-[0.08em] pl-[0.45rem] will-change-transform sm:pl-[clamp(0.45rem,1.6vw,1.1rem)]"
+          className="cursor-pointer absolute inset-y-0 left-0 z-20 flex w-1/2 items-center justify-end overflow-hidden border-r border-line bg-paper pr-[0.08em] pl-[0.45rem] will-change-transform sm:pl-[clamp(0.45rem,1.6vw,1.1rem)]"
         >
           <motion.span
             style={{ scale: openScale, opacity: wordOpacity }}
@@ -126,8 +136,9 @@ export function SplitReveal({ wordLeft, wordRight, children }: SplitRevealProps)
         <motion.div
           ref={rightPaneRef}
           aria-hidden="true"
+          onClick={handleOpenClick}
           style={{ x: rightX }}
-          className="pointer-events-none absolute inset-y-0 right-0 flex w-1/2 items-center justify-start overflow-hidden bg-paper pl-[0.08em] pr-[0.45rem] will-change-transform sm:pr-[clamp(0.45rem,1.6vw,1.1rem)]"
+          className="cursor-pointer absolute inset-y-0 right-0 z-20 flex w-1/2 items-center justify-start overflow-hidden bg-paper pl-[0.08em] pr-[0.45rem] will-change-transform sm:pr-[clamp(0.45rem,1.6vw,1.1rem)]"
         >
           <motion.span
             style={{ scale: openScale, opacity: wordOpacity }}
@@ -137,6 +148,13 @@ export function SplitReveal({ wordLeft, wordRight, children }: SplitRevealProps)
               {wordRight}
             </span>
           </motion.span>
+        </motion.div>
+
+        <motion.div
+          style={{ opacity: hintOpacity }}
+          className="pointer-events-none absolute inset-x-0 bottom-16 z-30 flex justify-center text-[10px] tracking-[0.24em] uppercase text-muted"
+        >
+          <span>Листайте или нажмите, чтобы открыть</span>
         </motion.div>
       </div>
     </section>

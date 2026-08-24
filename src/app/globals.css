@@ -169,12 +169,12 @@
     overflow: visible;
     white-space: nowrap;
     font-family: var(--font-display);
-    font-weight: 400;
-    line-height: 0.86;
-    letter-spacing: -0.045em;
+    font-weight: 500;
+    line-height: 0.9;
+    letter-spacing: -0.035em;
     color: var(--color-ink);
     user-select: none;
-    font-size: min(11svh, calc((50vw - 2.4rem) / 10.8));
+    font-size: clamp(1.8rem, 11svh, 9vw);
   }
 
   .frame-columns {
@@ -355,23 +355,23 @@
     top: 100%;
     left: 0;
     width: 100%;
-    height: 72%;
+    height: 75%;
     overflow: hidden;
     pointer-events: none;
-    opacity: 0.65;
+    opacity: 0.85;
     -webkit-mask-image: linear-gradient(
       to bottom,
-      rgba(0, 0, 0, 0.88) 0%,
-      rgba(0, 0, 0, 0.52) 30%,
-      rgba(0, 0, 0, 0.18) 65%,
-      transparent 100%
+      rgba(0, 0, 0, 0.95) 0%,
+      rgba(0, 0, 0, 0.70) 25%,
+      rgba(0, 0, 0, 0.35) 60%,
+      rgba(0, 0, 0, 0) 100%
     );
     mask-image: linear-gradient(
       to bottom,
-      rgba(0, 0, 0, 0.88) 0%,
-      rgba(0, 0, 0, 0.52) 30%,
-      rgba(0, 0, 0, 0.18) 65%,
-      transparent 100%
+      rgba(0, 0, 0, 0.95) 0%,
+      rgba(0, 0, 0, 0.70) 25%,
+      rgba(0, 0, 0, 0.35) 60%,
+      rgba(0, 0, 0, 0) 100%
     );
   }
 
@@ -380,9 +380,9 @@
     top: 0;
     left: 0;
     width: 100%;
-    height: calc(100% / 0.72);
+    height: calc(100% / 0.75);
     transform: scaleY(-1);
-    transform-origin: top;
+    transform-origin: 50% 50%;
     background: transparent;
   }
 

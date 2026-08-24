@@ -34,8 +34,8 @@ export function SplitReveal({ wordLeft, wordRight, children }: SplitRevealProps)
   useEffect(() => {
     if (reduced) return;
     const control = animate(intro, 1, {
-      duration: 2.8,
-      delay: 3.2,
+      duration: 4.2,
+      delay: 5.5,
       ease: [0.16, 1, 0.3, 1],
     });
     return () => control.stop();
@@ -59,7 +59,7 @@ export function SplitReveal({ wordLeft, wordRight, children }: SplitRevealProps)
   const handleOpenClick = () => {
     if (reduced) return;
     animate(intro, 1, {
-      duration: 2.0,
+      duration: 2.8,
       ease: [0.16, 1, 0.3, 1],
     });
   };

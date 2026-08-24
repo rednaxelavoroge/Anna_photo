@@ -7,12 +7,12 @@ import { useReducedMotion } from "framer-motion";
 import { useLayoutEffect, useRef, useState } from "react";
 
 /** Core theme `imf.create(..., horizon, size, zoom, border)` */
-const HORIZON = 0.52;
-const SIZE = 0.38;
-const BORDER = 14;
+const HORIZON = 0.45;
+const SIZE = 0.35;
+const BORDER = 18;
 const LERP = 0.12;
 const DRAG_THRESHOLD = 8;
-const AUTO_MS = 3600;
+const AUTO_MS = 4000;
 
 type Slot = {
   loaded: boolean;

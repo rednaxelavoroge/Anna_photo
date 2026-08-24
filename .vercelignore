@@ -1,0 +1,9 @@
+Anna_whatsapp
+.wp-export
+Anna_wordpress_photos
+.verify-shots
+.verify
+.git
+*.log
+.env
+.env*.local

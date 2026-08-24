@@ -1,6 +1,8 @@
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SmoothScroll } from "@/components/SmoothScroll";
+import { ThemeBar } from "@/components/ThemeBar";
+import { ThemeScript } from "@/components/ThemeScript";
 import { getSite } from "@/lib/content";
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
@@ -54,12 +56,15 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: "#F3EFE8",
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ru">
+    <html lang="ru" suppressHydrationWarning>
       <body>
+        <ThemeScript />
         <SmoothScroll />
         <a
           href="#main"
@@ -70,6 +75,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SiteHeader />
         <main id="main">{children}</main>
         <SiteFooter />
+        <ThemeBar />
       </body>
     </html>
   );

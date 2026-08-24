@@ -28,8 +28,8 @@ export default function PhototourPage() {
             <a href={`https://wa.me/${contacts.whatsappDigits}`} className="link-line">
               {phototour.cta}
             </a>
-            <Link href="/portfolio/travel/armenia" className="link-line">
-              Кадры Армении
+            <Link href="/portfolio/travel" className="link-line">
+              Кадры путешествий
             </Link>
           </div>
         </div>

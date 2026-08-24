@@ -1,0 +1,99 @@
+{
+  "items": [
+    {
+      "src": "/photos/_preview/newborn.jpg",
+      "alt": "Фотосессия новорождённых",
+      "categories": ["newborn", "family"]
+    },
+    {
+      "src": "/photos/_preview/newborn-home.jpg",
+      "alt": "Новорождённый дома",
+      "categories": ["newborn", "family"]
+    },
+    {
+      "src": "/photos/_preview/children-babies.jpg",
+      "alt": "Малыш до года",
+      "categories": ["babies", "children", "family"]
+    },
+    {
+      "src": "/photos/_preview/children.jpg",
+      "alt": "Детская фотосессия",
+      "categories": ["children", "family"]
+    },
+    {
+      "src": "/photos/_preview/children-animals.jpg",
+      "alt": "Съёмка с животными",
+      "categories": ["animals", "children"]
+    },
+    {
+      "src": "/photos/_preview/family.jpg",
+      "alt": "Семейная фотосессия",
+      "categories": ["family", "children"]
+    },
+    {
+      "src": "/photos/_preview/individual.jpg",
+      "alt": "Индивидуальный портрет",
+      "categories": ["individual"]
+    },
+    {
+      "src": "/photos/_preview/costumes.jpg",
+      "alt": "Армянский национальный костюм",
+      "categories": ["armenian-costumes", "travel"]
+    },
+    {
+      "src": "/photos/_preview/underwater.jpg",
+      "alt": "Подводная съёмка",
+      "categories": ["underwater"]
+    },
+    {
+      "src": "/photos/_preview/smoke.jpg",
+      "alt": "Дым и краски",
+      "categories": ["smoke-paint"]
+    },
+    {
+      "src": "/photos/_preview/seasonal-newyear.jpg",
+      "alt": "Новогодняя фотосессия",
+      "categories": ["new-year", "children", "family"]
+    },
+    {
+      "src": "/photos/_preview/seasonal-bloom.jpg",
+      "alt": "Фотосессия в цветении",
+      "categories": ["bloom", "family"]
+    },
+    {
+      "src": "/photos/_preview/seasonal.jpg",
+      "alt": "Осенняя фотосессия",
+      "categories": ["autumn", "family"]
+    },
+    {
+      "src": "/photos/_preview/commercial.jpg",
+      "alt": "Интерьер",
+      "categories": ["interiors"]
+    },
+    {
+      "src": "/photos/_preview/watches.jpg",
+      "alt": "Часы",
+      "categories": ["watches", "product"]
+    },
+    {
+      "src": "/photos/_preview/food.jpg",
+      "alt": "Еда",
+      "categories": ["food", "product"]
+    },
+    {
+      "src": "/photos/_preview/reportage.jpg",
+      "alt": "Репортаж",
+      "categories": ["reportage", "family"]
+    },
+    {
+      "src": "/photos/_preview/travel.jpg",
+      "alt": "Путешествия",
+      "categories": ["travel"]
+    },
+    {
+      "src": "/photos/_preview/home-hero.jpg",
+      "alt": "Портрет",
+      "categories": ["individual"]
+    }
+  ]
+}

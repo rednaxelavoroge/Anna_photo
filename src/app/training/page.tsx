@@ -1,12 +1,11 @@
 import { CoverArt } from "@/components/CoverArt";
 import { getSite, getWorkshops } from "@/lib/content";
 import type { Metadata } from "next";
-import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Обучение фотографии — 45 воркшопов",
   description:
-    "Обучение фотографии в Армении: 45 проведённых воркшопов, направления и форматы. Фототур в Армению — отдельно, это не курс.",
+    "Обучение фотографии в Армении: 45 проведённых воркшопов, направления и форматы.",
   keywords: ["обучение фотографии Армения", "воркшоп фотографии Ереван"],
 };
 
@@ -27,7 +26,7 @@ export default function TrainingPage() {
         <CoverArt slug="training" title={training.title} />
       </div>
 
-      <div className="mt-14 grid gap-[var(--frame-gap)] md:grid-cols-3">
+      <div className="mt-14 grid gap-[var(--frame-gap)] md:grid-cols-2">
         {training.formats.map((item) => (
           <div key={item.title} className="bg-snow p-6">
             <h2 className="font-display text-2xl">{item.title}</h2>
@@ -35,12 +34,6 @@ export default function TrainingPage() {
           </div>
         ))}
       </div>
-
-      <p className="mt-8 text-sm">
-        <Link href="/phototour" className="link-line">
-          Фототур в Армению — для гостей, не для учеников →
-        </Link>
-      </p>
 
       <div className="mt-16 grid gap-[var(--frame-gap)] sm:grid-cols-2 lg:grid-cols-3">
         {workshops.map((item) => (

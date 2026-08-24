@@ -1,5 +1,6 @@
 import { getPreviewCover } from "@/lib/preview";
 import Image from "next/image";
+import type { CSSProperties } from "react";
 
 function hash(value: string) {
   return [...value].reduce((sum, char) => sum + char.charCodeAt(0), 0);
@@ -9,15 +10,17 @@ export function CoverArt({
   slug,
   title,
   className = "",
+  style,
 }: {
   slug: string;
   title: string;
   className?: string;
+  style?: CSSProperties;
 }) {
   const src = getPreviewCover(slug);
   if (src) {
     return (
-      <span className={`relative block h-full w-full overflow-hidden bg-void ${className}`}>
+      <span className={`relative block h-full w-full overflow-hidden bg-void ${className}`} style={style}>
         <Image
           src={src}
           alt={title}
@@ -37,7 +40,7 @@ export function CoverArt({
   const c = silvers[(n + 4) % silvers.length];
 
   return (
-    <svg viewBox="0 0 1200 1500" className={`h-full w-full ${className}`} role="img" aria-label={title}>
+    <svg viewBox="0 0 1200 1500" className={`h-full w-full ${className}`} style={style} role="img" aria-label={title}>
       <defs>
         <filter id={`gelatin-${slug}`} x="0" y="0" width="100%" height="100%">
           <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch" result="noise" />

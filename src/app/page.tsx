@@ -4,13 +4,12 @@ import { SplitReveal } from "@/components/SplitReveal";
 import { getCategories, getSite } from "@/lib/content";
 import Link from "next/link";
 
-const HOME_MEET = ["newborn", "children", "family", "armenian-costumes", "travel", "reportage"];
+const HOME_MEET = ["newborn", "babies", "children", "family", "armenian-costumes", "travel"];
 
 export default function HomePage() {
   const site = getSite();
   const categories = getCategories();
   const meeting = categories.filter((item) => HOME_MEET.includes(item.slug));
-  const rest = categories.filter((item) => !HOME_MEET.includes(item.slug));
 
   return (
     <>
@@ -22,18 +21,18 @@ export default function HomePage() {
           <div className="absolute inset-0 bg-gradient-to-t from-ink/55 via-ink/10 to-transparent" />
           <div className="relative max-w-2xl">
             <p className="eyebrow text-snow/75">Фотограф · Ереван</p>
-            <h1 className="mt-5 font-display text-4xl leading-[0.95] md:text-6xl">
+            <h1 className="mt-5 max-w-[18ch] font-display text-[1.55rem] leading-[1.15] text-balance md:max-w-none md:text-5xl md:leading-[1.05]">
               {site.tagline}
             </h1>
-            <p className="mt-6 max-w-lg text-sm leading-relaxed text-snow/80 md:text-base">
+            <p className="mt-6 max-w-lg text-sm leading-relaxed text-pretty text-snow/80 md:text-base">
               {site.intro}
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-6 text-xs tracking-[0.2em] uppercase">
               <Link href="/portfolio" className="link-line">
                 Портфолио
               </Link>
-              <Link href="/phototour" className="link-line">
-                Фототур
+              <Link href="/contacts" className="link-line">
+                Контакты
               </Link>
             </div>
             <p className="mt-6 text-[10px] tracking-[0.18em] text-snow/50 uppercase">
@@ -47,23 +46,16 @@ export default function HomePage() {
 
       <section className="border-t border-line bg-paper px-5 py-20 md:px-8">
         <div className="mx-auto max-w-[1500px]">
-          <p className="eyebrow">Ещё альбомы</p>
-          <div className="mt-10 grid gap-[var(--frame-gap)] sm:grid-cols-2 lg:grid-cols-5">
-            {rest.map((item) => (
-              <Link
-                key={item.slug}
-                href={`/portfolio/${item.slug}`}
-                className="gallery-print group"
-              >
-                <div className="aspect-[4/5] overflow-hidden bg-void">
-                  <div className="tile-zoom h-full">
-                    <CoverArt slug={item.slug} title={item.menu} />
-                  </div>
-                </div>
-                <span className="gallery-print-name">{item.menu}</span>
-              </Link>
-            ))}
-          </div>
+          <p className="eyebrow">Все съёмки</p>
+          <h2 className="mt-4 max-w-2xl font-display text-3xl md:text-5xl">
+            Дальше портфолио идёт длинным списком — без подразделов.
+          </h2>
+          <p className="mt-5 max-w-xl text-sm text-muted md:text-base">
+            Новый год, цветение, осень, животные и ИИ — каждый пункт сам по себе. Одно фото может быть в нескольких лентах.
+          </p>
+          <Link href="/portfolio" className="link-line mt-8 inline-block text-xs tracking-[0.2em] uppercase">
+            Смотреть весь список
+          </Link>
         </div>
       </section>
     </>

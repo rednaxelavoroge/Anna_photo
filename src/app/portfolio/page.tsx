@@ -1,11 +1,13 @@
-import { MeetSections } from "@/components/MeetSection";
+import { PhotoTape } from "@/components/PhotoTape";
+import { PortfolioNav } from "@/components/PortfolioNav";
 import { getCategories } from "@/lib/content";
+import { getLibraryPhotos } from "@/lib/photos";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Портфолио фотографа в Армении",
   description:
-    "Альбомы: новорождённые, дети, семья, travel, национальные костюмы, коммерческая и репортажная съёмка в Армении.",
+    "Плоский список съёмок: новорождённые, малыши, дети, семья, национальные костюмы, животные, сезон, коммерция, travel и ИИ-проекты.",
   keywords: [
     "портфолио фотографа Армения",
     "фотосессия новорождённых в Армении",
@@ -16,19 +18,12 @@ export const metadata: Metadata = {
 
 export default function PortfolioPage() {
   const categories = getCategories();
+  const photos = getLibraryPhotos();
 
   return (
-    <div className="pt-20">
-      <header className="px-5 py-16 md:px-8 md:py-24">
-        <p className="eyebrow">Портфолио</p>
-        <h1 className="mt-4 max-w-3xl font-display text-4xl leading-[0.95] md:text-6xl">
-          Фотосессии в Армении — портфолио Анны Манасарян
-        </h1>
-        <p className="mt-5 max-w-xl text-sm leading-relaxed text-muted md:text-base">
-          Короткие названия в меню — внутри страниц полные SEO-заголовки. Листайте: половины сходятся навстречу.
-        </p>
-      </header>
-      <MeetSections categories={categories} />
+    <div className="tape-page">
+      <PortfolioNav categories={categories} activeSlug="portfolio" />
+      <PhotoTape photos={photos} slug="portfolio" />
     </div>
   );
 }

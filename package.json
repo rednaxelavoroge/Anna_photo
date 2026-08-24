@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "fonts": "node tools/fetch-fonts.mjs"
+    "fonts": "node tools/fetch-fonts.mjs",
+    "wp:media": "node tools/pull-wp-media.mjs"
   },
   "dependencies": {
     "framer-motion": "^11.15.0",

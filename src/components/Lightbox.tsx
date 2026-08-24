@@ -4,6 +4,10 @@ import { CoverArt } from "@/components/CoverArt";
 import type { Photo } from "@/lib/content";
 import { useEffect } from "react";
 
+function isVideo(photo: Photo) {
+  return photo.kind === "video" || Boolean(photo.src && /\.(mp4|webm|mov)$/i.test(photo.src));
+}
+
 export function Lightbox({
   photos,
   index,
@@ -56,14 +60,16 @@ export function Lightbox({
         <button type="button" onClick={onPrev} className="hidden px-4 text-2xl md:block" aria-label="Предыдущий">
           ‹
         </button>
-        <button type="button" onClick={onNext} className="max-h-[80svh] w-full max-w-5xl" aria-label="Следующий кадр">
-          {photo.src ? (
+        <div className="flex max-h-[80svh] w-full max-w-5xl items-center justify-center">
+          {isVideo(photo) && photo.src ? (
+            <video src={photo.src} className="max-h-[80svh] w-auto max-w-full" controls autoPlay playsInline />
+          ) : photo.src ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={photo.src} alt={photo.alt} className="mx-auto max-h-[80svh] w-auto object-contain" />
+            <img src={photo.src} alt={photo.alt} className="max-h-[80svh] w-auto object-contain" />
           ) : (
             <CoverArt slug={`${slug}-${photo.id}`} title={photo.alt} className="mx-auto max-h-[80svh]" />
           )}
-        </button>
+        </div>
         <button type="button" onClick={onNext} className="hidden px-4 text-2xl md:block" aria-label="Следующий">
           ›
         </button>

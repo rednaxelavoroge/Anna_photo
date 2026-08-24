@@ -33,6 +33,7 @@
   html {
     -webkit-text-size-adjust: 100%;
     scroll-behavior: auto;
+    overflow-x: clip;
   }
 
   body {
@@ -41,7 +42,74 @@
     font-family: var(--font-sans);
     font-weight: 400;
     -webkit-font-smoothing: antialiased;
-    overflow-x: hidden;
+    overflow-x: clip;
+    max-width: 100%;
+    padding-bottom: 3.75rem;
+  }
+
+  html[data-theme="beige"] {
+    --color-paper: #f3efe8;
+    --color-snow: #fffcf8;
+    --color-ink: #2c2824;
+    --color-stone: #a39e96;
+    --color-line: #d8d2c8;
+    --color-silver: #c9c4bb;
+    --color-bg: #f3efe8;
+    --color-surface: #fffcf8;
+    --color-muted: #a39e96;
+    --color-ash: #c9c4bb;
+    --color-void: #1a1815;
+  }
+
+  html[data-theme="white"] {
+    --color-paper: #ffffff;
+    --color-snow: #f5f5f5;
+    --color-ink: #1a1a1a;
+    --color-stone: #8a8a8a;
+    --color-line: #e2e2e2;
+    --color-silver: #c8c8c8;
+    --color-bg: #ffffff;
+    --color-surface: #f5f5f5;
+    --color-muted: #6e6e6e;
+    --color-ash: #c8c8c8;
+    --color-void: #111111;
+  }
+
+  html[data-theme="gray"] {
+    --color-paper: #d4d6d9;
+    --color-snow: #e6e8ea;
+    --color-ink: #1c1e21;
+    --color-stone: #6a6f74;
+    --color-line: #b5b8bc;
+    --color-silver: #9aa0a5;
+    --color-bg: #d4d6d9;
+    --color-surface: #e6e8ea;
+    --color-muted: #5c6166;
+    --color-ash: #9aa0a5;
+    --color-void: #2a2d31;
+  }
+
+  html[data-theme="black"] {
+    --color-paper: #000000;
+    --color-snow: #0d0d0d;
+    --color-ink: #f4f4f4;
+    --color-stone: #8a8a8a;
+    --color-line: #2a2a2a;
+    --color-silver: #444444;
+    --color-bg: #000000;
+    --color-surface: #0d0d0d;
+    --color-muted: #9a9a9a;
+    --color-ash: #444444;
+    --color-void: #000000;
+  }
+
+  main,
+  header,
+  article,
+  section,
+  footer {
+    min-width: 0;
+    max-width: 100%;
   }
 
   h1,
@@ -51,6 +119,17 @@
     font-family: var(--font-display);
     font-weight: 400;
     letter-spacing: -0.03em;
+    overflow-wrap: break-word;
+    word-break: normal;
+    hyphens: none;
+  }
+
+  p,
+  li,
+  figcaption {
+    overflow-wrap: break-word;
+    word-break: normal;
+    hyphens: none;
   }
 
   img,
@@ -83,12 +162,19 @@
 }
 
 @layer components {
-  .eyebrow {
-    font-size: 0.625rem;
-    letter-spacing: 0.28em;
-    text-transform: uppercase;
-    color: var(--color-stone);
-    font-weight: 500;
+  .split-word {
+    display: block;
+    width: max-content;
+    max-width: none;
+    overflow: visible;
+    white-space: nowrap;
+    font-family: var(--font-display);
+    font-weight: 400;
+    line-height: 0.86;
+    letter-spacing: -0.045em;
+    color: var(--color-ink);
+    user-select: none;
+    font-size: min(11svh, calc((50vw - 2.4rem) / 10.8));
   }
 
   .frame-columns {
@@ -126,7 +212,7 @@
 
   .gallery-print:hover,
   .gallery-print:focus-visible {
-    background-color: #e8e3da;
+    background-color: color-mix(in srgb, var(--color-snow) 70%, var(--color-line));
     box-shadow: 0 1px 0 color-mix(in srgb, var(--color-silver) 90%, transparent);
   }
 
@@ -179,7 +265,184 @@
 
   /* Full-screen mobile nav — solid paper, never glass/alpha. */
   .mobile-nav-panel {
-    background-color: #f3efe8;
-    color: #2c2824;
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .tape-page {
+    display: flex;
+    height: calc(100svh - 3.75rem);
+    flex-direction: column;
+    overflow: hidden;
+    padding-top: 4.75rem;
+    background: var(--color-paper);
+  }
+
+  .tape-page-nav {
+    flex-shrink: 0;
+    padding: 0.5rem 1.25rem 0.5rem;
+  }
+
+  .portfolio-category-strip {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .image-flow-stage {
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 18rem;
+  }
+
+  .image-flow {
+    --horizon: 0.52;
+    --floor: calc(1 - var(--horizon));
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    user-select: none;
+    touch-action: none;
+    background: var(--color-paper);
+  }
+
+  .image-flow.is-dragging {
+    cursor: grabbing;
+  }
+
+  .image-flow-item {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    z-index: 1;
+    display: none;
+    padding: 0;
+    border: 0;
+    overflow: visible;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .image-flow-item.is-current {
+    cursor: zoom-in;
+  }
+
+  .image-flow-plate {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: var(--color-void);
+  }
+
+  .image-flow-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+    pointer-events: none;
+  }
+
+  .image-flow-reflection {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    height: 72%;
+    overflow: hidden;
+    pointer-events: none;
+    opacity: 0.65;
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.88) 0%,
+      rgba(0, 0, 0, 0.52) 30%,
+      rgba(0, 0, 0, 0.18) 65%,
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.88) 0%,
+      rgba(0, 0, 0, 0.52) 30%,
+      rgba(0, 0, 0, 0.18) 65%,
+      transparent 100%
+    );
+  }
+
+  .image-flow-reflection-inner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: calc(100% / 0.72);
+    transform: scaleY(-1);
+    transform-origin: top;
+    background: transparent;
+  }
+
+  .image-flow-reflection-inner .image-flow-image {
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+  }
+
+  .image-flow-horizon {
+    display: none;
+  }
+
+  .image-flow-scrollbar {
+    position: absolute;
+    left: 10%;
+    right: 10%;
+    bottom: 12px;
+    z-index: 20;
+    height: 16px;
+    pointer-events: none;
+  }
+
+  .image-flow-scrollbar::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 1px;
+    background: var(--color-line);
+  }
+
+  .image-flow-thumb {
+    position: absolute;
+    top: 50%;
+    width: 12px;
+    height: 12px;
+    translate: -50% -50%;
+    background: var(--color-ink);
+  }
+
+  @media (min-width: 768px) {
+    .tape-page {
+      padding-top: 5.5rem;
+    }
+
+    .tape-page-nav {
+      padding-inline: 2rem;
+      padding-bottom: 0.75rem;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .tape-page {
+      padding-top: 4.5rem;
+    }
+
+    .tape-page-nav {
+      padding-inline: 1rem;
+    }
   }
 }

@@ -1,14 +1,9 @@
+import aboutVideos from "@/data/about-videos.json";
+import photoTags from "@/data/photo-tags.json";
 import portfolioData from "@/data/portfolio.json";
 import reviewsData from "@/data/reviews.json";
 import siteData from "@/data/site.json";
 import workshopsData from "@/data/workshops.json";
-
-export type Album = {
-  slug: string;
-  menu: string;
-  title: string;
-  description: string;
-};
 
 export type Category = {
   slug: string;
@@ -16,7 +11,6 @@ export type Category = {
   title: string;
   description: string;
   keywords: string[];
-  albums: Album[];
   cta?: { href: string; label: string };
 };
 
@@ -28,6 +22,18 @@ export type Photo = {
   height: number;
   featured?: boolean;
   year?: number;
+  kind?: "image" | "video";
+};
+
+export type AboutVideo = {
+  id: string;
+  title: string;
+};
+
+export type PhotoTag = {
+  src: string;
+  alt: string;
+  categories: string[];
 };
 
 export function getSite() {
@@ -42,10 +48,6 @@ export function getCategory(slug: string): Category | undefined {
   return getCategories().find((item) => item.slug === slug);
 }
 
-export function getAlbum(categorySlug: string, albumSlug: string): Album | undefined {
-  return getCategory(categorySlug)?.albums.find((item) => item.slug === albumSlug);
-}
-
 export function getReviews() {
   return reviewsData.items;
 }
@@ -54,15 +56,53 @@ export function getWorkshops() {
   return workshopsData.items;
 }
 
-export function getPhotos(categorySlug: string, albumSlug?: string): Photo[] {
-  const seed = `${categorySlug}-${albumSlug ?? "all"}`;
-  return Array.from({ length: albumSlug ? 12 : 16 }, (_, index) => {
+export function getAboutVideos(): AboutVideo[] {
+  const seen = new Set<string>();
+  return (aboutVideos.items as AboutVideo[]).filter((item) => {
+    if (seen.has(item.id)) return false;
+    seen.add(item.id);
+    return true;
+  });
+}
+
+export function getAllTaggedPhotos(): Photo[] {
+  const seen = new Set<string>();
+  const out: Photo[] = [];
+  for (const item of photoTags.items as PhotoTag[]) {
+    if (seen.has(item.src)) continue;
+    seen.add(item.src);
+    out.push({
+      id: item.src,
+      src: item.src,
+      alt: item.alt,
+      width: 1600,
+      height: 1200,
+      featured: out.length === 0,
+    });
+  }
+  return out;
+}
+
+export function getTaggedPhotos(categorySlug: string): Photo[] {
+  return (photoTags.items as PhotoTag[])
+    .filter((item) => item.categories.includes(categorySlug))
+    .map((item, index) => ({
+      id: item.src,
+      src: item.src,
+      alt: item.alt,
+      width: 1600,
+      height: 1200,
+      featured: index === 0,
+    }));
+}
+
+export function getPhotos(categorySlug: string): Photo[] {
+  const seed = `${categorySlug}-tape`;
+  return Array.from({ length: 10 }, (_, index) => {
     const portrait = (index + seed.length) % 3 !== 0;
     return {
       id: `${seed}-${index + 1}`,
-      alt: albumSlug
-        ? `Образец ритма ${index + 1} — ${albumSlug}`
-        : `Образец ритма ${index + 1} — ${categorySlug}`,
+      alt: `Кадр ${index + 1} — ${categorySlug}`,
       width: portrait ? 1200 : 1600,
       height: portrait ? 1600 : 1100,
       featured: index === 0,

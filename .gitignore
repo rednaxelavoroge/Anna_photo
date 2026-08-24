@@ -7,4 +7,8 @@ out
 .env
 .env*.local
 Anna_3
+.wp-export
+Anna_wordpress_photos
+.verify-shots
+.verify
 tsconfig.tsbuildinfo

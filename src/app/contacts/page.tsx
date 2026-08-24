@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Контакты фотографа в Ереване",
   description:
-    "Связаться с Анной Манасарян: WhatsApp, телефон в Армении и России, Instagram. Фотосессии в Ереване.",
+    "Связаться с Анной Манасарян: WhatsApp, телефон в Армении и России, почта, Instagram. Фотосессии в Ереване.",
   keywords: ["фотограф Ереван контакты", "заказать фотосессию в Армении"],
 };
 
@@ -29,6 +29,12 @@ export default function ContactsPage() {
           <p className="eyebrow">Россия</p>
           <a href={`tel:${contacts.phoneRussia.replace(/\s/g, "")}`} className="mt-2 inline-block">
             {contacts.phoneRussia}
+          </a>
+        </li>
+        <li>
+          <p className="eyebrow">Почта</p>
+          <a href={`mailto:${contacts.email}`} className="link-line mt-2 inline-block">
+            {contacts.email}
           </a>
         </li>
         <li>

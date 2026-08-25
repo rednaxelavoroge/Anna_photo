@@ -1,27 +1,26 @@
-export const THEMES = ["beige", "white", "gray", "black"] as const;
+export const THEMES = ["beige", "white", "black"] as const;
 
 export type ThemeId = (typeof THEMES)[number];
 
 export const THEME_LABELS: Record<ThemeId, string> = {
   beige: "Бежевый",
   white: "Белый",
-  gray: "Серый",
   black: "Чёрный",
 };
 
 export const THEME_SWATCHES: Record<ThemeId, string> = {
   beige: "#f3efe8",
   white: "#ffffff",
-  gray: "#d4d6d9",
   black: "#000000",
 };
 
 const LEGACY: Record<string, ThemeId> = {
-  dark: "gray",
+  dark: "beige",
+  gray: "beige",
 };
 
 export function isTheme(value: string | null | undefined): value is ThemeId {
-  return value === "beige" || value === "white" || value === "gray" || value === "black";
+  return value === "beige" || value === "white" || value === "black";
 }
 
 export function resolveTheme(value: string | null | undefined): ThemeId {

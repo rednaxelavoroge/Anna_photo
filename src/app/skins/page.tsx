@@ -10,7 +10,6 @@ export const metadata: Metadata = {
 const NOTES: Record<string, string> = {
   beige: "Тёплая бумага, как сейчас. Мягкий кремовый пол под кадрами.",
   white: "Чистый белый. Галерея без желтизны, максимальный свет.",
-  gray: "Светлый нейтральный серый с вашего кружка. Не коричневый и не тёмный.",
   black: "Чистый чёрный. Модная витрина, максимальный контраст.",
 };
 
@@ -18,11 +17,11 @@ export default function SkinsPage() {
   return (
     <div className="min-h-svh bg-paper px-5 pt-28 pb-24 text-ink md:px-8">
       <p className="eyebrow">Превью для выбора</p>
-      <h1 className="mt-4 max-w-2xl font-display text-3xl md:text-5xl">Четыре фона. Один сайт.</h1>
+      <h1 className="mt-4 max-w-2xl font-display text-3xl md:text-5xl">Три фона. Один сайт.</h1>
       <p className="mt-5 max-w-xl text-sm leading-relaxed text-muted">
         Откройте каждый вариант, полистайте главную и портфолио, потом напишите какой оставить.
       </p>
-      <div className="mt-12 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="mt-12 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {THEMES.map((id) => (
           <Link
             key={id}

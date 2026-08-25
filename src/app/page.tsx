@@ -4,12 +4,9 @@ import { SplitReveal } from "@/components/SplitReveal";
 import { getCategories, getSite } from "@/lib/content";
 import Link from "next/link";
 
-const HOME_MEET = ["newborn", "babies", "children", "family", "armenian-costumes", "travel"];
-
 export default function HomePage() {
   const site = getSite();
   const categories = getCategories();
-  const meeting = categories.filter((item) => HOME_MEET.includes(item.slug));
 
   return (
     <>
@@ -42,22 +39,7 @@ export default function HomePage() {
         </div>
       </SplitReveal>
 
-      <MeetSections categories={meeting} />
-
-      <section className="border-t border-line bg-paper px-5 py-20 md:px-8">
-        <div className="mx-auto max-w-[1500px]">
-          <p className="eyebrow">Все съёмки</p>
-          <h2 className="mt-4 max-w-2xl font-display text-3xl md:text-5xl">
-            Дальше портфолио идёт длинным списком — без подразделов.
-          </h2>
-          <p className="mt-5 max-w-xl text-sm text-muted md:text-base">
-            Новый год, цветение, осень, животные и ИИ — каждый пункт сам по себе. Одно фото может быть в нескольких лентах.
-          </p>
-          <Link href="/portfolio" className="link-line mt-8 inline-block text-xs tracking-[0.2em] uppercase">
-            Смотреть весь список
-          </Link>
-        </div>
-      </section>
+      <MeetSections categories={categories} />
     </>
   );
 }

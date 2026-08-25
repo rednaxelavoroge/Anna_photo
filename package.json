@@ -9,7 +9,8 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "fonts": "node tools/fetch-fonts.mjs",
-    "wp:media": "node tools/pull-wp-media.mjs"
+    "wp:media": "node tools/pull-wp-media.mjs",
+    "export:namecheap": "next build && rm -f annamanasaryan-com.zip && cd out && zip -r ../annamanasaryan-com.zip ."
   },
   "dependencies": {
     "framer-motion": "^11.15.0",

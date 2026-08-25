@@ -1,8 +1,11 @@
 import aboutVideos from "@/data/about-videos.json";
+import backstageData from "@/data/backstage.json";
+import featuredData from "@/data/featured.json";
 import photoTags from "@/data/photo-tags.json";
 import portfolioData from "@/data/portfolio.json";
 import reviewsData from "@/data/reviews.json";
 import siteData from "@/data/site.json";
+import tagsData from "@/data/tags.json";
 import workshopsData from "@/data/workshops.json";
 
 export type Category = {
@@ -34,6 +37,19 @@ export type PhotoTag = {
   src: string;
   alt: string;
   categories: string[];
+  tags?: string[];
+  images?: string[];
+  video?: string;
+};
+
+export type StudioTag = { slug: string; name: string };
+
+export type FeaturedFeed = {
+  visible: boolean;
+  eyebrow: string;
+  title: string;
+  subtitle: string;
+  photoSrcs: string[];
 };
 
 export function getSite() {
@@ -96,6 +112,49 @@ export function getTaggedPhotos(categorySlug: string): Photo[] {
     }));
 }
 
+export function getStudioTags(): StudioTag[] {
+  return (tagsData.items ?? []) as StudioTag[];
+}
+
+export function getFeaturedFeed(): FeaturedFeed {
+  return featuredData as FeaturedFeed;
+}
+
+export function getFeaturedPhotos(): Photo[] {
+  const feed = getFeaturedFeed();
+  if (!feed.visible) return [];
+  const items = photoTags.items as PhotoTag[];
+  const selected = feed.photoSrcs
+    .map((src) => items.find((item) => item.src === src))
+    .filter((item): item is PhotoTag => Boolean(item));
+  const list = selected.length > 0 ? selected : fallbackFeatured(items);
+  return list.map((item, index) => ({
+    id: item.src,
+    src: item.src,
+    alt: item.alt,
+    width: 1600,
+    height: 1200,
+    featured: index === 0,
+  }));
+}
+
+function fallbackFeatured(items: PhotoTag[]): PhotoTag[] {
+  const seen = new Set<string>();
+  const out: PhotoTag[] = [];
+  for (const category of getCategories()) {
+    const hit = items.find((item) => item.categories.includes(category.slug) && !seen.has(item.src));
+    if (hit) {
+      seen.add(hit.src);
+      out.push(hit);
+    }
+  }
+  return out;
+}
+
+export function getBackstageEntries() {
+  return (backstageData.items ?? []) as { src: string; alt: string }[];
+}
+
 export function getPhotos(categorySlug: string): Photo[] {
   const seed = `${categorySlug}-tape`;
   return Array.from({ length: 10 }, (_, index) => {
@@ -112,6 +171,17 @@ export function getPhotos(categorySlug: string): Photo[] {
 }
 
 export function getBackstagePhotos(): Photo[] {
+  const entries = getBackstageEntries();
+  if (entries.length > 0) {
+    return entries.map((item, index) => ({
+      id: item.src,
+      src: item.src,
+      alt: item.alt,
+      width: 1600,
+      height: 1200,
+      featured: index === 0,
+    }));
+  }
   return Array.from({ length: 18 }, (_, index) => ({
     id: `backstage-${index + 1}`,
     alt: `Образец бэкстейджа ${index + 1}`,
@@ -120,3 +190,4 @@ export function getBackstagePhotos(): Photo[] {
     year: 2023 + (index % 3),
   }));
 }
+

@@ -1,4 +1,4 @@
-import { getPhotos as getPlaceholderPhotos, getBackstagePhotos as getPlaceholderBackstage, getTaggedPhotos, getAllTaggedPhotos, type Photo } from "@/lib/content";
+import { getPhotos as getPlaceholderPhotos, getBackstagePhotos as getPlaceholderBackstage, getTaggedPhotos, getAllTaggedPhotos, getBackstageEntries, type Photo } from "@/lib/content";
 import { getPreviewCover } from "@/lib/preview";
 import fs from "node:fs";
 import path from "node:path";
@@ -66,5 +66,16 @@ export function getPhotos(categorySlug: string): Photo[] {
 }
 
 export function getBackstagePhotos(): Photo[] {
+  const fromJson = getBackstageEntries();
+  if (fromJson.length > 0) {
+    return fromJson.map((item, index) => ({
+      id: item.src,
+      src: item.src,
+      alt: item.alt,
+      width: 1600,
+      height: 1200,
+      featured: index === 0,
+    }));
+  }
   return readAlbumDir(["backstage"], "Бэкстейдж") ?? previewAsAlbum("backstage", "Бэкстейдж") ?? getPlaceholderBackstage();
 }

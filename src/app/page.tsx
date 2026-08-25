@@ -1,12 +1,14 @@
 import { CoverArt } from "@/components/CoverArt";
 import { MeetSections } from "@/components/MeetSection";
 import { SplitReveal } from "@/components/SplitReveal";
-import { getCategories, getSite } from "@/lib/content";
+import { getCategories, getFeaturedFeed, getFeaturedPhotos, getSite } from "@/lib/content";
 import Link from "next/link";
 
 export default function HomePage() {
   const site = getSite();
   const categories = getCategories();
+  const feed = getFeaturedFeed();
+  const featured = getFeaturedPhotos();
 
   return (
     <>
@@ -38,6 +40,27 @@ export default function HomePage() {
           </div>
         </div>
       </SplitReveal>
+
+      {feed.visible && featured.length > 0 ? (
+        <section className="border-t border-line bg-paper px-5 py-16 md:px-12">
+          <p className="eyebrow">{feed.eyebrow}</p>
+          <h2 className="mt-3 font-display text-3xl md:text-5xl">{feed.title}</h2>
+          {feed.subtitle ? <p className="mt-4 max-w-xl text-sm text-muted">{feed.subtitle}</p> : null}
+          <div className="mt-10 flex gap-4 overflow-x-auto pb-4">
+            {featured.map((photo) => (
+              <figure key={photo.id} className="w-[min(72vw,280px)] shrink-0">
+                <div className="aspect-[3/4] overflow-hidden bg-void">
+                  {photo.src ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={photo.src} alt={photo.alt} className="h-full w-full object-cover" />
+                  ) : null}
+                </div>
+                <figcaption className="mt-3 text-sm">{photo.alt}</figcaption>
+              </figure>
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       <MeetSections categories={categories} />
     </>

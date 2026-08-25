@@ -1,7 +1,4 @@
-import { SiteFooter } from "@/components/SiteFooter";
-import { SiteHeader } from "@/components/SiteHeader";
-import { SmoothScroll } from "@/components/SmoothScroll";
-import { ThemeBar } from "@/components/ThemeBar";
+import { SiteChrome } from "@/components/SiteChrome";
 import { ThemeScript } from "@/components/ThemeScript";
 import { getSite } from "@/lib/content";
 import type { Metadata, Viewport } from "next";
@@ -65,17 +62,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="ru" suppressHydrationWarning>
       <body>
         <ThemeScript />
-        <SmoothScroll />
-        <a
-          href="#main"
-          className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:bg-surface focus:px-4 focus:py-2"
-        >
-          Перейти к содержимому
-        </a>
-        <SiteHeader />
-        <main id="main">{children}</main>
-        <SiteFooter />
-        <ThemeBar />
+        <SiteChrome>{children}</SiteChrome>
       </body>
     </html>
   );

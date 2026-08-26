@@ -12,10 +12,28 @@ export function generateStaticParams() {
   }));
 }
 
+function targetPath(category: string, album: string) {
+  const to = resolveLegacyAlbum(category, album);
+  if (to) return `/portfolio/${to}`;
+  if (getCategory(category)) return `/portfolio/${category}`;
+  return null;
+}
+
 export default async function AlbumRedirectPage({ params }: { params: Promise<Params> }) {
   const { category, album } = await params;
-  const to = resolveLegacyAlbum(category, album);
-  if (to) redirect(`/portfolio/${to}`);
-  if (getCategory(category)) redirect(`/portfolio/${category}`);
-  notFound();
+  const href = targetPath(category, album);
+  if (!href) notFound();
+
+  // Static HTML export cannot use next/navigation redirect().
+  if (process.env.NAMECHEAP_EXPORT === "1") {
+    const dest = `${href}/`;
+    return (
+      <p className="px-5 py-24 text-sm">
+        <script dangerouslySetInnerHTML={{ __html: `location.replace(${JSON.stringify(dest)});` }} />
+        <a href={dest}>Перейти в раздел</a>
+      </p>
+    );
+  }
+
+  redirect(href);
 }

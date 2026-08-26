@@ -5,7 +5,10 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 const site = getSite();
-const DEMO_URL = "https://annamanasaryan-photo.vercel.app";
+const DEMO_URL =
+  process.env.NAMECHEAP_EXPORT === "1"
+    ? site.domain.replace(/\/$/, "")
+    : "https://annamanasaryan-photo.vercel.app";
 const titleDefault = `${site.owner} — детский и семейный фотограф в Армении`;
 const descriptionDefault =
   "Фотосессия новорождённых, детская и семейная съёмка в Армении. Воркшопы, travel и фототур в Ереван.";

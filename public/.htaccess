@@ -1,2 +1,49 @@
-DirectoryIndex index.html
+# Apache / LiteSpeed on Namecheap. Vercel ignores this file.
+
+DirectoryIndex index.html index.php
 ErrorDocument 404 /404.html
+
+<IfModule LiteSpeed>
+  CacheDisable public /
+</IfModule>
+
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType image/webp "access plus 1 year"
+  ExpiresByType image/jpeg "access plus 1 year"
+  ExpiresByType font/woff2 "access plus 1 year"
+  ExpiresByType text/css "access plus 1 week"
+  ExpiresByType application/javascript "access plus 1 week"
+</IfModule>
+
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css application/javascript image/svg+xml
+</IfModule>
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # Админка на Vercel. 302, чтобы браузер не запоминал навсегда.
+  RewriteRule ^admin(/.*)?$ https://admin.annamanasaryan.com/admin$1 [R=302,L]
+
+  # Старые вложенные адреса WordPress → плоские разделы.
+  RewriteRule ^portfolio/newborn/images-0-1/?$ /portfolio/newborn/ [R=301,L]
+  RewriteRule ^portfolio/newborn/home-discharge/?$ /portfolio/newborn/ [R=301,L]
+  RewriteRule ^portfolio/children/babies-1-12/?$ /portfolio/babies/ [R=301,L]
+  RewriteRule ^portfolio/children/sessions/?$ /portfolio/children/ [R=301,L]
+  RewriteRule ^portfolio/children/animals/?$ /portfolio/animals/ [R=301,L]
+  RewriteRule ^portfolio/seasonal/bloom/?$ /portfolio/bloom/ [R=301,L]
+  RewriteRule ^portfolio/seasonal/new-year/?$ /portfolio/new-year/ [R=301,L]
+  RewriteRule ^portfolio/seasonal/autumn/?$ /portfolio/autumn/ [R=301,L]
+  RewriteRule ^portfolio/travel/armenia/?$ /portfolio/travel/ [R=301,L]
+  RewriteRule ^portfolio/travel/italy/?$ /portfolio/travel/ [R=301,L]
+  RewriteRule ^portfolio/travel/georgia/?$ /portfolio/travel/ [R=301,L]
+  RewriteRule ^portfolio/travel/other/?$ /portfolio/travel/ [R=301,L]
+  RewriteRule ^portfolio/commercial/interiors/?$ /portfolio/interiors/ [R=301,L]
+  RewriteRule ^portfolio/commercial/food/?$ /portfolio/food/ [R=301,L]
+  RewriteRule ^portfolio/commercial/watches/?$ /portfolio/watches/ [R=301,L]
+  RewriteRule ^portfolio/commercial/product/?$ /portfolio/product/ [R=301,L]
+  RewriteRule ^portfolio/seasonal/?$ /portfolio/new-year/ [R=301,L]
+  RewriteRule ^portfolio/commercial/?$ /portfolio/interiors/ [R=301,L]
+</IfModule>

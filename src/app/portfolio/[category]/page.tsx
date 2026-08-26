@@ -30,7 +30,7 @@ export async function generateMetadata({
 export default async function CategoryPage({ params }: { params: Promise<Params> }) {
   const { category: slug } = await params;
   const legacy = LEGACY_CATEGORY_REDIRECTS.find((item) => item.from === slug);
-  if (legacy) redirect(`/portfolio/${legacy.to}`);
+  if (legacy && process.env.NAMECHEAP_EXPORT !== "1") redirect(`/portfolio/${legacy.to}`);
 
   const category = getCategory(slug);
   if (!category) notFound();

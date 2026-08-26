@@ -18,21 +18,24 @@ const nextConfig: NextConfig = {
         deviceSizes: [375, 640, 828, 1080, 1200, 1600],
         imageSizes: [96, 160, 256, 384],
       },
-  async redirects() {
-    if (isExport) return [];
-    return [
-      ...LEGACY_CATEGORY_REDIRECTS.map((item) => ({
-        source: `/portfolio/${item.from}`,
-        destination: `/portfolio/${item.to}`,
-        permanent: true,
-      })),
-      ...LEGACY_ALBUM_REDIRECTS.map((item) => ({
-        source: `/portfolio/${item.category}/${item.album}`,
-        destination: `/portfolio/${item.to}`,
-        permanent: true,
-      })),
-    ];
-  },
+  ...(isExport
+    ? {}
+    : {
+        async redirects() {
+          return [
+            ...LEGACY_CATEGORY_REDIRECTS.map((item) => ({
+              source: `/portfolio/${item.from}`,
+              destination: `/portfolio/${item.to}`,
+              permanent: true,
+            })),
+            ...LEGACY_ALBUM_REDIRECTS.map((item) => ({
+              source: `/portfolio/${item.category}/${item.album}`,
+              destination: `/portfolio/${item.to}`,
+              permanent: true,
+            })),
+          ];
+        },
+      }),
 };
 
 export default nextConfig;

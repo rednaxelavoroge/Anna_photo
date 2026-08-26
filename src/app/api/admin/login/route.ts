@@ -1,8 +1,13 @@
 import { ADMIN_COOKIE, adminPassword, isAdmin, sessionToken } from "@/lib/admin-auth";
 import { NextResponse } from "next/server";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
-  return NextResponse.json({ authenticated: await isAdmin() });
+  return NextResponse.json(
+    { authenticated: await isAdmin() },
+    { headers: { "Cache-Control": "no-store" } },
+  );
 }
 
 export async function POST(request: Request) {

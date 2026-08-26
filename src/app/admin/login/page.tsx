@@ -19,13 +19,14 @@ export default function AdminLoginPage() {
         className="mt-10"
         onSubmit={async (event) => {
           event.preventDefault();
+          const formPassword = String(new FormData(event.currentTarget).get("password") || password);
           setBusy(true);
           setError("");
           try {
             const res = await fetch("/api/admin/login", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ password }),
+              body: JSON.stringify({ password: formPassword }),
             });
             const json = (await res.json()) as { error?: string };
             if (!res.ok) throw new Error(json.error || "Неверный пароль");
@@ -41,6 +42,7 @@ export default function AdminLoginPage() {
         <label className="block text-[10px] tracking-[0.2em] text-muted uppercase">Пароль</label>
         <input
           type="password"
+          name="password"
           value={password}
           onChange={(event) => setPassword(event.target.value)}
           className="mt-2 w-full border border-line bg-surface px-3 py-3"

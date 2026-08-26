@@ -1,3 +1,9 @@
+import backstageFile from "@/data/backstage.json";
+import featuredFile from "@/data/featured.json";
+import photosFile from "@/data/photo-tags.json";
+import portfolioFile from "@/data/portfolio.json";
+import siteFile from "@/data/site.json";
+import tagsFile from "@/data/tags.json";
 import type { Category } from "@/lib/content";
 import { slugifyRu } from "@/lib/slugify";
 import fs from "node:fs/promises";
@@ -47,7 +53,7 @@ function githubRepo() {
 }
 
 function githubBranch() {
-  return process.env.GITHUB_BRANCH || process.env.VERCEL_GIT_COMMIT_REF || "main";
+  return process.env.GITHUB_BRANCH || process.env.VERCEL_GIT_COMMIT_REF || "cursor/namecheap-static-f40b";
 }
 
 function githubHeaders() {
@@ -70,9 +76,30 @@ async function readGithub(rel: string) {
   return Buffer.from(json.content.replace(/\n/g, ""), "base64").toString("utf8");
 }
 
+const BUNDLED: Record<string, string> = {
+  [FILES.portfolio]: JSON.stringify(portfolioFile),
+  [FILES.tags]: JSON.stringify(tagsFile),
+  [FILES.photos]: JSON.stringify(photosFile),
+  [FILES.featured]: JSON.stringify(featuredFile),
+  [FILES.site]: JSON.stringify(siteFile),
+  [FILES.backstage]: JSON.stringify(backstageFile),
+};
+
 async function readText(rel: string) {
-  if (process.env.GITHUB_TOKEN) return readGithub(rel);
-  return readLocal(rel);
+  if (process.env.GITHUB_TOKEN) {
+    try {
+      return await readGithub(rel);
+    } catch {
+      // fall through to local / bundle so the panel still opens
+    }
+  }
+  try {
+    return await readLocal(rel);
+  } catch {
+    const bundled = BUNDLED[rel];
+    if (bundled) return bundled;
+    throw new Error(`Нет файла ${rel}`);
+  }
 }
 
 export async function loadStudio(): Promise<StudioState> {
@@ -184,15 +211,30 @@ export async function saveStudio(state: StudioState, message = "Обновлен
       content: Buffer.from(`${JSON.stringify({ items: state.backstage }, null, 2)}\n`),
     },
   ];
-  if (process.env.GITHUB_TOKEN) await writeGithub(files, message);
-  else await writeLocal(files);
+  if (process.env.GITHUB_TOKEN) {
+    await writeGithub(files, message);
+    return;
+  }
+  if (process.env.VERCEL) {
+    throw new Error(
+      "На Vercel задайте GITHUB_TOKEN (право repo), GITHUB_REPO=rednaxelavoroge/Anna_photo и GITHUB_BRANCH — иначе сохранения не попадут в GitHub",
+    );
+  }
+  await writeLocal(files);
 }
 
 export async function saveUpload(filename: string, data: Buffer) {
   const safe = filename.replace(/[^a-zA-Z0-9._-]/g, "-");
   const rel = `public/photos/uploads/${Date.now()}-${safe}`;
-  if (process.env.GITHUB_TOKEN) await writeGithub([{ path: rel, content: data }], `Фото: ${safe}`);
-  else await writeLocal([{ path: rel, content: data }]);
+  if (process.env.GITHUB_TOKEN) {
+    await writeGithub([{ path: rel, content: data }], `Фото: ${safe}`);
+  } else if (process.env.VERCEL) {
+    throw new Error(
+      "На Vercel задайте GITHUB_TOKEN (право repo) — иначе загруженные фото не сохранятся в GitHub",
+    );
+  } else {
+    await writeLocal([{ path: rel, content: data }]);
+  }
   return `/${rel.replace(/^public\//, "")}`;
 }
 

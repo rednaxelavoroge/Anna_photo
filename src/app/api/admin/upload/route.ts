@@ -2,6 +2,8 @@ import { isAdmin } from "@/lib/admin-auth";
 import { saveUpload } from "@/lib/admin-store";
 import { NextResponse } from "next/server";
 
+export const dynamic = "force-dynamic";
+
 export async function POST(request: Request) {
   if (!(await isAdmin())) return NextResponse.json({ error: "Нужен вход" }, { status: 401 });
   const body = (await request.json().catch(() => null)) as { dataUrl?: string; filename?: string } | null;

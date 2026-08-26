@@ -8,6 +8,9 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   ...(isExport ? { output: "export" as const, trailingSlash: true } : {}),
   outputFileTracingRoot: path.join(__dirname),
+  outputFileTracingIncludes: {
+    "/api/admin/**/*": ["./src/data/**/*.json"],
+  },
   images: isExport
     ? { unoptimized: true }
     : {

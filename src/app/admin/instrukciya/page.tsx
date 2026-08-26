@@ -40,7 +40,8 @@ export default function AdminGuidePage() {
         <p className="eyebrow">Глава 01</p>
         <h2 className="mt-2 font-display text-3xl">Как войти в панель</h2>
         <ol className="mt-6 list-decimal space-y-2 pl-5 text-sm">
-          <li>Откройте адрес admin.annamanasaryan.com</li>
+          <li>Откройте admin.annamanasaryan.com — откроется вход, или сразу кабинет, если вы уже внутри</li>
+          <li>Если просит пароль, адрес входа: admin.annamanasaryan.com/admin/login</li>
           <li>Введите пароль в поле Пароль</li>
           <li>Нажмите Войти в кабинет →</li>
         </ol>

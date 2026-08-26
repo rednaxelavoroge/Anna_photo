@@ -68,6 +68,7 @@ export function AdminPanel() {
   const router = useRouter();
   const [tab, setTab] = useState<Tab>("photos");
   const [state, setState] = useState<StudioState | null>(null);
+  const [loadError, setLoadError] = useState("");
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState("");
   const [query, setQuery] = useState("");
@@ -78,20 +79,36 @@ export function AdminPanel() {
   const [tagCreate, setTagCreate] = useState("");
 
   useEffect(() => {
+    let cancelled = false;
     void (async () => {
-      const auth = await fetch("/api/admin/login");
-      const json = (await auth.json()) as { authenticated?: boolean };
-      if (!json.authenticated) {
-        router.push("/admin/login");
-        return;
+      try {
+        const auth = await fetch("/api/admin/login", { cache: "no-store" });
+        const json = (await auth.json()) as { authenticated?: boolean };
+        if (!json.authenticated) {
+          router.replace("/admin/login");
+          if (!cancelled) setLoadError("Нужен вход в панель");
+          return;
+        }
+        const res = await fetch("/api/admin/state", { cache: "no-store" });
+        const payload = (await res.json().catch(() => null)) as StudioState | { error?: string } | null;
+        if (!res.ok) {
+          const message =
+            payload && typeof payload === "object" && "error" in payload && payload.error
+              ? payload.error
+              : `Не удалось загрузить данные (${res.status})`;
+          if (!cancelled) setLoadError(message);
+          return;
+        }
+        if (!cancelled) setState(payload as StudioState);
+      } catch (error) {
+        if (!cancelled) {
+          setLoadError(error instanceof Error ? error.message : "Ошибка сети при загрузке панели");
+        }
       }
-      const res = await fetch("/api/admin/state");
-      if (!res.ok) {
-        setNote("Не удалось загрузить данные");
-        return;
-      }
-      setState((await res.json()) as StudioState);
     })();
+    return () => {
+      cancelled = true;
+    };
   }, [router]);
 
   const photosInSection = useMemo(() => {
@@ -141,6 +158,27 @@ export function AdminPanel() {
   }
 
   if (!state) {
+    if (loadError) {
+      return (
+        <div className="mx-auto max-w-md px-5 py-24">
+          <p className="eyebrow">Панель управления</p>
+          <h1 className="mt-4 font-display text-3xl">Не удалось открыть кабинет</h1>
+          <p className="mt-4 text-sm text-muted">{loadError}</p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <button
+              type="button"
+              className="rounded-full bg-ink px-4 py-2 text-xs text-snow uppercase"
+              onClick={() => window.location.reload()}
+            >
+              Повторить
+            </button>
+            <Link href="/admin/login" className="rounded-full border border-line px-4 py-2 text-xs uppercase">
+              Перейти ко входу
+            </Link>
+          </div>
+        </div>
+      );
+    }
     return <p className="px-5 py-24 text-sm text-muted">Загрузка панели управления…</p>;
   }
 
@@ -764,9 +802,13 @@ function PhotoEditor({
           accept="image/*"
           multiple
           onChange={async (event) => {
-            const srcs = await onUpload(event.target.files);
-            const next = [...images, ...srcs];
-            setDraft({ ...draft, images: next, src: next[0] ?? "" });
+            try {
+              const srcs = await onUpload(event.target.files);
+              const next = [...images, ...srcs];
+              setDraft({ ...draft, images: next, src: next[0] ?? "" });
+            } catch (error) {
+              window.alert(error instanceof Error ? error.message : "Ошибка загрузки фото");
+            }
             event.target.value = "";
           }}
         />

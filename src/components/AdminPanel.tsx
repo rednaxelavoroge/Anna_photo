@@ -91,6 +91,7 @@ export function AdminPanel() {
   const [tagCreate, setTagCreate] = useState("");
   const [categoryDraft, setCategoryDraft] = useState<Category | null>(null);
   const [backstageCaption, setBackstageCaption] = useState("");
+  const [backstagePending, setBackstagePending] = useState<string[]>([]);
   const [featuredSearch, setFeaturedSearch] = useState("");
 
   useEffect(() => {
@@ -415,7 +416,7 @@ export function AdminPanel() {
       {tab === "tags" ? (
         <section className="mt-8">
           <p className="max-w-xl text-sm text-muted">
-            Подраздел появляется в каталоге, когда метку получает хотя бы один кадр. Стрелки сразу сохраняют порядок.
+            Подраздел появляется в портфолио, когда метку получает хотя бы один кадр. Стрелки сразу сохраняют порядок.
           </p>
           <div className="mt-6 flex flex-wrap gap-2">
             <input value={tagDraft} onChange={(event) => setTagDraft(event.target.value)} placeholder="Новый подраздел" className="border border-line px-3 py-2" />
@@ -519,14 +520,9 @@ export function AdminPanel() {
                   accept="image/*"
                   multiple
                   onChange={async (event) => {
-                    const caption = backstageCaption.trim() || "Бэкстейдж";
                     try {
                       const srcs = await uploadFiles(event.target.files);
-                      persist({
-                        ...state,
-                        backstage: [...state.backstage, ...srcs.map((src) => ({ src, alt: caption }))],
-                      });
-                      setBackstageCaption("");
+                      setBackstagePending((prev) => [...prev, ...srcs]);
                     } catch (error) {
                       setNote(error instanceof Error ? error.message : "Ошибка загрузки");
                     }
@@ -534,7 +530,26 @@ export function AdminPanel() {
                   }}
                 />
               </label>
+              <button
+                type="button"
+                disabled={busy || !backstagePending.length}
+                className="rounded-full bg-ink px-5 py-2 text-xs text-snow uppercase disabled:opacity-40"
+                onClick={() => {
+                  const caption = backstageCaption.trim() || "Бэкстейдж";
+                  persist({
+                    ...state,
+                    backstage: [...state.backstage, ...backstagePending.map((src) => ({ src, alt: caption }))],
+                  });
+                  setBackstageCaption("");
+                  setBackstagePending([]);
+                }}
+              >
+                Опубликовать
+              </button>
             </div>
+            {backstagePending.length ? (
+              <p className="mt-3 text-xs text-muted">Выбрано кадров: {backstagePending.length}. Нажмите «Опубликовать», чтобы они встали в ленту.</p>
+            ) : null}
           </div>
           <p className="mt-6 text-sm text-muted">
             Порядок кадров здесь — это порядок на странице «Бэкстейдж». Стрелки ↑ ↓ сразу сохраняют.

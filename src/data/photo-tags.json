@@ -3,97 +3,226 @@
     {
       "src": "/photos/_preview/newborn.jpg",
       "alt": "Фотосессия новорождённых",
-      "categories": ["newborn", "family"]
+      "categories": [
+        "newborn",
+        "family"
+      ],
+      "tags": [],
+      "images": [
+        "/photos/_preview/newborn.jpg"
+      ]
     },
     {
       "src": "/photos/_preview/newborn-home.jpg",
       "alt": "Новорождённый дома",
-      "categories": ["newborn", "family"]
+      "categories": [
+        "newborn",
+        "family"
+      ],
+      "tags": [],
+      "images": [
+        "/photos/_preview/newborn-home.jpg"
+      ]
     },
     {
       "src": "/photos/_preview/children-babies.jpg",
       "alt": "Малыш до года",
-      "categories": ["babies", "children", "family"]
+      "categories": [
+        "babies",
+        "children",
+        "family"
+      ],
+      "tags": [],
+      "images": [
+        "/photos/_preview/children-babies.jpg"
+      ]
     },
     {
       "src": "/photos/_preview/children.jpg",
       "alt": "Детская фотосессия",
-      "categories": ["children", "family"]
+      "categories": [
+        "children",
+        "family"
+      ],
+      "tags": [],
+      "images": [
+        "/photos/_preview/children.jpg"
+      ]
     },
     {
       "src": "/photos/_preview/children-animals.jpg",
       "alt": "Съёмка с животными",
-      "categories": ["animals", "children"]
+      "categories": [
+        "animals",
+        "children"
+      ],
+      "tags": [],
+      "images": [
+        "/photos/_preview/children-animals.jpg"
+      ]
     },
     {
       "src": "/photos/_preview/family.jpg",
       "alt": "Семейная фотосессия",
-      "categories": ["family", "children"]
+      "categories": [
+        "family",
+        "children"
+      ],
+      "tags": [],
+      "images": [
+        "/photos/_preview/family.jpg"
+      ]
     },
     {
       "src": "/photos/_preview/individual.jpg",
       "alt": "Индивидуальный портрет",
-      "categories": ["individual"]
+      "categories": [
+        "individual"
+      ],
+      "tags": [],
+      "images": [
+        "/photos/_preview/individual.jpg"
+      ]
     },
     {
       "src": "/photos/_preview/costumes.jpg",
       "alt": "Армянский национальный костюм",
-      "categories": ["armenian-costumes", "travel"]
+      "categories": [
+        "armenian-costumes",
+        "travel"
+      ],
+      "tags": [],
+      "images": [
+        "/photos/_preview/costumes.jpg"
+      ]
     },
     {
       "src": "/photos/_preview/underwater.jpg",
       "alt": "Подводная съёмка",
-      "categories": ["underwater"]
+      "categories": [
+        "underwater"
+      ],
+      "tags": [],
+      "images": [
+        "/photos/_preview/underwater.jpg"
+      ]
     },
     {
       "src": "/photos/_preview/smoke.jpg",
       "alt": "Дым и краски",
-      "categories": ["smoke-paint"]
+      "categories": [
+        "smoke-paint"
+      ],
+      "tags": [],
+      "images": [
+        "/photos/_preview/smoke.jpg"
+      ]
     },
     {
       "src": "/photos/_preview/seasonal-newyear.jpg",
       "alt": "Новогодняя фотосессия",
-      "categories": ["new-year", "children", "family"]
+      "categories": [
+        "new-year",
+        "children",
+        "family"
+      ],
+      "tags": [],
+      "images": [
+        "/photos/_preview/seasonal-newyear.jpg"
+      ]
     },
     {
       "src": "/photos/_preview/seasonal-bloom.jpg",
       "alt": "Фотосессия в цветении",
-      "categories": ["bloom", "family"]
+      "categories": [
+        "bloom",
+        "family"
+      ],
+      "tags": [],
+      "images": [
+        "/photos/_preview/seasonal-bloom.jpg"
+      ]
     },
     {
       "src": "/photos/_preview/seasonal.jpg",
       "alt": "Осенняя фотосессия",
-      "categories": ["autumn", "family"]
+      "categories": [
+        "autumn",
+        "family"
+      ],
+      "tags": [],
+      "images": [
+        "/photos/_preview/seasonal.jpg"
+      ]
     },
     {
       "src": "/photos/_preview/commercial.jpg",
       "alt": "Интерьер",
-      "categories": ["interiors"]
+      "categories": [
+        "interiors"
+      ],
+      "tags": [],
+      "images": [
+        "/photos/_preview/commercial.jpg"
+      ]
     },
     {
       "src": "/photos/_preview/watches.jpg",
       "alt": "Часы",
-      "categories": ["watches", "product"]
+      "categories": [
+        "watches",
+        "product"
+      ],
+      "tags": [],
+      "images": [
+        "/photos/_preview/watches.jpg"
+      ]
     },
     {
       "src": "/photos/_preview/food.jpg",
       "alt": "Еда",
-      "categories": ["food", "product"]
+      "categories": [
+        "food",
+        "product"
+      ],
+      "tags": [],
+      "images": [
+        "/photos/_preview/food.jpg"
+      ]
     },
     {
       "src": "/photos/_preview/reportage.jpg",
       "alt": "Репортаж",
-      "categories": ["reportage", "family"]
+      "categories": [
+        "reportage",
+        "family"
+      ],
+      "tags": [],
+      "images": [
+        "/photos/_preview/reportage.jpg"
+      ]
     },
     {
       "src": "/photos/_preview/travel.jpg",
       "alt": "Путешествия",
-      "categories": ["travel"]
+      "categories": [
+        "travel"
+      ],
+      "tags": [],
+      "images": [
+        "/photos/_preview/travel.jpg"
+      ]
     },
     {
       "src": "/photos/_preview/home-hero.jpg",
       "alt": "Портрет",
-      "categories": ["individual"]
+      "categories": [
+        "individual"
+      ],
+      "tags": [],
+      "images": [
+        "/photos/_preview/home-hero.jpg"
+      ]
     }
   ]
 }

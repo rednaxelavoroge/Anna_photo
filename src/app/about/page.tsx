@@ -11,7 +11,8 @@ export const metadata: Metadata = {
 };
 
 export default function AboutPage() {
-  const { about } = getSite();
+  const site = getSite();
+  const { about } = site;
   const videos = getAboutVideos();
 
   return (
@@ -21,7 +22,7 @@ export default function AboutPage() {
         {about.title}
       </h1>
       <div className="relative mt-10 aspect-[3/4] max-w-md overflow-hidden bg-void">
-        <CoverArt slug="home-hero" title={about.title} />
+        <CoverArt slug="home-hero" title={about.title} src={site.portrait} />
       </div>
       <p className="mt-8 max-w-2xl text-lg leading-relaxed">{about.lead}</p>
       <div className="mt-10 max-w-2xl space-y-5 text-sm leading-relaxed text-muted md:text-base">

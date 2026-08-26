@@ -15,7 +15,7 @@ export default function HomePage() {
       <SplitReveal wordLeft="АННА" wordRight="МАНАСАРЯН">
         <div className="relative flex min-h-svh flex-col justify-end bg-paper px-5 pb-16 text-snow md:px-12 md:pb-24">
           <div className="absolute inset-0">
-            <CoverArt slug="home-hero" title={site.owner} />
+            <CoverArt slug="home-hero" title={site.owner} src={site.portrait} />
           </div>
           <div className="absolute inset-0 bg-gradient-to-t from-ink/55 via-ink/10 to-transparent" />
           <div className="relative max-w-2xl">

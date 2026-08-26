@@ -24,8 +24,15 @@ export async function PUT(request: Request) {
   if (!body?.categories || !body.photos || !body.featured || !body.site) {
     return json({ error: "Неполные данные" }, 400);
   }
+  const state: StudioState = {
+    ...body,
+    aboutVideos: body.aboutVideos ?? [],
+    reviews: body.reviews ?? [],
+    workshops: body.workshops ?? [],
+    backstage: body.backstage ?? [],
+  };
   try {
-    await saveStudio(body);
+    await saveStudio(state);
     return json({ ok: true });
   } catch (error) {
     return json({ error: error instanceof Error ? error.message : "Не удалось сохранить" }, 500);

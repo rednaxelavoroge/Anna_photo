@@ -14,6 +14,7 @@ export type Category = {
   title: string;
   description: string;
   keywords: string[];
+  cover?: string;
   cta?: { href: string; label: string };
 };
 
@@ -52,8 +53,42 @@ export type FeaturedFeed = {
   photoSrcs: string[];
 };
 
+export type Review = { id: string; name: string; role: string; text: string };
+
+export type Workshop = { id: string; n: number; title: string; place: string; year: number };
+
+export type SiteContacts = {
+  whatsapp: string;
+  whatsappDigits: string;
+  phone: string;
+  phoneRussia: string;
+  instagram: string;
+  facebook?: string;
+  email: string;
+  city: string;
+};
+
+export type SiteData = {
+  owner: string;
+  brand: string;
+  domain: string;
+  tagline: string;
+  intro: string;
+  portrait?: string;
+  about: { eyebrow: string; title: string; lead: string; body: string[]; note: string };
+  training: {
+    eyebrow: string;
+    title: string;
+    stat: string;
+    lead: string;
+    formats: { title: string; text: string }[];
+  };
+  phototour: { eyebrow: string; title: string; lead: string; cta: string };
+  contacts: SiteContacts;
+};
+
 export function getSite() {
-  return siteData;
+  return siteData as SiteData;
 }
 
 export function getCategories(): Category[] {
@@ -64,12 +99,12 @@ export function getCategory(slug: string): Category | undefined {
   return getCategories().find((item) => item.slug === slug);
 }
 
-export function getReviews() {
-  return reviewsData.items;
+export function getReviews(): Review[] {
+  return reviewsData.items as Review[];
 }
 
-export function getWorkshops() {
-  return workshopsData.items;
+export function getWorkshops(): Workshop[] {
+  return workshopsData.items as Workshop[];
 }
 
 export function getAboutVideos(): AboutVideo[] {

@@ -48,6 +48,14 @@ export default function ContactsPage() {
             @{contacts.instagram}
           </a>
         </li>
+        {contacts.facebook ? (
+          <li>
+            <p className="eyebrow">Facebook</p>
+            <a href={contacts.facebook} target="_blank" rel="noreferrer" className="link-line mt-2 inline-block">
+              Facebook
+            </a>
+          </li>
+        ) : null}
       </ul>
     </article>
   );

@@ -50,7 +50,7 @@ function MeetSection({
       aria-label={`Открыть ${category.menu}`}
     >
       <div className="tile-zoom absolute inset-0">
-        <CoverArt slug={category.slug} title={category.menu} />
+        <CoverArt slug={category.slug} title={category.menu} src={category.cover} />
       </div>
       <div className="absolute inset-0 flex items-end p-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100 md:p-8">
         <span className="text-xs tracking-[0.22em] text-snow uppercase">Открыть →</span>

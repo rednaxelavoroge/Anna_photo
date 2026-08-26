@@ -1,10 +1,13 @@
+import aboutVideosFile from "@/data/about-videos.json";
 import backstageFile from "@/data/backstage.json";
 import featuredFile from "@/data/featured.json";
 import photosFile from "@/data/photo-tags.json";
 import portfolioFile from "@/data/portfolio.json";
+import reviewsFile from "@/data/reviews.json";
 import siteFile from "@/data/site.json";
 import tagsFile from "@/data/tags.json";
-import type { Category } from "@/lib/content";
+import workshopsFile from "@/data/workshops.json";
+import type { AboutVideo, Category, Review, SiteData, Workshop } from "@/lib/content";
 import { slugifyRu } from "@/lib/slugify";
 import fs from "node:fs/promises";
 import path from "node:path";
@@ -35,8 +38,11 @@ export type StudioState = {
   tags: Tag[];
   photos: PhotoItem[];
   featured: Featured;
-  site: unknown;
+  site: SiteData;
   backstage: BackstageItem[];
+  aboutVideos: AboutVideo[];
+  reviews: Review[];
+  workshops: Workshop[];
 };
 
 const FILES = {
@@ -46,6 +52,9 @@ const FILES = {
   featured: "src/data/featured.json",
   site: "src/data/site.json",
   backstage: "src/data/backstage.json",
+  aboutVideos: "src/data/about-videos.json",
+  reviews: "src/data/reviews.json",
+  workshops: "src/data/workshops.json",
 };
 
 function githubRepo() {
@@ -83,6 +92,9 @@ const BUNDLED: Record<string, string> = {
   [FILES.featured]: JSON.stringify(featuredFile),
   [FILES.site]: JSON.stringify(siteFile),
   [FILES.backstage]: JSON.stringify(backstageFile),
+  [FILES.aboutVideos]: JSON.stringify(aboutVideosFile),
+  [FILES.reviews]: JSON.stringify(reviewsFile),
+  [FILES.workshops]: JSON.stringify(workshopsFile),
 };
 
 async function readText(rel: string) {
@@ -103,20 +115,27 @@ async function readText(rel: string) {
 }
 
 export async function loadStudio(): Promise<StudioState> {
-  const [portfolioRaw, tagsRaw, photosRaw, featuredRaw, siteRaw, backstageRaw] = await Promise.all([
-    readText(FILES.portfolio),
-    readText(FILES.tags),
-    readText(FILES.photos),
-    readText(FILES.featured),
-    readText(FILES.site),
-    readText(FILES.backstage),
-  ]);
+  const [portfolioRaw, tagsRaw, photosRaw, featuredRaw, siteRaw, backstageRaw, videosRaw, reviewsRaw, workshopsRaw] =
+    await Promise.all([
+      readText(FILES.portfolio),
+      readText(FILES.tags),
+      readText(FILES.photos),
+      readText(FILES.featured),
+      readText(FILES.site),
+      readText(FILES.backstage),
+      readText(FILES.aboutVideos).catch(() => JSON.stringify({ items: [] })),
+      readText(FILES.reviews).catch(() => JSON.stringify({ items: [] })),
+      readText(FILES.workshops).catch(() => JSON.stringify({ items: [] })),
+    ]);
   const portfolio = JSON.parse(portfolioRaw) as { categories: Category[] };
   const tags = JSON.parse(tagsRaw) as { items: Tag[] };
   const photos = JSON.parse(photosRaw) as { items: PhotoItem[] };
   const featured = JSON.parse(featuredRaw) as Featured;
-  const site = JSON.parse(siteRaw);
+  const site = JSON.parse(siteRaw) as SiteData;
   const backstage = JSON.parse(backstageRaw) as { items: BackstageItem[] };
+  const videos = JSON.parse(videosRaw) as { items: AboutVideo[] };
+  const reviews = JSON.parse(reviewsRaw) as { items: Review[] };
+  const workshops = JSON.parse(workshopsRaw) as { items: Workshop[] };
   return {
     categories: portfolio.categories,
     tags: tags.items ?? [],
@@ -126,8 +145,15 @@ export async function loadStudio(): Promise<StudioState> {
       images: item.images?.length ? item.images : [item.src],
     })),
     featured,
-    site,
+    site: {
+      ...site,
+      contacts: { facebook: "", ...site.contacts },
+      portrait: site.portrait ?? "",
+    },
     backstage: backstage.items ?? [],
+    aboutVideos: videos.items ?? [],
+    reviews: reviews.items ?? [],
+    workshops: workshops.items ?? [],
   };
 }
 
@@ -209,6 +235,18 @@ export async function saveStudio(state: StudioState, message = "Обновлен
     {
       path: FILES.backstage,
       content: Buffer.from(`${JSON.stringify({ items: state.backstage }, null, 2)}\n`),
+    },
+    {
+      path: FILES.aboutVideos,
+      content: Buffer.from(`${JSON.stringify({ items: state.aboutVideos }, null, 2)}\n`),
+    },
+    {
+      path: FILES.reviews,
+      content: Buffer.from(`${JSON.stringify({ items: state.reviews }, null, 2)}\n`),
+    },
+    {
+      path: FILES.workshops,
+      content: Buffer.from(`${JSON.stringify({ items: state.workshops }, null, 2)}\n`),
     },
   ];
   if (process.env.GITHUB_TOKEN) {

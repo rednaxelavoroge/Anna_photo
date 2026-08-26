@@ -2,6 +2,7 @@
   "owner": "Анна Манасарян",
   "brand": "Anna Manasaryan",
   "domain": "https://annamanasaryan.com",
+  "portrait": "",
   "tagline": "Детский и семейный фотограф в Армении",
   "intro": "Рада вас видеть на своём сайте. Я детский и семейный фотограф Анна Манасарян. Запечатлеть первые минуты жизни, детство и семью — спокойно, внимательно, без спешки.",
   "about": {
@@ -43,6 +44,7 @@
     "phone": "+374 98 0 33 55 0",
     "phoneRussia": "+7 915 00 33 55 0",
     "instagram": "annamanasaryan",
+    "facebook": "",
     "email": "annamanasaryan.foto@gmail.com",
     "city": "Ереван, Армения"
   }

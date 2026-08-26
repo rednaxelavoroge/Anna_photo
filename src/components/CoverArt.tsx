@@ -9,20 +9,22 @@ function hash(value: string) {
 export function CoverArt({
   slug,
   title,
+  src,
   className = "",
   style,
 }: {
   slug: string;
   title: string;
+  src?: string;
   className?: string;
   style?: CSSProperties;
 }) {
-  const src = getPreviewCover(slug);
-  if (src) {
+  const resolved = src || getPreviewCover(slug);
+  if (resolved) {
     return (
       <span className={`relative block h-full w-full overflow-hidden bg-void ${className}`} style={style}>
         <Image
-          src={src}
+          src={resolved}
           alt={title}
           fill
           priority={slug === "home-hero"}

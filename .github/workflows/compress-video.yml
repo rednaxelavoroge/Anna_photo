@@ -19,6 +19,12 @@ on:
         required: true
         type: string
 
+# Право нужно объявить и здесь. Вызываемый процесс коммитит готовый ролик,
+# то есть просит contents: write, а больше, чем есть у вызывающего, GitHub
+# не выдаёт: без этой строки запуск обрывается ещё до первого шага.
+permissions:
+  contents: write
+
 jobs:
   compress:
     uses: rednaxelavoroge/Anna_photo/.github/workflows/compress-video.yml@cursor/namecheap-static-f40b

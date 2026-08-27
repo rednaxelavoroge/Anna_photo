@@ -1,0 +1,150 @@
+# Публикация самого сайта annamanasaryan.com на хостинге заказчицы.
+#
+# Зачем этот файл появился. Выкладка фотосайта раньше жила в репозитории
+# сайта свечей (deploy-photo-com.yml) и запускалась только кнопкой. Ни один
+# из трёх её запусков не дошёл до конца: у той FTP-учётки не было доступа
+# к папке фотосайта. То есть Анна сохраняла из панели, а на сайте ничего
+# не менялось — при том что панель обещает ей «обновится через несколько
+# минут». Здесь это обещание становится правдой.
+#
+# Почему сама, а не кнопкой. Выгрузка сайта — 7 МБ и полторы сотни файлов,
+# минуты работы. Заставлять кого-то нажимать кнопку после каждой правки
+# заказчицы незачем, а забыть нажать — легко.
+#
+# Панели это не касается: она живёт своей жизнью и обновляется отдельным
+# процессом deploy-panel.yml по кнопке.
+
+name: Выложить сайт на хостинг
+
+on:
+  push:
+    branches:
+      - cursor/namecheap-static-f40b
+    paths-ignore:
+      # Записи и процессы на сайт не попадают — гонять сборку из-за них незачем.
+      - "docs/**"
+      - ".github/**"
+      - "README.md"
+  # На случай, когда нужно выложить тот же код заново.
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-site
+  # Заказчица часто сохраняет несколько раз подряд. Промежуточные выкладки
+  # не нужны — важна последняя.
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Проверить, заданы ли доступы
+        id: check
+        run: |
+          if [ -z "${{ secrets.FTP_HOST }}" ]; then
+            echo "Секрет FTP_HOST не задан — выкладка пропущена."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Установить зависимости
+        if: steps.check.outputs.ready == 'true'
+        run: npm ci
+
+      - name: Собрать сайт папкой готовых файлов
+        if: steps.check.outputs.ready == 'true'
+        run: npm run export:namecheap
+
+      - name: Проверить, что собралось именно то
+        if: steps.check.outputs.ready == 'true'
+        run: |
+          set -e
+          # Пустая или наполовину собранная выгрузка, залитая поверх рабочего
+          # сайта, — это сломанный сайт. Дешевле остановиться здесь.
+          test -f out/index.html
+          test -f out/.htaccess
+          test -d out/portfolio
+          echo "Готово к отправке: $(du -sh out | cut -f1), файлов: $(find out -type f | wc -l)"
+
+      - name: Залить сайт на хостинг
+        if: steps.check.outputs.ready == 'true'
+        env:
+          FTP_HOST: ${{ secrets.FTP_HOST }}
+          FTP_USER: ${{ secrets.PANEL_FTP_USER || secrets.FTP_USER }}
+          FTP_PASSWORD: ${{ secrets.PANEL_FTP_PASSWORD || secrets.FTP_PASSWORD }}
+        run: |
+          set -e
+          sudo apt-get update -qq && sudo apt-get install -y -qq lftp
+
+          listing() {
+            lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" <<LFTP 2>/dev/null
+              set ssl:verify-certificate no
+              set ftp:ssl-allow yes
+              set cmd:fail-exit yes
+              cd "$1"
+              cls -1
+              bye
+          LFTP
+          }
+
+          # На этом аккаунте cPanel живут два сайта. Залить фотосайт поверх
+          # каталога свечей — это уничтожить чужой сайт, поэтому папка обязана
+          # предъявить приметы: своя (index.html или папка панели) и заведомо
+          # не чужая (catalog + brand — это свечи).
+          TARGET=""
+          for candidate in \
+            "." \
+            "public_html" \
+            "../public_html" \
+            "../../public_html" \
+            "/home/annaclvt/public_html"
+          do
+            found="$(listing "$candidate" || true)"
+            if [ -z "$found" ]; then
+              echo "  $candidate — не открылась"
+              continue
+            fi
+            if printf '%s\n' "$found" | grep -qE '^catalog/?$' \
+               && printf '%s\n' "$found" | grep -qE '^brand/?$'; then
+              echo "  $candidate — это каталог свечей, не наш сайт"
+              continue
+            fi
+            if ! printf '%s\n' "$found" | grep -qE '^(index\.html|admin-panel)/?$'; then
+              echo "  $candidate — открылась, но на корень сайта не похожа"
+              continue
+            fi
+            echo "  $candidate — подходит: это корень annamanasaryan.com"
+            TARGET="$candidate"
+            break
+          done
+
+          if [ -z "$TARGET" ]; then
+            echo "Не нашёл папку сайта annamanasaryan.com на хостинге."
+            echo "Нужна FTP-учётка с корнем в public_html — см."
+            echo "docs/perenos-paneli-na-hosting.md."
+            exit 1
+          fi
+
+          echo "Заливаю сайт в $TARGET на $FTP_HOST"
+          # --delete здесь НЕТ и быть не должно: в той же папке лежит
+          # admin-panel — файлы панели. С --delete первая же выкладка сайта
+          # снесла бы панель целиком.
+          lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" <<LFTP
+            set ssl:verify-certificate no
+            set ftp:ssl-allow yes
+            set cmd:fail-exit yes
+            set net:max-retries 3
+            set net:timeout 30
+            mirror -R --parallel=4 --exclude-glob .DS_Store out "$TARGET"
+            bye
+          LFTP
+          echo "Сайт выложен."

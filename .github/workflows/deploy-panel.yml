@@ -240,11 +240,25 @@ jobs:
           set -e
           # Хостинг перезапускает приложение, когда меняется этот файл.
           date > restart.txt
+
+          # Папку создаём отдельно и без строгого режима. У lftp «mkdir -p»
+          # не означает «молчи, если уже есть»: со второй выкладки он честно
+          # отвечает «File exists», а в строгом режиме это валит весь шаг —
+          # ровно так первое обновление панели и не доехало до перезапуска.
+          lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" <<LFTP || true
+            set ssl:verify-certificate no
+            set ftp:ssl-allow yes
+            mkdir -p "$PANEL_DIR/tmp"
+            bye
+          LFTP
+
+          # А вот сама метка обязана лечь: без неё хостинг не перезапустит
+          # приложение, оно останется на прежней сборке, и выкладка молча
+          # ничего не изменит.
           lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" <<LFTP
             set ssl:verify-certificate no
             set ftp:ssl-allow yes
             set cmd:fail-exit yes
-            mkdir -p "$PANEL_DIR/tmp"
             put -O "$PANEL_DIR/tmp" restart.txt
             bye
           LFTP

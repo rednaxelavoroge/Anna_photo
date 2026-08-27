@@ -4,6 +4,7 @@ import type { Category, SiteData } from "@/lib/content";
 import type { Featured, PhotoItem, StudioState, Tag } from "@/lib/admin-store";
 import { mediaUrl } from "@/lib/media-url";
 import { slugifyRu } from "@/lib/slugify";
+import { useDragOrder, withMoved } from "@/lib/use-drag-order";
 import { useVideoUpload } from "@/lib/use-video-upload";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -155,6 +156,32 @@ export function AdminPanel() {
       });
   }, [query, section, state]);
 
+  /*
+    Порядок мышью и пальцем. Стрелки ↑ ↓ рядом остаются: ими удобно
+    поправить на одну позицию, а перетаскиванием — перенести через полсписка.
+
+    В списке кадров видно не всё сразу: он отфильтрован разделом и поиском.
+    Поэтому позиции с экрана переводятся в позиции в полном списке — иначе
+    кадр уехал бы не туда, стоило открыть какой-нибудь раздел.
+  */
+  const photoDrag = useDragOrder((from, to) => {
+    if (!state) return;
+    const fromReal = photosInSection[from]?.index;
+    const toReal = photosInSection[to]?.index;
+    if (fromReal === undefined || toReal === undefined) return;
+    persist({ ...state, photos: withMoved(state.photos, fromReal, toReal) }, "Меняю порядок…");
+  }, !busy);
+
+  const categoryDrag = useDragOrder((from, to) => {
+    if (!state) return;
+    persist({ ...state, categories: withMoved(state.categories, from, to) }, "Меняю порядок…");
+  }, !busy);
+
+  const backstageDrag = useDragOrder((from, to) => {
+    if (!state) return;
+    persist({ ...state, backstage: withMoved(state.backstage, from, to) }, "Меняю порядок…");
+  }, !busy);
+
   async function persist(next: StudioState, message?: string) {
     setBusy(true);
     setNote(message ?? "Сохранение…");
@@ -298,9 +325,17 @@ export function AdminPanel() {
               Новый кадр
             </button>
           </div>
-          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <p className="mt-6 text-xs text-muted">
+            Порядок кадров меняется перетаскиванием: мышью, а на телефоне — нажать,
+            подержать и вести пальцем. Стрелки ↑ ↓ тоже работают.
+          </p>
+          <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {photosInSection.map(({ photo, index }, visibleIndex) => (
-              <article key={`${photo.src}-${index}`} className="border border-line bg-surface p-3">
+              <article
+                key={`${photo.src}-${index}`}
+                {...photoDrag.itemProps(visibleIndex)}
+                className={`border border-line bg-surface p-3 transition ${photoDrag.itemClass(visibleIndex)}`}
+              >
                 <div className="aspect-[3/4] overflow-hidden bg-void">
                   {photo.src ? (
                     // eslint-disable-next-line @next/next/no-img-element
@@ -368,7 +403,11 @@ export function AdminPanel() {
           </div>
           <div className="mt-6 space-y-3">
             {state.categories.map((category, index) => (
-              <div key={category.slug} className="flex flex-col gap-4 border border-line bg-surface p-4 md:flex-row md:items-center md:justify-between">
+              <div
+                key={category.slug}
+                {...categoryDrag.itemProps(index)}
+                className={`flex flex-col gap-4 border border-line bg-surface p-4 transition md:flex-row md:items-center md:justify-between ${categoryDrag.itemClass(index)}`}
+              >
                 <div className="flex items-start gap-4">
                   <div className="h-16 w-16 shrink-0 overflow-hidden bg-void">
                     {category.cover ? (
@@ -559,11 +598,15 @@ export function AdminPanel() {
             ) : null}
           </div>
           <p className="mt-6 text-sm text-muted">
-            Порядок кадров здесь — это порядок на странице «Бэкстейдж». Стрелки ↑ ↓ сразу сохраняют.
+            Порядок кадров здесь — это порядок на странице «Бэкстейдж». Кадр можно перетащить мышью, а на телефоне — нажать, подержать и вести пальцем. Стрелки ↑ ↓ тоже работают.
           </p>
           <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {state.backstage.map((item, index) => (
-              <figure key={`${item.src}-${index}`} className="border border-line bg-surface p-2">
+              <figure
+                key={`${item.src}-${index}`}
+                {...backstageDrag.itemProps(index)}
+                className={`border border-line bg-surface p-2 transition ${backstageDrag.itemClass(index)}`}
+              >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={mediaUrl(item.src)} alt="" className="aspect-[3/4] w-full object-cover" />
                 <p className="mt-2 text-xs">{item.alt}</p>
@@ -1078,6 +1121,12 @@ function PhotoEditor({
   const images = draft.images?.length ? draft.images : draft.src ? [draft.src] : [];
   const video = useVideoUpload();
 
+  // Здесь порядок важнее всего: первый файл — обложка кадра.
+  const imageDrag = useDragOrder((from, to) => {
+    const next = withMoved(images, from, to);
+    setDraft({ ...draft, images: next, src: next[0] ?? "" });
+  });
+
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-ink/40 p-4">
       <div className="mx-auto max-w-2xl bg-paper p-5">
@@ -1142,9 +1191,16 @@ function PhotoEditor({
           </button>
         </div>
         <p className="mt-5 text-[10px] tracking-[0.16em] text-muted uppercase">Фотографии</p>
+        <p className="mt-1 text-xs text-muted">
+          Первая — обложка кадра. Порядок меняется перетаскиванием: мышью, а на телефоне — нажать, подержать и вести пальцем. Стрелки ← → тоже работают.
+        </p>
         <div className="mt-2 grid grid-cols-3 gap-2">
           {images.map((src, index) => (
-            <div key={`${src}-${index}`} className="relative">
+            <div
+              key={`${src}-${index}`}
+              {...imageDrag.itemProps(index)}
+              className={`relative transition ${imageDrag.itemClass(index)}`}
+            >
               {isVideoFile(src) ? (
                 // Ролик в этом же списке — значит показать его надо
                 // проигрывателем: картинкой он выглядит как битый файл.

@@ -42,7 +42,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
+      # Ветка задана явно, а не берётся из той, с которой запустили. Кнопка
+      # запуска живёт в главной ветке, а она отстаёт от рабочей: без этой
+      # строки нажатие кнопки собирает старый код — а то и не собирает
+      # вовсе, как случилось при первой проверке.
       - uses: actions/checkout@v4
+        with:
+          ref: cursor/namecheap-static-f40b
 
       - uses: actions/setup-node@v4
         with:

@@ -1,0 +1,27 @@
+# Запуск сжатия ролика, загруженного через панель.
+#
+# Панель запускает этот процесс через API сразу после того, как приняла
+# ролик. Запуск через API виден только с ветки по умолчанию — с рабочей
+# ветки GitHub отвечает «не найдено», — поэтому файл лежит здесь.
+#
+# Здесь только вызов. Сам процесс — сжатие, проверка на обрывки, коммит
+# готового ролика и ответ панели — живёт в рабочей ветке
+# cursor/namecheap-static-f40b, в одном экземпляре: две копии рано или
+# поздно разъедутся.
+
+name: Сжать загруженный ролик
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Имя готового файла, оно же имя приложения с исходником"
+        required: true
+        type: string
+
+jobs:
+  compress:
+    uses: rednaxelavoroge/Anna_photo/.github/workflows/compress-video.yml@cursor/namecheap-static-f40b
+    with:
+      target: ${{ inputs.target }}
+    secrets: inherit

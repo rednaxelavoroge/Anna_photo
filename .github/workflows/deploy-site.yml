@@ -1,0 +1,19 @@
+# Кнопка «выложить сайт заново».
+#
+# Обычно она не нужна: сайт публикуется сам при каждом сохранении из
+# панели. Но кнопка показывается в Actions только с ветки по умолчанию,
+# а сам процесс живёт в рабочей ветке cursor/namecheap-static-f40b —
+# в одном экземпляре, чтобы две копии не разъехались.
+#
+# Что именно делает выкладка, смотрите в файле
+# .github/workflows/deploy-site.yml в ветке cursor/namecheap-static-f40b.
+
+name: Выложить сайт на хостинг
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    uses: rednaxelavoroge/Anna_photo/.github/workflows/deploy-site.yml@cursor/namecheap-static-f40b
+    secrets: inherit

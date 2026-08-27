@@ -1,4 +1,4 @@
-import { ADMIN_COOKIE, adminPassword, isAdmin, sessionToken } from "@/lib/admin-auth";
+import { adminPasswordSet, isAdmin, loginAdmin, logoutAdmin } from "@/lib/admin-auth";
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
@@ -12,25 +12,24 @@ export async function GET() {
 
 export async function POST(request: Request) {
   const body = (await request.json().catch(() => null)) as { password?: string; action?: string } | null;
+
   if (body?.action === "logout") {
-    const res = NextResponse.json({ ok: true });
-    res.cookies.set(ADMIN_COOKIE, "", { path: "/", maxAge: 0 });
-    return res;
+    await logoutAdmin();
+    return NextResponse.json({ ok: true });
   }
-  const expected = adminPassword();
-  if (!expected) {
-    return NextResponse.json({ error: "На Vercel задайте ADMIN_PASSWORD" }, { status: 500 });
+
+  if (!adminPasswordSet()) {
+    return NextResponse.json(
+      { error: "Пароль панели не задан в настройках — вход закрыт" },
+      { status: 500 },
+    );
   }
-  if (!body?.password || body.password !== expected) {
+
+  // Пропуск выдаёт сам admin-auth: там же, где он проверяется, чтобы формат
+  // куки и её проверка не разъехались.
+  if (!(await loginAdmin(body?.password ?? ""))) {
     return NextResponse.json({ error: "Неверный пароль" }, { status: 401 });
   }
-  const res = NextResponse.json({ ok: true });
-  res.cookies.set(ADMIN_COOKIE, sessionToken(), {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    path: "/",
-    maxAge: 60 * 60 * 24 * 30,
-  });
-  return res;
+
+  return NextResponse.json({ ok: true });
 }

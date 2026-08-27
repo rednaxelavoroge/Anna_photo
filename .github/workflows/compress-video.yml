@@ -197,7 +197,15 @@ jobs:
           fi
           cat result.json
 
-          RELEASE_ID=$(gh api "repos/${{ github.repository }}/releases/tags/video-inbox" --jq .id)
+          # Этот шаг не имеет права падать. Он единственный, кто говорит панели,
+          # чем всё кончилось: если он оборвётся, она двенадцать минут будет
+          # ждать ответа, которого уже никто не пришлёт, вместо того чтобы
+          # сразу показать причину. Поэтому дальше всё со страховкой.
+          RELEASE_ID=$(gh api "repos/${{ github.repository }}/releases/tags/video-inbox" --jq .id 2>/dev/null || true)
+          if [ -z "$RELEASE_ID" ]; then
+            echo "Служебного выпуска нет — ответ панели положить некуда."
+            exit 0
+          fi
 
           # Прошлый ответ с тем же именем мог остаться, если панель его не
           # забрала, — GitHub не разрешает два приложения с одним именем.
@@ -216,3 +224,7 @@ jobs:
           if [ -n "${ASSET_ID:-}" ]; then
             gh api -X DELETE "repos/${{ github.repository }}/releases/assets/$ASSET_ID" || true
           fi
+
+          # Сам этот шаг ничего не решает — он только рассказывает. Пусть его
+          # неудача не превращается в ещё одну ошибку поверх настоящей.
+          exit 0

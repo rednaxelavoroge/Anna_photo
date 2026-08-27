@@ -2,6 +2,7 @@
 
 import type { Category, SiteData } from "@/lib/content";
 import type { Featured, PhotoItem, StudioState, Tag } from "@/lib/admin-store";
+import { mediaUrl } from "@/lib/media-url";
 import { slugifyRu } from "@/lib/slugify";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -297,7 +298,7 @@ export function AdminPanel() {
                 <div className="aspect-[3/4] overflow-hidden bg-void">
                   {photo.src ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={photo.src} alt="" className="h-full w-full object-cover" />
+                    <img src={mediaUrl(photo.src)} alt="" className="h-full w-full object-cover" />
                   ) : (
                     <div className="flex h-full items-center justify-center text-xs text-snow/50">Нет фото</div>
                   )}
@@ -366,7 +367,7 @@ export function AdminPanel() {
                   <div className="h-16 w-16 shrink-0 overflow-hidden bg-void">
                     {category.cover ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={category.cover} alt="" className="h-full w-full object-cover" />
+                      <img src={mediaUrl(category.cover)} alt="" className="h-full w-full object-cover" />
                     ) : (
                       <div className="flex h-full items-center justify-center text-[10px] text-snow/50">Нет</div>
                     )}
@@ -558,7 +559,7 @@ export function AdminPanel() {
             {state.backstage.map((item, index) => (
               <figure key={`${item.src}-${index}`} className="border border-line bg-surface p-2">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={item.src} alt="" className="aspect-[3/4] w-full object-cover" />
+                <img src={mediaUrl(item.src)} alt="" className="aspect-[3/4] w-full object-cover" />
                 <p className="mt-2 text-xs">{item.alt}</p>
                 <div className="mt-2 flex gap-2 text-xs">
                   <button type="button" disabled={busy} onClick={() => persist({ ...state, backstage: move(state.backstage, index, -1) })}>
@@ -858,7 +859,7 @@ function TextsTab({
           <p className="mt-1 text-xs text-muted">Это фото стоит на первом экране главной и на странице «Обо мне». Встанет после «Сохранить все тексты».</p>
           {site.portrait ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={site.portrait} alt="" className="mt-3 h-32 w-24 object-cover" />
+            <img src={mediaUrl(site.portrait)} alt="" className="mt-3 h-32 w-24 object-cover" />
           ) : null}
         </label>
       </div>
@@ -1018,7 +1019,7 @@ function CategoryEditor({
         />
         {draft.cover ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={draft.cover} alt="" className="mt-3 h-24 w-20 object-cover" />
+          <img src={mediaUrl(draft.cover)} alt="" className="mt-3 h-24 w-20 object-cover" />
         ) : null}
         <div className="mt-6 flex flex-wrap gap-3">
           <button
@@ -1138,7 +1139,7 @@ function PhotoEditor({
           {images.map((src, index) => (
             <div key={`${src}-${index}`} className="relative">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={src} alt="" className="aspect-[3/4] w-full object-cover" />
+              <img src={mediaUrl(src)} alt="" className="aspect-[3/4] w-full object-cover" />
               {index === 0 ? <span className="absolute top-1 left-1 bg-ink px-1 text-[10px] text-snow">Обложка</span> : null}
               <div className="mt-1 flex justify-between text-xs">
                 <button type="button" onClick={() => setDraft({ ...draft, images: move(images, index, -1), src: move(images, index, -1)[0] ?? "" })}>

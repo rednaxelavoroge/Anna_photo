@@ -57,11 +57,13 @@ const FILES = {
   workshops: "src/data/workshops.json",
 };
 
-function githubRepo() {
+// Экспортируются, чтобы приёмник роликов брал те же репозиторий и ветку,
+// а не завёл рядом вторую пару значений, которая однажды разойдётся.
+export function githubRepo() {
   return process.env.GITHUB_REPO || "rednaxelavoroge/Anna_photo";
 }
 
-function githubBranch() {
+export function githubBranch() {
   return process.env.GITHUB_BRANCH || process.env.VERCEL_GIT_COMMIT_REF || "cursor/namecheap-static-f40b";
 }
 

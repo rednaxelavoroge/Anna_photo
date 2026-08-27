@@ -4,6 +4,7 @@ import type { Category, SiteData } from "@/lib/content";
 import type { Featured, PhotoItem, StudioState, Tag } from "@/lib/admin-store";
 import { mediaUrl } from "@/lib/media-url";
 import { slugifyRu } from "@/lib/slugify";
+import { useVideoUpload } from "@/lib/use-video-upload";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
@@ -68,6 +69,11 @@ function emptyPhoto(): PhotoItem {
 
 function emptyCategory(): Category {
   return { slug: "", menu: "", title: "", description: "", keywords: [] };
+}
+
+/** Тем же признаком сайт отличает ролик от фотографии — по расширению файла. */
+function isVideoFile(src: string) {
+  return /\.(mp4|webm|mov)$/i.test(src);
 }
 
 function youtubeId(value: string) {
@@ -1070,6 +1076,7 @@ function PhotoEditor({
 }) {
   const [draft, setDraft] = useState(photo);
   const images = draft.images?.length ? draft.images : draft.src ? [draft.src] : [];
+  const video = useVideoUpload();
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-ink/40 p-4">
@@ -1138,9 +1145,16 @@ function PhotoEditor({
         <div className="mt-2 grid grid-cols-3 gap-2">
           {images.map((src, index) => (
             <div key={`${src}-${index}`} className="relative">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={mediaUrl(src)} alt="" className="aspect-[3/4] w-full object-cover" />
+              {isVideoFile(src) ? (
+                // Ролик в этом же списке — значит показать его надо
+                // проигрывателем: картинкой он выглядит как битый файл.
+                <video src={mediaUrl(src)} className="aspect-[3/4] w-full object-cover" muted playsInline preload="metadata" />
+              ) : (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={mediaUrl(src)} alt="" className="aspect-[3/4] w-full object-cover" />
+              )}
               {index === 0 ? <span className="absolute top-1 left-1 bg-ink px-1 text-[10px] text-snow">Обложка</span> : null}
+              {isVideoFile(src) ? <span className="absolute top-1 right-1 bg-ink px-1 text-[10px] text-snow">Ролик</span> : null}
               <div className="mt-1 flex justify-between text-xs">
                 <button type="button" onClick={() => setDraft({ ...draft, images: move(images, index, -1), src: move(images, index, -1)[0] ?? "" })}>
                   ←
@@ -1177,6 +1191,38 @@ function PhotoEditor({
             event.target.value = "";
           }}
         />
+        <p className="mt-5 text-[10px] tracking-[0.16em] text-muted uppercase">Ролик с телефона</p>
+        <p className="mt-1 text-xs text-muted">
+          Снятый на телефон ролик можно выбрать как есть — панель сама его уменьшит. До 200 МБ.
+          Готовый встанет в список выше и покажется на сайте проигрывателем.
+        </p>
+        <input
+          className="mt-2 block w-full text-sm"
+          type="file"
+          accept="video/*"
+          disabled={video.stage === "sending" || video.stage === "working"}
+          onChange={async (event) => {
+            const file = event.target.files?.[0];
+            // Поле очищаем сразу: иначе повторный выбор того же файла
+            // браузер не считает изменением и ничего не произойдёт.
+            event.target.value = "";
+            if (!file) return;
+            const src = await video.send(file);
+            if (!src) return;
+            const next = [...images, src];
+            setDraft({ ...draft, images: next, src: next[0] ?? "" });
+          }}
+        />
+        {video.note ? (
+          <p className={`mt-2 text-xs ${video.stage === "failed" ? "text-ink" : "text-muted"}`}>
+            {video.note}
+            {video.stage === "sending" ? (
+              <span className="mt-1 block h-1 w-full bg-line">
+                <span className="block h-1 bg-ink" style={{ width: `${video.percent}%` }} />
+              </span>
+            ) : null}
+          </p>
+        ) : null}
         <label className="mt-5 block text-[10px] tracking-[0.16em] text-muted uppercase">Видео (YouTube id или ссылка)</label>
         <input className="mt-1 w-full border border-line px-3 py-2" value={draft.video ?? ""} onChange={(event) => setDraft({ ...draft, video: event.target.value })} />
         <div className="mt-6 flex flex-wrap gap-3">

@@ -127,15 +127,15 @@ jobs:
           set -e
           sudo apt-get update -qq && sudo apt-get install -y -qq lftp
 
-          # Заходит в указанную папку и печатает, где оказался. Молчит и
-          # возвращает ошибку, если папки нет.
-          probe() {
+          # Заходит в указанную папку и перечисляет, что в ней лежит.
+          # Молчит, если папки нет или войти в неё не вышло.
+          listing() {
             lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" <<LFTP 2>/dev/null
               set ssl:verify-certificate no
               set ftp:ssl-allow yes
               set cmd:fail-exit yes
               cd "$1"
-              pwd
+              cls -1
               bye
           LFTP
           }
@@ -143,38 +143,49 @@ jobs:
           if [ -n "$PANEL_DIR" ]; then
             echo "Папка панели задана секретом FTP_PANEL_DIR."
           else
-            # У этого аккаунта cPanel несколько сайтов, и FTP-логин попадает
-            # то в корень, то сразу в папку одного из доменов. Ищем перебором,
-            # откуда видно public_html — папку сайта .com.
+            # На этом аккаунте cPanel несколько сайтов, и FTP-логин попадает
+            # то в общий корень, то сразу внутрь папки одного из доменов.
+            # Поэтому папку сайта ищем перебором.
+            #
+            # Мало убедиться, что папка открылась: у соседнего сайта корень
+            # устроен так же, и панель молча уехала бы к нему. Поэтому папка
+            # обязана предъявить приметы именно этого сайта — index.html
+            # и раздел phototour. Ошибиться на этом месте дорого: ниже
+            # работает mirror с --delete.
             echo "Секрет FTP_PANEL_DIR не задан, ищу папку сайта."
             for candidate in \
+              "." \
               "public_html" \
               "../public_html" \
               "../../public_html" \
               "/home/annaclvt/public_html"
             do
-              where="$(probe "$candidate" || true)"
-              if [ -z "$where" ]; then
+              found="$(listing "$candidate" || true)"
+              if [ -z "$found" ]; then
                 echo "  $candidate — не открылась"
                 continue
               fi
-              case "$where" in
-                *annamanasaryan.art*)
-                  echo "  $candidate — это папка .art, не наша"
-                  continue
-                  ;;
-              esac
-              echo "  $candidate — подходит ($where)"
+              if ! printf '%s\n' "$found" | grep -qE '^index\.html/?$'; then
+                echo "  $candidate — открылась, но это не корень сайта"
+                continue
+              fi
+              if ! printf '%s\n' "$found" | grep -qE '^phototour/?$'; then
+                echo "  $candidate — это корень чужого сайта, не annamanasaryan.com"
+                continue
+              fi
+              echo "  $candidate — подходит: это корень annamanasaryan.com"
               PANEL_DIR="$candidate/admin-panel"
               break
             done
           fi
 
           if [ -z "$PANEL_DIR" ]; then
-            echo "Не нашёл папку сайта на хостинге."
-            echo "Заведите в cPanel → FTP Accounts отдельную учётку с корнем"
-            echo "в public_html и положите её в секреты PANEL_FTP_USER и"
-            echo "PANEL_FTP_PASSWORD, либо впишите путь в секрет FTP_PANEL_DIR."
+            echo "Не нашёл папку сайта annamanasaryan.com на хостинге."
+            echo "Либо у FTP-учётки нет доступа к public_html — тогда заведите"
+            echo "в cPanel → FTP Accounts отдельную учётку с корнем в"
+            echo "public_html и положите её в секреты PANEL_FTP_USER и"
+            echo "PANEL_FTP_PASSWORD, — либо впишите путь до папки панели"
+            echo "прямо в секрет FTP_PANEL_DIR."
             exit 1
           fi
 

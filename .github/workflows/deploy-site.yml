@@ -183,7 +183,7 @@ jobs:
         if: steps.check.outputs.ready == 'true'
         run: |
           python3 - <<'EOF'
-          import re, html, urllib.parse, urllib.request
+          import re, html, time, urllib.parse, urllib.request
           from concurrent.futures import ThreadPoolExecutor
           site = "https://annamanasaryan.com"
           def get(url, method="GET"):
@@ -209,7 +209,15 @@ jobs:
                       assets.setdefault(u, set()).add(p); n += 1
               print(f"{st}  файлов={n:<4} {p}")
           def head(u):
-              return u, get(site + (u if "%" in u else urllib.parse.quote(u)), "HEAD")[0]
+              # Хостинг под нагрузкой после заливки иногда отвечает 404 на один
+              # случайный файл; повторяем трижды, прежде чем счесть ссылку битой.
+              url = site + (u if "%" in u else urllib.parse.quote(u))
+              st = None
+              for attempt in range(3):
+                  st = get(url, "HEAD")[0]
+                  if st == 200: break
+                  time.sleep(3)
+              return u, st
           with ThreadPoolExecutor(16) as ex:
               results = list(ex.map(head, sorted(assets)))
           bad = [(u, st) for u, st in results if st != 200]

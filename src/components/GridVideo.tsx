@@ -4,9 +4,13 @@ import { useEffect, useRef } from "react";
 
 /**
  * Ролик в сетке альбома. Не грузится целиком заранее: браузер берёт только
- * заголовок файла (preload="metadata"), а воспроизведение без звука
- * начинается, когда ролик попал в окно, и останавливается, когда ушёл из него.
- * Иначе страница с пятью роликами тянула бы десятки мегабайт сразу.
+ * заголовок файла и первый кадр (preload="metadata").
+ *
+ * На широком экране ролик без звука сам играет, пока виден, и
+ * останавливается, когда ушёл из окна. На телефоне и при включённой
+ * экономии трафика сам не играет: в бэкстейдже почти тридцать роликов,
+ * и листать их с автопроигрыванием — это сотни мегабайт по мобильной сети.
+ * Там ролик открывается по нажатию, в полноэкранном просмотре.
  */
 export function GridVideo({ src, className }: { src: string; className?: string }) {
   const ref = useRef<HTMLVideoElement>(null);
@@ -14,6 +18,9 @@ export function GridVideo({ src, className }: { src: string; className?: string 
   useEffect(() => {
     const node = ref.current;
     if (!node || typeof IntersectionObserver === "undefined") return;
+    const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
+    const wide = window.matchMedia("(min-width: 768px)").matches;
+    if (!wide || connection?.saveData) return;
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {

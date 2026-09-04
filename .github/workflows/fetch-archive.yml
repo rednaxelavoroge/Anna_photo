@@ -130,8 +130,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add public docs
-          git commit -m "Забрать из архива Яндекс.Диска то, что не взяла первая интеграция
-
-Список — tools/archive-fetch-list.txt, файлов: $n. Ролики пережаты до
-1280 px, H.264, +faststart; фото — до 2000 px, JPEG 85."
+          git commit \
+            -m "Забрать из архива Яндекс.Диска то, что не взяла первая интеграция" \
+            -m "Список — tools/archive-fetch-list.txt, файлов: $n. Ролики пережаты до 1280 px, H.264, +faststart; фото — до 2000 px, JPEG 85."
           git push

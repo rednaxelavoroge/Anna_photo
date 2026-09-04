@@ -36,8 +36,10 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.ref || github.ref_name }}
 
-      - name: Поставить Pillow
-        run: pip install --quiet pillow
+      - name: Поставить ffmpeg и Pillow
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          pip install --quiet pillow
 
       - name: Скачать, пережать, разложить
         env:

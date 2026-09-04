@@ -3,7 +3,6 @@
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SmoothScroll } from "@/components/SmoothScroll";
-import { ThemeBar } from "@/components/ThemeBar";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 
@@ -24,7 +23,6 @@ export function SiteChrome({ children }: { children: ReactNode }) {
       <SiteHeader />
       <main id="main">{children}</main>
       <SiteFooter />
-      <ThemeBar />
     </>
   );
 }

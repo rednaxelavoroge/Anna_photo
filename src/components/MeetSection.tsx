@@ -2,13 +2,12 @@
 
 import { CoverArt } from "@/components/CoverArt";
 import type { Category } from "@/lib/content";
-import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
-import { useRef } from "react";
 
 export function MeetSections({ categories }: { categories: Category[] }) {
   return (
-    <div>
+    <div className="bg-paper">
       {categories.map((category, index) => (
         <MeetSection
           key={category.slug}
@@ -30,75 +29,65 @@ function MeetSection({
   index: number;
   total: number;
 }) {
-  const sectionRef = useRef<HTMLElement>(null);
   const reduced = useReducedMotion();
   const imageLeft = index % 2 === 0;
   const number = `${String(index + 1).padStart(2, "0")} / ${String(total).padStart(2, "0")}`;
 
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "end start"],
-  });
-
-  const leftX = useTransform(scrollYProgress, [0.08, 0.34, 0.66, 0.9], ["-58%", "0%", "0%", "-58%"]);
-  const rightX = useTransform(scrollYProgress, [0.08, 0.34, 0.66, 0.9], ["58%", "0%", "0%", "58%"]);
-
   const image = (
     <Link
       href={`/portfolio/${category.slug}`}
-      className="group relative flex h-full w-full items-center justify-center overflow-hidden bg-paper p-2 sm:p-4 md:p-8"
+      className="group relative block w-full overflow-hidden"
       aria-label={`Открыть ${category.menu}`}
     >
-      <div className="relative aspect-[2/3] h-auto max-h-[86svh] w-full max-w-[540px] overflow-hidden bg-paper shadow-xs transition-transform duration-500 group-hover:scale-[1.015]">
+      <div className="relative mx-auto aspect-[2/3] h-[40svh] max-h-[340px] w-auto overflow-hidden rounded-xs bg-paper shadow-sm ring-1 ring-ink/10 transition-transform duration-500 group-hover:scale-[1.015] sm:max-h-[380px] md:h-auto md:max-h-[70svh] md:w-full md:max-w-[460px]">
         <CoverArt slug={category.slug} title={category.menu} src={category.cover} contain />
       </div>
-      <div className="pointer-events-none absolute inset-0 flex items-end justify-start p-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100 md:p-8">
-        <span className="bg-ink/80 px-3 py-1.5 text-xs tracking-[0.22em] text-snow uppercase backdrop-blur-xs">Открыть →</span>
+      <div className="pointer-events-none absolute inset-0 flex items-end justify-start p-3 opacity-0 transition-opacity duration-300 group-hover:opacity-100 md:p-6">
+        <span className="bg-ink/85 px-3 py-1.5 text-xs tracking-[0.22em] text-snow uppercase backdrop-blur-xs">
+          Смотреть альбом →
+        </span>
       </div>
     </Link>
   );
 
   const copy = (
-    <div className="flex min-w-0 flex-col justify-center bg-paper px-3 py-6 sm:px-5 md:px-12 md:py-10 lg:px-16">
-      <p className="eyebrow">{number}</p>
-      <h2 className="mt-3 font-display text-[clamp(1.05rem,3.8vw,3rem)] leading-[1.12] text-ink [overflow-wrap:normal] [word-break:keep-all] md:mt-4">
+    <div className="flex flex-col justify-center px-1 py-1 text-center md:text-left sm:px-4 md:px-8 lg:px-12">
+      <p className="eyebrow text-muted">{number}</p>
+      <h2 className="mt-2 font-display text-xl leading-[1.15] text-ink sm:text-2xl md:text-3xl lg:text-4xl">
         {category.menu}
       </h2>
-      <p className="mt-3 text-[0.78rem] leading-relaxed text-muted [overflow-wrap:normal] [word-break:normal] md:mt-5 md:max-w-md md:text-base">
+      <p className="mt-2 max-w-lg text-xs leading-relaxed text-muted sm:text-sm md:mt-3 md:text-base">
         {category.description}
       </p>
-      <Link
-        href={`/portfolio/${category.slug}`}
-        className="link-line mt-5 w-fit text-[10px] tracking-[0.18em] uppercase md:mt-8 md:text-xs md:tracking-[0.22em]"
-      >
-        Смотреть ленту
-      </Link>
+      <div className="mt-4 flex justify-center md:justify-start md:mt-6">
+        <Link
+          href={`/portfolio/${category.slug}`}
+          className="link-line inline-flex items-center text-xs tracking-[0.2em] uppercase"
+        >
+          Смотреть альбом →
+        </Link>
+      </div>
     </div>
   );
 
-  if (reduced) {
-    return (
-      <section className="border-t border-line">
-        <div className="grid md:grid-cols-2 md:min-h-[70svh]">
-          <div className={`min-h-[46svh] md:min-h-0 ${imageLeft ? "md:order-1" : "md:order-2"}`}>
-            <div className="aspect-[2/3] h-full min-h-[46svh] md:aspect-auto">{image}</div>
-          </div>
-          <div className={imageLeft ? "md:order-2" : "md:order-1"}>{copy}</div>
-        </div>
-      </section>
-    );
-  }
-
   return (
-    <section ref={sectionRef} className="relative h-[145svh] bg-paper">
-      <div className="sticky top-0 flex h-svh overflow-hidden">
-        <motion.div style={{ x: leftX }} className="flex min-w-0 w-1/2 will-change-transform">
-          {imageLeft ? image : copy}
-        </motion.div>
-        <motion.div style={{ x: rightX }} className="flex min-w-0 w-1/2 will-change-transform">
-          {imageLeft ? copy : image}
-        </motion.div>
+    <motion.section
+      initial={reduced ? undefined : { opacity: 0, y: 24 }}
+      whileInView={reduced ? undefined : { opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+      className="border-t border-line/60 bg-paper py-8 sm:py-12 md:py-16"
+    >
+      <div className="mx-auto max-w-6xl px-4 md:px-10">
+        <div className="grid grid-cols-1 items-center gap-5 sm:gap-6 md:grid-cols-2 md:gap-12 lg:gap-16">
+          <div className={imageLeft ? "md:order-1" : "md:order-2"}>
+            {image}
+          </div>
+          <div className={imageLeft ? "md:order-2" : "md:order-1"}>
+            {copy}
+          </div>
+        </div>
       </div>
-    </section>
+    </motion.section>
   );
 }

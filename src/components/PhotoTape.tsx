@@ -109,6 +109,10 @@ function Media({
 export function PhotoTape({ photos, slug }: { photos: Photo[]; slug: string }) {
   const reduced = useReducedMotion();
   const [open, setOpen] = useState<number | null>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const activeIndexRef = useRef(0);
+  const thumbnailsScrollRef = useRef<HTMLDivElement>(null);
+  const thumbButtonsRef = useRef<(HTMLButtonElement | null)[]>([]);
   const stageRef = useRef<HTMLDivElement>(null);
   const thumbRef = useRef<HTMLDivElement>(null);
   const itemsRef = useRef<(HTMLButtonElement | null)[]>([]);
@@ -121,6 +125,7 @@ export function PhotoTape({ photos, slug }: { photos: Photo[]; slug: string }) {
   const openRef = useRef(open);
   const calcRef = useRef<() => void>(() => {});
   const stepRef = useRef<(dir: number) => void>(() => {});
+  const paintRef = useRef<(force?: boolean) => void>(() => {});
   const autoDir = useRef(1);
   const idleRef = useRef(0);
   const dragStartX = useRef(0);
@@ -143,6 +148,18 @@ export function PhotoTape({ photos, slug }: { photos: Photo[]; slug: string }) {
       const slots = slotsRef.current;
       const view = Math.max(0, Math.min(n - 1, viewRef.current));
       viewRef.current = view;
+      if (activeIndexRef.current !== view) {
+        activeIndexRef.current = view;
+        setActiveIndex(view);
+        const targetBtn = thumbButtonsRef.current[view];
+        if (targetBtn && thumbnailsScrollRef.current) {
+          targetBtn.scrollIntoView({
+            behavior: "smooth",
+            block: "nearest",
+            inline: "center",
+          });
+        }
+      }
       const o = slots[view];
       const wh = stageW();
       const ht = stageH();
@@ -293,6 +310,7 @@ export function PhotoTape({ photos, slug }: { photos: Photo[]; slug: string }) {
 
     calcRef.current = calc;
     stepRef.current = step;
+    paintRef.current = paint;
 
     const onKey = (event: KeyboardEvent) => {
       if (openRef.current !== null) return;
@@ -366,83 +384,145 @@ export function PhotoTape({ photos, slug }: { photos: Photo[]; slug: string }) {
     calcRef.current();
   };
 
-  return (
-    <div className="image-flow-stage">
-      <div
-        ref={stageRef}
-        className="image-flow"
-        data-lenis-prevent
-        onPointerEnter={() => {
-          hoverRef.current = true;
-        }}
-        onPointerLeave={(event) => {
-          const next = event.relatedTarget;
-          if (next instanceof Node && event.currentTarget.contains(next)) return;
-          hoverRef.current = false;
-          pendingRef.current = false;
-          draggingRef.current = false;
-        }}
-        onPointerDown={(event) => {
-          pendingRef.current = true;
-          draggingRef.current = false;
-          movedRef.current = false;
-          dragStartX.current = event.clientX;
-          dragStartTime.current = performance.now();
-        }}
-        onPointerMove={(event) => {
-          if (!pendingRef.current && !draggingRef.current) return;
-          const dx = event.clientX - dragStartX.current;
-          if (!draggingRef.current && Math.abs(dx) >= DRAG_THRESHOLD) {
-            draggingRef.current = true;
-            movedRef.current = true;
-            event.currentTarget.classList.add("is-dragging");
-            try {
-              event.currentTarget.setPointerCapture(event.pointerId);
-            } catch {
-              /* ignore */
-            }
-          }
-        }}
-        onPointerUp={endDrag}
-        onPointerCancel={endDrag}
-      >
-        <div className="image-flow-horizon" aria-hidden="true" />
-        {photos.map((photo, index) => (
-          <button
-            key={`${photo.id}-${index}`}
-            ref={(node) => {
-              itemsRef.current[index] = node;
-            }}
-            type="button"
-            className="image-flow-item"
-            aria-label={photo.alt}
-            onClick={() => onOpen(index)}
-          >
-            <span className="image-flow-plate">
-              <Media photo={photo} slug={slug} className="image-flow-image" onSize={(w, h) => setSize(index, w, h)} />
-            </span>
-            <span className="image-flow-reflection" aria-hidden="true">
-              <span className="image-flow-reflection-inner">
-                <Media photo={photo} slug={slug} className="image-flow-image" />
-              </span>
-            </span>
-          </button>
-        ))}
-        <div className="image-flow-scrollbar" aria-hidden="true">
-          <div ref={thumbRef} className="image-flow-thumb" />
-        </div>
+  const selectPhoto = (index: number) => {
+    if (index < 0 || index >= n) return;
+    viewRef.current = index;
+    idleRef.current = 0;
+    calcRef.current();
+    paintRef.current(true);
+    activeIndexRef.current = index;
+    setActiveIndex(index);
+    thumbButtonsRef.current[index]?.scrollIntoView({
+      behavior: "smooth",
+      block: "nearest",
+      inline: "center",
+    });
+  };
 
-        {open !== null ? (
-          <Lightbox
-            photos={photos}
-            index={open}
-            slug={slug}
-            onClose={() => setOpen(null)}
-            onPrev={() => setOpen((current) => (current === null ? 0 : (current + photos.length - 1) % photos.length))}
-            onNext={() => setOpen((current) => (current === null ? 0 : (current + 1) % photos.length))}
-          />
-        ) : null}
+  return (
+    <div className="relative flex h-full flex-col overflow-hidden">
+      <div className="image-flow-stage relative min-h-0 flex-1">
+        <div
+          ref={stageRef}
+          className="image-flow"
+          data-lenis-prevent
+          onPointerEnter={() => {
+            hoverRef.current = true;
+          }}
+          onPointerLeave={(event) => {
+            const next = event.relatedTarget;
+            if (next instanceof Node && event.currentTarget.contains(next)) return;
+            hoverRef.current = false;
+            pendingRef.current = false;
+            draggingRef.current = false;
+          }}
+          onPointerDown={(event) => {
+            pendingRef.current = true;
+            draggingRef.current = false;
+            movedRef.current = false;
+            dragStartX.current = event.clientX;
+            dragStartTime.current = performance.now();
+          }}
+          onPointerMove={(event) => {
+            if (!pendingRef.current && !draggingRef.current) return;
+            const dx = event.clientX - dragStartX.current;
+            if (!draggingRef.current && Math.abs(dx) >= DRAG_THRESHOLD) {
+              draggingRef.current = true;
+              movedRef.current = true;
+              event.currentTarget.classList.add("is-dragging");
+              try {
+                event.currentTarget.setPointerCapture(event.pointerId);
+              } catch {
+                /* ignore */
+              }
+            }
+          }}
+          onPointerUp={endDrag}
+          onPointerCancel={endDrag}
+        >
+          <div className="image-flow-horizon" aria-hidden="true" />
+          {photos.map((photo, index) => (
+            <button
+              key={`${photo.id}-${index}`}
+              ref={(node) => {
+                itemsRef.current[index] = node;
+              }}
+              type="button"
+              className="image-flow-item"
+              aria-label={photo.alt}
+              onClick={() => onOpen(index)}
+            >
+              <span className="image-flow-plate">
+                <Media photo={photo} slug={slug} className="image-flow-image" onSize={(w, h) => setSize(index, w, h)} />
+              </span>
+              <span className="image-flow-reflection" aria-hidden="true">
+                <span className="image-flow-reflection-inner">
+                  <Media photo={photo} slug={slug} className="image-flow-image" />
+                </span>
+              </span>
+            </button>
+          ))}
+          <div className="image-flow-scrollbar" aria-hidden="true">
+            <div ref={thumbRef} className="image-flow-thumb" />
+          </div>
+
+          {open !== null ? (
+            <Lightbox
+              photos={photos}
+              index={open}
+              slug={slug}
+              onClose={() => setOpen(null)}
+              onPrev={() => setOpen((current) => (current === null ? 0 : (current + photos.length - 1) % photos.length))}
+              onNext={() => setOpen((current) => (current === null ? 0 : (current + 1) % photos.length))}
+            />
+          ) : null}
+        </div>
       </div>
+
+      {/* Album Thumbnails Filmstrip */}
+      {n > 1 ? (
+        <div className="relative z-30 shrink-0 border-t border-line/70 bg-paper/95 px-3 py-2.5 backdrop-blur-xs sm:px-6">
+          <div
+            ref={thumbnailsScrollRef}
+            className="flex items-center gap-2 overflow-x-auto py-1 scroll-smooth no-scrollbar"
+            role="tablist"
+            aria-label="Миниатюры фотографий альбома"
+          >
+            {photos.map((photo, index) => {
+              const isSelected = activeIndex === index;
+              return (
+                <button
+                  key={`thumb-${photo.id}-${index}`}
+                  ref={(node) => {
+                    thumbButtonsRef.current[index] = node;
+                  }}
+                  type="button"
+                  role="tab"
+                  aria-selected={isSelected}
+                  aria-label={`Перейти к фото ${index + 1} из ${n}`}
+                  onClick={() => selectPhoto(index)}
+                  className={`relative shrink-0 overflow-hidden rounded-xs transition-all duration-200 focus-visible:outline-hidden ${
+                    isSelected
+                      ? "ring-2 ring-ink shadow-sm opacity-100 scale-105"
+                      : "opacity-45 hover:opacity-85 hover:scale-[1.02]"
+                  } h-12 w-9 sm:h-14 sm:w-11 md:h-16 md:w-12 bg-surface`}
+                >
+                  {photo.src ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={photo.src}
+                      alt={photo.alt || `Превью ${index + 1}`}
+                      className="h-full w-full object-cover pointer-events-none"
+                      loading="lazy"
+                      draggable={false}
+                    />
+                  ) : null}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

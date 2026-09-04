@@ -279,10 +279,10 @@
 
   .tape-page {
     display: flex;
-    height: calc(100svh - 3.75rem);
+    height: 100svh;
     flex-direction: column;
     overflow: hidden;
-    padding-top: 4.75rem;
+    padding-top: 4.5rem;
     background: var(--color-paper);
   }
 
@@ -398,13 +398,7 @@
   }
 
   .image-flow-scrollbar {
-    position: absolute;
-    left: 10%;
-    right: 10%;
-    bottom: 12px;
-    z-index: 20;
-    height: 16px;
-    pointer-events: none;
+    display: none;
   }
 
   .image-flow-scrollbar::before {

@@ -1,0 +1,137 @@
+# Забрать недостающие файлы из архива заказчицы на Яндекс.Диске.
+#
+# Зачем на машине GitHub: из среды, где правится код, Яндекс.Диск закрыт
+# сетью, а здесь открыт. Список того, что взять, лежит в
+# tools/archive-fetch-list.txt. Ролики пережимаются как в compress-video.yml
+# (1280 px по длинной стороне, H.264, звук AAC, +faststart), фотографии
+# ужимаются до 2000 px, документы уходят в docs/materials и их текст
+# печатается в лог. Готовое коммитится в ветку pull request.
+#
+# Пуш от имени GITHUB_TOKEN другие процессы не запускает, поэтому петли
+# «коммит → запуск → коммит» нет. Повторный запуск безопасен: файлы, которые
+# уже лежат в репозитории, пропускаются.
+
+name: Забрать недостающее из архива
+
+on:
+  pull_request:
+    paths:
+      - tools/archive-fetch-list.txt
+      - .github/workflows/fetch-archive.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: fetch-archive-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref || github.ref_name }}
+
+      - name: Поставить Pillow
+        run: pip install --quiet pillow
+
+      - name: Скачать, пережать, разложить
+        env:
+          PUBLIC_URL: https://disk.yandex.ru/d/Jgm7EDdj2WLl_A
+        run: |
+          python3 - <<'EOF'
+          import io, json, os, re, shutil, subprocess, sys, urllib.parse, urllib.request, zipfile, html
+          from PIL import Image, ImageOps
+          key = os.environ["PUBLIC_URL"]
+          api = "https://cloud-api.yandex.net/v1/disk/public/resources/download"
+
+          def download(path, dest):
+              q = urllib.parse.urlencode({"public_key": key, "path": path})
+              with urllib.request.urlopen(api + "?" + q, timeout=60) as r:
+                  href = json.load(r)["href"]
+              with urllib.request.urlopen(href, timeout=600) as r, open(dest, "wb") as f:
+                  shutil.copyfileobj(r, f, 1 << 20)
+              return os.path.getsize(dest)
+
+          def target_for(path):
+              base = os.path.basename(path)
+              low = base.lower()
+              if low.endswith((".mp4", ".mov", ".avi", ".wmv", ".webm")):
+                  name = re.sub(r"\.(mp4|mov|avi|wmv|webm)$", ".mp4", low)
+                  return "public/photos/backstage/" + name if path.startswith("/Бэкстейдж/") else "public/videos/" + name
+              if low.endswith((".jpg", ".jpeg", ".png")):
+                  folder = {"/Фотосессия взрослых/": "individual"}.get(path.rsplit("/", 1)[0] + "/")
+                  if not folder:
+                      raise SystemExit(f"не знаю, в какую папку класть {path}")
+                  return f"public/photos/{folder}/{base}"
+              if low.endswith((".docx", ".pdf")):
+                  return "docs/materials/" + base
+              raise SystemExit(f"неизвестный тип файла: {path}")
+
+          def docx_text(fp):
+              z = zipfile.ZipFile(fp)
+              xml = z.read("word/document.xml").decode("utf8")
+              out = []
+              for p in re.findall(r"<w:p[ >].*?</w:p>", xml, flags=re.S):
+                  t = html.unescape("".join(re.findall(r"<w:t[^>]*>([^<]*)</w:t>", p))).strip()
+                  if t: out.append(t)
+              return "\n".join(out)
+
+          os.makedirs("tmp-archive", exist_ok=True)
+          done, skipped = [], []
+          for line in open("tools/archive-fetch-list.txt", encoding="utf8"):
+              path = line.strip()
+              if not path or path.startswith("#"): continue
+              target = target_for(path)
+              if os.path.exists(target) and os.path.getsize(target) > 0:
+                  skipped.append(target); continue
+              raw = os.path.join("tmp-archive", os.path.basename(path))
+              size = download(path, raw)
+              os.makedirs(os.path.dirname(target), exist_ok=True)
+              low = raw.lower()
+              if low.endswith((".mp4", ".mov", ".avi", ".wmv", ".webm")):
+                  subprocess.run([
+                      "ffmpeg", "-y", "-loglevel", "error", "-i", raw,
+                      "-vf", "scale='min(1280,iw)':'min(1280,ih)':force_original_aspect_ratio=decrease:force_divisible_by=2,format=yuv420p",
+                      "-c:v", "libx264", "-preset", "medium", "-crf", "23", "-profile:v", "high",
+                      "-c:a", "aac", "-b:a", "128k", "-movflags", "+faststart", target,
+                  ], check=True)
+              elif low.endswith((".jpg", ".jpeg", ".png")):
+                  im = ImageOps.exif_transpose(Image.open(raw))
+                  w, h = im.size
+                  if max(w, h) > 2000:
+                      s = 2000 / max(w, h); im = im.resize((round(w * s), round(h * s)), Image.LANCZOS)
+                  im.convert("RGB").save(target, "JPEG", quality=85, optimize=True, progressive=True)
+              else:
+                  shutil.copyfile(raw, target)
+                  if low.endswith(".docx"):
+                      print(f"=== ТЕКСТ {os.path.basename(path)} ===")
+                      print(docx_text(raw))
+                      print("=== КОНЕЦ ===")
+              os.remove(raw)
+              print(f"{path}: {size/1e6:.1f} МБ → {target} {os.path.getsize(target)/1e6:.1f} МБ")
+              done.append(target)
+          print("готово:", len(done), " пропущено (уже есть):", len(skipped))
+          with open("tmp-archive/done.txt", "w") as f: f.write("\n".join(done))
+          EOF
+
+      - name: Закоммитить в ветку
+        run: |
+          if [ ! -s tmp-archive/done.txt ]; then
+            echo "Нового ничего нет."
+            exit 0
+          fi
+          n=$(wc -l < tmp-archive/done.txt)
+          rm -rf tmp-archive
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public docs
+          git commit -m "Забрать из архива Яндекс.Диска то, что не взяла первая интеграция
+
+Список — tools/archive-fetch-list.txt, файлов: $n. Ролики пережаты до
+1280 px, H.264, +faststart; фото — до 2000 px, JPEG 85."
+          git push

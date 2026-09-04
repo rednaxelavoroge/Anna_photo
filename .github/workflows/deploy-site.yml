@@ -157,3 +157,25 @@ jobs:
             bye
           LFTP
           echo "Сайт выложен."
+
+          # Выкладка идёт без --delete, поэтому то, что убрано из репозитория,
+          # само с хостинга не исчезает. Здесь перечислено то, чего на сайте
+          # быть не должно: Word-файлы заказчицы, которые первая интеграция
+          # положила в папку сайта, и старые копии папок и роликов под
+          # прежними именами. Ошибки «нет такого файла» не страшны — значит,
+          # уже убрано.
+          lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" <<LFTP || true
+            set ssl:verify-certificate no
+            set ftp:ssl-allow yes
+            set cmd:fail-exit no
+            cd "$TARGET"
+            rm -r -f photos/about
+            rm -r -f photos/bloom
+            rm -r -f photos/product
+            rm -f "videos/Мастер-класс-2015(1).mp4"
+            rm -f "videos/Мастер-класс-2015(2).mp4"
+            rm -f photos/backstage/back-14.MP4
+            rm -f photos/individual/adult-30-3.jpg
+            bye
+          LFTP
+          echo "Старые файлы убраны."

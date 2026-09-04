@@ -77,14 +77,69 @@ jobs:
               print(f"{s:>10}  {p}")
           EOF
 
+      - name: Сверка архива с репозиторием
+        env:
+          PUBLIC_URL: ${{ inputs.yandex_public_url || 'https://disk.yandex.ru/d/Jgm7EDdj2WLl_A' }}
+        run: |
+          python3 - <<'EOF'
+          import json, os, re, urllib.parse, urllib.request
+          from collections import Counter, defaultdict
+          key = os.environ["PUBLIC_URL"]
+          api = "https://cloud-api.yandex.net/v1/disk/public/resources"
+          def listing(path):
+              items, offset = [], 0
+              while True:
+                  q = {"public_key": key, "limit": 1000, "offset": offset}
+                  if path: q["path"] = path
+                  with urllib.request.urlopen(api + "?" + urllib.parse.urlencode(q), timeout=60) as r:
+                      d = json.load(r)
+                  emb = d.get("_embedded", {})
+                  items += emb.get("items", [])
+                  offset += 1000
+                  if offset >= emb.get("total", 0): break
+              return items
+          folders, arch = [""], []
+          while folders:
+              path = folders.pop(0)
+              for it in listing(path):
+                  p = (path + "/" + it["name"]) if path else "/" + it["name"]
+                  if it["type"] == "dir": folders.append(p)
+                  else: arch.append(p)
+          repo = []
+          for root in ("public/photos", "public/videos", "docs/materials"):
+              for dp, _, fs in os.walk(root):
+                  for f in fs: repo.append(os.path.join(dp, f))
+          def norm(name):
+              base = os.path.basename(name).lower()
+              base = re.sub(r"\.jpeg$", ".jpg", base)
+              return re.sub(r"[\s_\-()]+", "", base)
+          rn = defaultdict(list)
+          for p in repo: rn[norm(p)].append(p)
+          media = re.compile(r"\.(jpe?g|png|webp|mp4|mov|webm|docx|pdf)$", re.I)
+          print("=== ПАПКИ АРХИВА → есть в репозитории / всего ===")
+          per = defaultdict(lambda: [0, 0])
+          missing = []
+          for p in arch:
+              d = p.rsplit("/", 1)[0] or "/"
+              per[d][1] += 1
+              if rn.get(norm(p)): per[d][0] += 1
+              else: missing.append(p)
+          for d in sorted(per): print(f"{per[d][0]:5d} / {per[d][1]:<5d} {d}")
+          print(f"ВСЕГО в архиве: {len(arch)}, найдено в репозитории: {len(arch)-len(missing)}, НЕ НАЙДЕНО: {len(missing)}")
+          print("=== ФАЙЛЫ АРХИВА, КОТОРЫХ НЕТ В РЕПОЗИТОРИИ ===")
+          for p in missing: print("  ", p)
+          an = {norm(p) for p in arch}
+          extra = [p for p in repo if norm(p) not in an and media.search(p) and "/_preview/" not in p and "/uploads/" not in p and "/publications/" not in p]
+          print("=== ФАЙЛЫ РЕПОЗИТОРИЯ, КОТОРЫХ НЕТ В АРХИВЕ (переименованные или лишние) ===")
+          for p in sorted(extra): print("  ", p)
+          EOF
+
       - name: Что лежит в репозитории (для сверки)
         run: |
           echo "=== ПАПКИ РЕПОЗИТОРИЯ (файлов) ==="
           for d in public/photos/*/ public/videos/; do
             printf "%5d  %s\n" "$(find "$d" -type f | wc -l)" "$d"
           done
-          echo "=== ВСЕ ФАЙЛЫ РЕПОЗИТОРИЯ ==="
-          find public/photos public/videos -type f | sort
 
       - name: Обход живого сайта
         env:
@@ -150,5 +205,17 @@ jobs:
           print("about: раздел «Фотоархив»:", "Фотоархив" in t, "; служебный заголовок «без повтора ради колонки»:", "без повтора ради колонки" in t)
           for u in ["/photos/about/Привет.docx", "/photos/about/Манасарян Анна Эдвардовна  07.docx", "/photos/bloom/fiori-1.jpg", "/photos/blooming/fiori-1.jpg", "/photos/product/gioielli-1.jpg", "/photos/objects/gioielli-1.jpg", "/photos/individual/adult-30-3.jpg"]:
               print(f"  {head(u)[1]}  {u}")
+          print("=== СКРИПТЫ СТРАНИЦЫ РАЗДЕЛА (портфолио/newborn) ===")
+          st, body, _ = get(site + "/portfolio/newborn/")
+          t = body.decode("utf8", "ignore")
+          for m in re.findall(r'<script[^>]+src="([^"]+)"', t):
+              u = html.unescape(m).split("?")[0]
+              raw = urllib.parse.unquote(u)
+              print(f"  encoded={get(site + u, 'HEAD')[0]}  raw={get(site + raw, 'HEAD')[0]}  {raw}")
+          for u in ["/_next/static/chunks/app/portfolio/%5Bcategory%5D/", "/_next/static/chunks/app/portfolio/", "/_next/static/chunks/app/"]:
+              print(f"  dir {get(site + u, 'HEAD')[0]}  {u}")
+          st, body, _ = get(site + "/portfolio/newborn/images-0-1/")
+          t = body.decode("utf8", "ignore")
+          print("album-redirect page:", st, [urllib.parse.unquote(html.unescape(m)) for m in re.findall(r'<script[^>]+src="([^"]+)"', t) if "album" in m])
           print("ИТОГ: битых ссылок на живом сайте:", len(bad))
           EOF

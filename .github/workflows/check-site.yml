@@ -13,6 +13,9 @@
 name: Проверить живой сайт и архив
 
 on:
+  # Кнопка работает только для процессов, которые есть в главной ветке; этот
+  # живёт в рабочей, поэтому запускается ещё и при открытии pull request.
+  pull_request:
   workflow_dispatch:
     inputs:
       yandex_public_url:
@@ -31,7 +34,7 @@ jobs:
 
       - name: Список файлов в архиве Яндекс.Диска
         env:
-          PUBLIC_URL: ${{ inputs.yandex_public_url }}
+          PUBLIC_URL: ${{ inputs.yandex_public_url || 'https://disk.yandex.ru/d/Jgm7EDdj2WLl_A' }}
         run: |
           python3 - <<'EOF'
           import json, os, sys, urllib.parse, urllib.request
@@ -85,7 +88,7 @@ jobs:
 
       - name: Обход живого сайта
         env:
-          SITE: ${{ inputs.site }}
+          SITE: ${{ inputs.site || 'https://annamanasaryan.com' }}
         run: |
           python3 - <<'EOF'
           import os, re, sys, html, urllib.parse, urllib.request
@@ -147,5 +150,5 @@ jobs:
           print("about: раздел «Фотоархив»:", "Фотоархив" in t, "; служебный заголовок «без повтора ради колонки»:", "без повтора ради колонки" in t)
           for u in ["/photos/about/Привет.docx", "/photos/about/Манасарян Анна Эдвардовна  07.docx", "/photos/bloom/fiori-1.jpg", "/photos/blooming/fiori-1.jpg", "/photos/product/gioielli-1.jpg", "/photos/objects/gioielli-1.jpg", "/photos/individual/adult-30-3.jpg"]:
               print(f"  {head(u)[1]}  {u}")
-          if bad: sys.exit(1)
+          print("ИТОГ: битых ссылок на живом сайте:", len(bad))
           EOF

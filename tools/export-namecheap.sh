@@ -13,5 +13,7 @@ mv src/app/admin src/app/api .export-stash
 if [ -f src/middleware.ts ]; then mv src/middleware.ts .export-stash/; fi
 export NAMECHEAP_EXPORT=1
 npx next build
+# Папки со скобками ([category]) не доезжают до хостинга — см. tools/fix-bracket-paths.mjs.
+node tools/fix-bracket-paths.mjs out
 rm -f annamanasaryan-com.zip
 (cd out && zip -r ../annamanasaryan-com.zip .)

@@ -1,5 +1,6 @@
 import { CoverArt } from "@/components/CoverArt";
-import { getAboutVideos, getSite } from "@/lib/content";
+import { PublicationsSection } from "@/components/PublicationsSection";
+import { getAboutVideos, getPublications, getSite } from "@/lib/content";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -14,6 +15,7 @@ export default function AboutPage() {
   const site = getSite();
   const { about } = site;
   const videos = getAboutVideos();
+  const publications = getPublications();
 
   return (
     <article className="px-5 pt-28 pb-24 md:px-8">
@@ -21,8 +23,8 @@ export default function AboutPage() {
       <h1 className="mt-4 max-w-3xl font-display text-4xl leading-[0.95] md:text-6xl">
         {about.title}
       </h1>
-      <div className="relative mt-10 aspect-[3/4] max-w-md overflow-hidden bg-void">
-        <CoverArt slug="home-hero" title={about.title} src={site.portrait} />
+      <div className="relative mt-10 aspect-[2/3] max-w-md overflow-hidden bg-paper shadow-xs">
+        <CoverArt slug="home-hero" title={about.title} src={site.portrait} contain />
       </div>
       <p className="mt-8 max-w-2xl text-lg leading-relaxed">{about.lead}</p>
       <div className="mt-10 max-w-2xl space-y-5 text-sm leading-relaxed text-muted md:text-base">
@@ -31,6 +33,8 @@ export default function AboutPage() {
         ))}
       </div>
       <p className="mt-12 max-w-2xl text-xs leading-relaxed text-ash">{about.note}</p>
+
+      <PublicationsSection publications={publications} />
 
       <section className="mt-24">
         <p className="eyebrow">Эфиры и сюжеты</p>

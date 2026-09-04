@@ -60,16 +60,29 @@ export function AlbumGrid({
             onClick={() => setOpen(index)}
             className="gallery-print group"
           >
-            <div className="overflow-hidden bg-void">
+            <div className="overflow-hidden bg-paper">
               <div className="tile-zoom">
                 {photo.src ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={photo.src} alt={photo.alt} className="w-full" />
+                  photo.kind === "video" || /\.(mp4|webm|mov)$/i.test(photo.src) ? (
+                    <video
+                      src={photo.src}
+                      muted
+                      loop
+                      playsInline
+                      autoPlay
+                      preload="metadata"
+                      className="w-full h-auto block"
+                    />
+                  ) : (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={photo.src} alt={photo.alt} className="w-full h-auto block" />
+                  )
                 ) : (
                   <CoverArt
                     slug={`${slug}-${photo.id}`}
                     title={photo.alt}
-                    className={photo.height > photo.width ? "aspect-[3/4]" : "aspect-[4/3]"}
+                    className={photo.height > photo.width ? "aspect-[2/3]" : "aspect-[3/2]"}
+                    contain
                   />
                 )}
               </div>

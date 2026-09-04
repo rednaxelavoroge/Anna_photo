@@ -12,24 +12,26 @@ export function CoverArt({
   src,
   className = "",
   style,
+  contain = false,
 }: {
   slug: string;
   title: string;
   src?: string;
   className?: string;
   style?: CSSProperties;
+  contain?: boolean;
 }) {
   const resolved = src || getPreviewCover(slug);
   if (resolved) {
     return (
-      <span className={`relative block h-full w-full overflow-hidden bg-void ${className}`} style={style}>
+      <span className={`relative block h-full w-full overflow-hidden ${contain ? "bg-paper" : "bg-void"} ${className}`} style={style}>
         <Image
           src={resolved}
           alt={title}
           fill
           priority={slug === "home-hero"}
           sizes="(max-width: 768px) 100vw, 50vw"
-          className="object-cover"
+          className={contain ? "object-contain" : "object-cover"}
         />
       </span>
     );

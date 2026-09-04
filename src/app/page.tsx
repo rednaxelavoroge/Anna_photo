@@ -2,13 +2,19 @@ import { CoverArt } from "@/components/CoverArt";
 import { MeetSections } from "@/components/MeetSection";
 import { SplitReveal } from "@/components/SplitReveal";
 import { getCategories, getFeaturedFeed, getFeaturedPhotos, getSite } from "@/lib/content";
+import { getPhotos } from "@/lib/photos";
 import Link from "next/link";
 
 export default function HomePage() {
   const site = getSite();
-  const categories = getCategories();
+  const rawCategories = getCategories();
   const feed = getFeaturedFeed();
   const featured = getFeaturedPhotos();
+
+  const categories = rawCategories.map((cat) => ({
+    ...cat,
+    cover: cat.cover || getPhotos(cat.slug)[0]?.src,
+  }));
 
   return (
     <>
@@ -34,9 +40,6 @@ export default function HomePage() {
                 Контакты
               </Link>
             </div>
-            <p className="mt-6 text-[10px] tracking-[0.18em] text-snow/50 uppercase">
-              Временное превью
-            </p>
           </div>
         </div>
       </SplitReveal>
@@ -49,10 +52,10 @@ export default function HomePage() {
           <div className="mt-10 flex gap-4 overflow-x-auto pb-4">
             {featured.map((photo) => (
               <figure key={photo.id} className="w-[min(72vw,280px)] shrink-0">
-                <div className="aspect-[3/4] overflow-hidden bg-void">
+                <div className="aspect-[2/3] overflow-hidden bg-paper shadow-xs">
                   {photo.src ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={photo.src} alt={photo.alt} className="h-full w-full object-cover" />
+                    <img src={photo.src} alt={photo.alt} className="h-full w-full object-contain" />
                   ) : null}
                 </div>
                 <figcaption className="mt-3 text-sm">{photo.alt}</figcaption>

@@ -46,14 +46,14 @@ function MeetSection({
   const image = (
     <Link
       href={`/portfolio/${category.slug}`}
-      className="group relative block h-full w-full overflow-hidden bg-void"
+      className="group relative flex h-full w-full items-center justify-center overflow-hidden bg-paper p-2 sm:p-4 md:p-8"
       aria-label={`Открыть ${category.menu}`}
     >
-      <div className="tile-zoom absolute inset-0">
-        <CoverArt slug={category.slug} title={category.menu} src={category.cover} />
+      <div className="relative aspect-[2/3] h-auto max-h-[86svh] w-full max-w-[540px] overflow-hidden bg-paper shadow-xs transition-transform duration-500 group-hover:scale-[1.015]">
+        <CoverArt slug={category.slug} title={category.menu} src={category.cover} contain />
       </div>
-      <div className="absolute inset-0 flex items-end p-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100 md:p-8">
-        <span className="text-xs tracking-[0.22em] text-snow uppercase">Открыть →</span>
+      <div className="pointer-events-none absolute inset-0 flex items-end justify-start p-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100 md:p-8">
+        <span className="bg-ink/80 px-3 py-1.5 text-xs tracking-[0.22em] text-snow uppercase backdrop-blur-xs">Открыть →</span>
       </div>
     </Link>
   );
@@ -81,7 +81,7 @@ function MeetSection({
       <section className="border-t border-line">
         <div className="grid md:grid-cols-2 md:min-h-[70svh]">
           <div className={`min-h-[46svh] md:min-h-0 ${imageLeft ? "md:order-1" : "md:order-2"}`}>
-            <div className="aspect-[4/5] h-full min-h-[46svh] md:aspect-auto">{image}</div>
+            <div className="aspect-[2/3] h-full min-h-[46svh] md:aspect-auto">{image}</div>
           </div>
           <div className={imageLeft ? "md:order-2" : "md:order-1"}>{copy}</div>
         </div>

@@ -7,6 +7,7 @@ import reviewsData from "@/data/reviews.json";
 import siteData from "@/data/site.json";
 import tagsData from "@/data/tags.json";
 import workshopsData from "@/data/workshops.json";
+import publicationsData from "@/data/publications.json";
 
 export type Category = {
   slug: string;
@@ -224,5 +225,21 @@ export function getBackstagePhotos(): Photo[] {
     height: index % 2 === 0 ? 1100 : 1600,
     year: 2023 + (index % 3),
   }));
+}
+
+export type Publication = {
+  id: string;
+  title: string;
+  media: string;
+  date: string;
+  author?: string;
+  badge: string;
+  lead: string;
+  paragraphs: string[];
+  link?: string;
+};
+
+export function getPublications(): Publication[] {
+  return (publicationsData.items ?? []) as Publication[];
 }
 

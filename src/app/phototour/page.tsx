@@ -33,8 +33,10 @@ export default function PhototourPage() {
             </Link>
           </div>
         </div>
-        <div className="relative min-h-[50svh] bg-void">
-          <CoverArt slug="phototour" title={phototour.title} />
+        <div className="relative min-h-[50svh] bg-paper flex items-center justify-center p-4">
+          <div className="relative aspect-[2/3] w-full max-w-md overflow-hidden bg-paper shadow-xs">
+            <CoverArt slug="phototour" title={phototour.title} contain />
+          </div>
         </div>
       </div>
     </article>

@@ -175,7 +175,6 @@ jobs:
             rm -f "videos/Мастер-класс-2015(1).mp4"
             rm -f "videos/Мастер-класс-2015(2).mp4"
             rm -f photos/backstage/back-14.MP4
-            rm -f photos/individual/adult-30-3.jpg
             bye
           LFTP
           echo "Старые файлы убраны."

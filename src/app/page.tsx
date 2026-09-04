@@ -11,10 +11,15 @@ export default function HomePage() {
   const feed = getFeaturedFeed();
   const featured = getFeaturedPhotos();
 
-  const categories = rawCategories.map((cat) => ({
-    ...cat,
-    cover: cat.cover || getPhotos(cat.slug)[0]?.src,
-  }));
+  // На первую страницу попадают только разделы, в которых уже лежат
+  // настоящие фотографии. Пустой раздел (сейчас — «ИИ-проекты») остаётся в
+  // меню и в портфолио, но серую заглушку на главной не показывает.
+  const categories = rawCategories
+    .map((cat) => ({
+      ...cat,
+      cover: cat.cover || getPhotos(cat.slug).find((photo) => Boolean(photo.src))?.src,
+    }))
+    .filter((cat) => Boolean(cat.cover));
 
   return (
     <>

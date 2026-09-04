@@ -237,9 +237,18 @@ export type Publication = {
   lead: string;
   paragraphs: string[];
   link?: string;
+  /** Кадры из публикации: скриншоты и фотографии, сохранённые из Word-файлов заказчицы. */
+  images?: string[];
 };
+
+export type PressLink = { id: string; title: string; media: string; href: string };
 
 export function getPublications(): Publication[] {
   return (publicationsData.items ?? []) as Publication[];
+}
+
+/** Ссылки на публикации, текст которых заказчица не копировала — только адрес. */
+export function getPressLinks(): PressLink[] {
+  return ((publicationsData as { links?: PressLink[] }).links ?? []) as PressLink[];
 }
 

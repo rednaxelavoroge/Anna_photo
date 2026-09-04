@@ -1,28 +1,48 @@
 "use client";
 
-import type { Publication } from "@/lib/content";
+import { Lightbox } from "@/components/Lightbox";
+import type { Photo, PressLink, Publication } from "@/lib/content";
 import { useState } from "react";
 
-export function PublicationsSection({ publications }: { publications: Publication[] }) {
+function toPhotos(pub: Publication): Photo[] {
+  return (pub.images ?? []).map((src, index) => ({
+    id: `${pub.id}-${index + 1}`,
+    src,
+    alt: `${pub.title} — ${index + 1}`,
+    width: 1200,
+    height: 800,
+  }));
+}
+
+export function PublicationsSection({
+  publications,
+  links,
+}: {
+  publications: Publication[];
+  links: PressLink[];
+}) {
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [open, setOpen] = useState<{ pub: string; index: number } | null>(null);
+  const openPub = open ? publications.find((item) => item.id === open.pub) : undefined;
+  const openPhotos = openPub ? toPhotos(openPub) : [];
 
   return (
     <section className="mt-24 border-t border-line pt-16">
       <p className="eyebrow">Публикации и СМИ</p>
-      <h2 className="mt-4 max-w-2xl font-display text-3xl md:text-5xl">
-        Пресса и выставки
-      </h2>
+      <h2 className="mt-4 max-w-2xl font-display text-3xl md:text-5xl">Пресса о фотографе</h2>
       <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted md:text-base">
-        Статьи, интервью и обзоры в профильных изданиях и на телевидении. Все тексты сохранены на сайте, а ссылки ведут на оригинальные источники.
+        Статьи, интервью и фоторяды в изданиях. Тексты и кадры публикаций сохранены здесь целиком,
+        ссылки ведут на оригиналы.
       </p>
 
       <div className="mt-12 grid gap-6 md:grid-cols-2">
         {publications.map((pub) => {
           const isOpen = activeId === pub.id;
+          const photos = toPhotos(pub);
           return (
             <div
               key={pub.id}
-              className="flex flex-col justify-between border border-line bg-snow p-6 md:p-8 transition-shadow duration-300 hover:shadow-xs"
+              className="flex min-w-0 flex-col justify-between border border-line bg-snow p-6 transition-shadow duration-300 hover:shadow-xs md:p-8"
             >
               <div>
                 <div className="flex flex-wrap items-center justify-between gap-2">
@@ -34,17 +54,34 @@ export function PublicationsSection({ publications }: { publications: Publicatio
                   </span>
                 </div>
 
-                <h3 className="mt-4 font-display text-xl leading-tight text-ink md:text-2xl">
-                  {pub.title}
-                </h3>
+                <h3 className="mt-4 font-display text-xl leading-tight text-ink md:text-2xl">{pub.title}</h3>
 
-                {pub.author ? (
-                  <p className="mt-1.5 text-xs text-muted">{pub.author}</p>
+                {pub.author ? <p className="mt-1.5 text-xs text-muted">{pub.author}</p> : null}
+
+                {photos.length > 0 ? (
+                  <div className="mt-5 flex max-w-full gap-2 overflow-x-auto pb-1">
+                    {photos.map((photo, index) => (
+                      <button
+                        key={photo.id}
+                        type="button"
+                        onClick={() => setOpen({ pub: pub.id, index })}
+                        className="group/thumb h-20 w-20 shrink-0 overflow-hidden bg-paper md:h-24 md:w-24"
+                        aria-label={`Открыть кадр ${index + 1} из публикации «${pub.title}»`}
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={photo.src}
+                          alt={photo.alt}
+                          loading="lazy"
+                          decoding="async"
+                          className="h-full w-full object-cover transition-transform duration-500 group-hover/thumb:scale-105"
+                        />
+                      </button>
+                    ))}
+                  </div>
                 ) : null}
 
-                <p className="mt-4 text-sm leading-relaxed text-ink/80">
-                  {pub.lead}
-                </p>
+                <p className="mt-4 text-sm leading-relaxed text-ink/80">{pub.lead}</p>
 
                 {isOpen ? (
                   <div className="mt-6 space-y-4 border-t border-line pt-6 text-sm leading-relaxed text-ink/90">
@@ -59,7 +96,7 @@ export function PublicationsSection({ publications }: { publications: Publicatio
                 <button
                   type="button"
                   onClick={() => setActiveId(isOpen ? null : pub.id)}
-                  className="link-line text-xs tracking-[0.16em] uppercase text-ink font-medium"
+                  className="link-line text-xs font-medium tracking-[0.16em] text-ink uppercase"
                 >
                   {isOpen ? "Свернуть статью ↑" : "Читать статью ↓"}
                 </button>
@@ -69,7 +106,7 @@ export function PublicationsSection({ publications }: { publications: Publicatio
                     href={pub.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs text-muted hover:text-ink transition-colors flex items-center gap-1 tracking-wider uppercase text-[11px]"
+                    className="flex items-center gap-1 text-[11px] tracking-wider text-muted uppercase transition-colors hover:text-ink"
                   >
                     Оригинал ↗
                   </a>
@@ -79,6 +116,44 @@ export function PublicationsSection({ publications }: { publications: Publicatio
           );
         })}
       </div>
+
+      {links.length > 0 ? (
+        <div className="mt-14">
+          <p className="eyebrow">Ссылки на публикации</p>
+          <ul className="mt-5 divide-y divide-line border-y border-line">
+            {links.map((item) => (
+              <li key={item.id}>
+                <a
+                  href={item.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex flex-col gap-1 py-4 md:flex-row md:items-baseline md:justify-between md:gap-6"
+                >
+                  <span className="text-sm leading-snug text-ink group-hover:underline md:text-base">{item.title}</span>
+                  <span className="shrink-0 text-[11px] tracking-[0.16em] text-muted uppercase">{item.media} ↗</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+
+      {open && openPhotos.length > 0 ? (
+        <Lightbox
+          photos={openPhotos}
+          index={open.index}
+          slug={open.pub}
+          onClose={() => setOpen(null)}
+          onPrev={() =>
+            setOpen((current) =>
+              current ? { ...current, index: (current.index + openPhotos.length - 1) % openPhotos.length } : current,
+            )
+          }
+          onNext={() =>
+            setOpen((current) => (current ? { ...current, index: (current.index + 1) % openPhotos.length } : current))
+          }
+        />
+      ) : null}
     </section>
   );
 }

@@ -40,30 +40,30 @@ export default function TrainingPage() {
 
       <section className="mt-20 border-t border-line pt-14">
         <p className="eyebrow">Мастер-классы</p>
-        <h2 className="mt-3 font-display text-3xl md:text-4xl">Видео с практических занятий</h2>
+        <h2 className="mt-3 font-display text-3xl md:text-4xl">Видео с мастер-класса</h2>
         <div className="mt-8 grid gap-6 md:grid-cols-2">
           <figure className="border border-line bg-snow p-4">
             <video
-              src="/videos/Мастер-класс-2015(1).mp4"
+              src="/videos/masterclass-2015-1.mp4"
               controls
               playsInline
               preload="metadata"
               className="aspect-video w-full bg-paper object-contain"
             />
             <figcaption className="mt-3 text-sm font-medium text-ink">
-              Мастер-класс по съёмке новорождённых — Часть 1
+              Мастер-класс «Секреты съёмки новорождённых», 2015 — часть 1
             </figcaption>
           </figure>
           <figure className="border border-line bg-snow p-4">
             <video
-              src="/videos/Мастер-класс-2015(2).mp4"
+              src="/videos/masterclass-2015-2.mp4"
               controls
               playsInline
               preload="metadata"
               className="aspect-video w-full bg-paper object-contain"
             />
             <figcaption className="mt-3 text-sm font-medium text-ink">
-              Мастер-класс по съёмке новорождённых — Часть 2
+              Мастер-класс «Секреты съёмки новорождённых», 2015 — часть 2
             </figcaption>
           </figure>
         </div>

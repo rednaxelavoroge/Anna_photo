@@ -101,6 +101,12 @@ export function getPhotos(categorySlug: string): Photo[] {
   return previewAsAlbum(categorySlug, categorySlug) ?? getPlaceholderPhotos(categorySlug);
 }
 
+/** Пресса и эфиры: фотографии с телевидения, выставок и страниц изданий (public/photos/press). */
+export function getPressPhotos(): Photo[] {
+  const list = readAlbumDir(["press"], "Пресса и эфиры") ?? [];
+  return list.filter((photo) => photo.kind !== "video");
+}
+
 export function getBackstagePhotos(): Photo[] {
   const fromJson = getBackstageEntries();
   if (fromJson.length > 0) {

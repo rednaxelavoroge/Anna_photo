@@ -1,6 +1,7 @@
 "use client";
 
 import { CoverArt } from "@/components/CoverArt";
+import { GridVideo } from "@/components/GridVideo";
 import { Lightbox } from "@/components/Lightbox";
 import type { Photo } from "@/lib/content";
 import { useMemo, useState } from "react";
@@ -64,18 +65,16 @@ export function AlbumGrid({
               <div className="tile-zoom">
                 {photo.src ? (
                   photo.kind === "video" || /\.(mp4|webm|mov)$/i.test(photo.src) ? (
-                    <video
-                      src={photo.src}
-                      muted
-                      loop
-                      playsInline
-                      autoPlay
-                      preload="metadata"
-                      className="w-full h-auto block"
-                    />
+                    <GridVideo src={photo.src} className="block h-auto w-full" />
                   ) : (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={photo.src} alt={photo.alt} className="w-full h-auto block" />
+                    <img
+                      src={photo.src}
+                      alt={photo.alt}
+                      loading={index < 6 ? "eager" : "lazy"}
+                      decoding="async"
+                      className="block h-auto w-full"
+                    />
                   )
                 ) : (
                   <CoverArt

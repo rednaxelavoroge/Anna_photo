@@ -37,11 +37,23 @@ export default async function CategoryPage({ params }: { params: Promise<Params>
 
   const photos = getPhotos(slug);
   const categories = getCategories();
+  const hasRealPhotos = photos.some((photo) => Boolean(photo.src));
 
   return (
     <article className="tape-page">
       <PortfolioNav categories={categories} activeSlug={slug} categoryName={category.menu} />
-      <PhotoTape photos={photos} slug={slug} />
+      {hasRealPhotos ? (
+        <PhotoTape photos={photos} slug={slug} />
+      ) : (
+        <div className="flex min-h-[50svh] items-center justify-center px-5 text-center">
+          <div>
+            <h1 className="font-display text-2xl md:text-4xl">{category.title}</h1>
+            <p className="mt-4 max-w-md text-sm leading-relaxed text-muted md:text-base">
+              Раздел наполняется — работы появятся здесь, как только будут готовы.
+            </p>
+          </div>
+        </div>
+      )}
     </article>
   );
 }

@@ -13,7 +13,8 @@ import { useEffect, useRef, useState } from "react";
  * Широкий экран: две половины, кадр слева или справа через одну. Телефон:
  * кадр сверху на всю ширину, подпись под ним — половина экрана шириной
  * 195 px давала ту самую «обрезку 1:4», от которой заказчица отказалась.
- * Фотография в обоих случаях показана целиком (object-contain) на бежевом.
+ * На широком экране кадр заполняет половину под обрез, как было с первой
+ * версии (заказчику так нравится); на телефоне показан целиком на бежевом.
  */
 export function MeetSections({ categories }: { categories: Category[] }) {
   return (
@@ -60,12 +61,12 @@ function MeetSection({ category, index, total }: { category: Category; index: nu
   const image = (
     <Link
       href={`/portfolio/${category.slug}`}
-      className="group relative flex h-full w-full items-center justify-center overflow-hidden bg-paper px-4 pt-2 pb-1 md:p-8"
+      className="group relative flex h-full w-full items-center justify-center overflow-hidden bg-paper px-4 pt-2 pb-1 md:bg-void md:p-0"
       aria-label={`Открыть ${category.menu}`}
     >
       {category.cover ? (
-        <div className="relative h-full w-full transition-transform duration-500 group-hover:scale-[1.015]">
-          <CoverArt slug={category.slug} title={category.menu} src={category.cover} contain />
+        <div className="tile-zoom relative h-full w-full">
+          <CoverArt slug={category.slug} title={category.menu} src={category.cover} contain coverFromMd />
         </div>
       ) : (
         <div className="flex aspect-[2/3] h-full max-w-full items-center justify-center border border-line px-6 text-center text-[11px] tracking-[0.2em] text-muted uppercase">

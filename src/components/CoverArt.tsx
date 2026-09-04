@@ -13,6 +13,7 @@ export function CoverArt({
   className = "",
   style,
   contain = false,
+  coverFromMd = false,
 }: {
   slug: string;
   title: string;
@@ -20,18 +21,23 @@ export function CoverArt({
   className?: string;
   style?: CSSProperties;
   contain?: boolean;
+  /** Телефон: целиком на бежевом (contain); широкий экран: под обрез на всю половину (cover). */
+  coverFromMd?: boolean;
 }) {
   const resolved = src || getPreviewCover(slug);
   if (resolved) {
     return (
-      <span className={`relative block h-full w-full overflow-hidden ${contain ? "bg-paper" : "bg-void"} ${className}`} style={style}>
+      <span
+        className={`relative block h-full w-full overflow-hidden ${contain ? "bg-paper" : "bg-void"} ${coverFromMd ? "md:bg-void" : ""} ${className}`}
+        style={style}
+      >
         <Image
           src={resolved}
           alt={title}
           fill
           priority={slug === "home-hero"}
           sizes="(max-width: 768px) 100vw, 50vw"
-          className={contain ? "object-contain" : "object-cover"}
+          className={`${contain ? "object-contain" : "object-cover"} ${coverFromMd ? "md:object-cover" : ""}`}
         />
       </span>
     );

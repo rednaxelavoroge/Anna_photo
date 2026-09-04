@@ -179,3 +179,47 @@ jobs:
             bye
           LFTP
           echo "Старые файлы убраны."
+
+      - name: Проверить живой сайт после выкладки
+        if: steps.check.outputs.ready == 'true'
+        run: |
+          python3 - <<'EOF'
+          import re, html, urllib.parse, urllib.request
+          from concurrent.futures import ThreadPoolExecutor
+          site = "https://annamanasaryan.com"
+          def get(url, method="GET"):
+              req = urllib.request.Request(url, method=method, headers={"User-Agent": "deploy-check"})
+              try:
+                  with urllib.request.urlopen(req, timeout=60) as r:
+                      return r.status, (r.read() if method == "GET" else b"")
+              except urllib.error.HTTPError as e:
+                  return e.code, b""
+              except Exception as e:
+                  return f"ERR {type(e).__name__}", b""
+          st, body = get(site + "/sitemap.xml")
+          pages = re.findall(r"<loc>([^<]+)</loc>", body.decode("utf8", "ignore"))
+          pages = [p.replace("https://www.", "https://") for p in pages] or [site + "/"]
+          assets = {}
+          for p in pages:
+              st, body = get(p)
+              text = body.decode("utf8", "ignore")
+              n = 0
+              for m in re.findall(r'(?:src|href|poster)="([^"]+)"', text):
+                  u = html.unescape(m).split("?")[0].split("#")[0]
+                  if u.startswith("/") and not u.startswith("//") and re.search(r"\.(jpe?g|png|webp|mp4|mov|webm|js|css)$", u, re.I):
+                      assets.setdefault(u, set()).add(p); n += 1
+              print(f"{st}  файлов={n:<4} {p}")
+          def head(u):
+              return u, get(site + (u if "%" in u else urllib.parse.quote(u)), "HEAD")[0]
+          with ThreadPoolExecutor(16) as ex:
+              results = list(ex.map(head, sorted(assets)))
+          bad = [(u, st) for u, st in results if st != 200]
+          print(f"Файлов, на которые ссылается сайт: {len(results)}; отвечают 200: {len(results) - len(bad)}; битых: {len(bad)}")
+          for u, st in bad:
+              print("  БИТАЯ:", st, u, "← со страниц:", ", ".join(sorted(assets[u]))[:160])
+          for u in ["/photos/about/Привет.docx", "/photos/about/Манасарян Анна Эдвардовна  07.docx"]:
+              st = get(site + urllib.parse.quote(u), "HEAD")[0]
+              print(f"  {st}  {u}  ({'убран' if st == 404 else 'ЕЩЁ СКАЧИВАЕТСЯ'})")
+          if bad:
+              raise SystemExit("На живом сайте есть битые ссылки — см. выше.")
+          EOF

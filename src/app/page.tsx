@@ -8,15 +8,13 @@ export default function HomePage() {
   const site = getSite();
   const rawCategories = getCategories();
 
-  // На первую страницу попадают только разделы, в которых уже лежат
-  // настоящие фотографии. Пустой раздел (сейчас — «ИИ-проекты») остаётся в
-  // меню и в портфолио, но серую заглушку на главной не показывает.
-  const categories = rawCategories
-    .map((cat) => ({
-      ...cat,
-      cover: cat.cover || getPhotos(cat.slug).find((photo) => Boolean(photo.src))?.src,
-    }))
-    .filter((cat) => Boolean(cat.cover));
+  // Все разделы из списка заказчицы, в её порядке. Обложка — первый кадр
+  // папки раздела; у раздела без кадров (сейчас «ИИ-проекты») обложки нет,
+  // и вместо неё показывается рамка «Раздел наполняется».
+  const categories = rawCategories.map((cat) => ({
+    ...cat,
+    cover: cat.cover || getPhotos(cat.slug).find((photo) => Boolean(photo.src))?.src,
+  }));
 
   return (
     <>

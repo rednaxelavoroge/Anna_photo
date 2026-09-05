@@ -77,13 +77,15 @@ export function PublicationsSection({
         {publications.map((pub) => {
           const isOpen = activeId === pub.id;
           const photos = toPhotos(pub);
-          const hasText = pub.paragraphs.length > 0;
           // У четырёх публикаций анонс — это дословно первый абзац статьи.
           // Анонс стоит над текстом всегда, поэтому в самом тексте его не
           // повторяем: иначе раскрытая статья начинается дважды одним и тем
           // же абзацем.
           const body =
             pub.paragraphs[0]?.trim() === pub.lead.trim() ? pub.paragraphs.slice(1) : pub.paragraphs;
+          // Читать нечего и в том случае, когда единственный абзац и был
+          // анонсом: кнопка «Читать статью» открывала бы пустоту.
+          const hasText = body.length > 0;
           const { slots, rest } = layout(photos, isOpen ? body.length : 0);
           const openAt = (photo: Photo) =>
             setOpen({ pub: pub.id, index: photos.findIndex((item) => item.id === photo.id) });

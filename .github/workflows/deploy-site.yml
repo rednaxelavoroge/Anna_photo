@@ -147,13 +147,23 @@ jobs:
           # --delete здесь НЕТ и быть не должно: в той же папке лежит
           # admin-panel — файлы панели. С --delete первая же выкладка сайта
           # снесла бы панель целиком.
+          #
+          # Хостинг пускает не больше 8 соединений с одного адреса (ответ
+          # «421 Too many connections»), поэтому --parallel=2, не 4.
+          # Фото и ролики сравниваются по размеру (--ignore-time): сборка
+          # каждый раз создаёт файлы заново, и по времени они всегда «новее»,
+          # из-за чего раньше 900 МБ уезжали на хостинг при каждой выкладке.
+          # Страницы и скрипты — как обычно, они маленькие.
           lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" <<LFTP
             set ssl:verify-certificate no
             set ftp:ssl-allow yes
             set cmd:fail-exit yes
-            set net:max-retries 3
+            set net:max-retries 5
+            set net:reconnect-interval-base 5
             set net:timeout 30
-            mirror -R --parallel=4 --exclude-glob .DS_Store out "$TARGET"
+            mirror -R --parallel=2 --exclude-glob .DS_Store --exclude ^photos/ --exclude ^videos/ out "$TARGET"
+            mirror -R --parallel=2 --ignore-time --exclude-glob .DS_Store out/photos "$TARGET/photos"
+            mirror -R --parallel=2 --ignore-time out/videos "$TARGET/videos"
             bye
           LFTP
           echo "Сайт выложен."

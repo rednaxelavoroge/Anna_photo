@@ -50,10 +50,12 @@ function MeetSection({ category, index, total }: { category: Category; index: nu
     offset: ["start end", "end start"],
   });
 
-  // Съезжаются к центру и остаются: разъезд обратно оставлял пустой экран
-  // между разделами, заказчица просила, чтобы разделы шли друг за другом.
-  const fromLeft = useTransform(scrollYProgress, [0.05, 0.3, 1], ["-58%", "0%", "0%"]);
-  const fromRight = useTransform(scrollYProgress, [0.05, 0.3, 1], ["58%", "0%", "0%"]);
+  // Секция 150svh, прилипший экран держится от progress 0.4 до 0.6. Съезд
+  // идёт на 0.4–0.53 — когда секция уже целиком на экране, иначе на телефоне
+  // подпись въезжала за нижним краем экрана и её движения никто не видел.
+  // Съезжаются к центру и остаются: разъезд обратно оставлял пустой экран.
+  const fromLeft = useTransform(scrollYProgress, [0.38, 0.53, 1], ["-70%", "0%", "0%"]);
+  const fromRight = useTransform(scrollYProgress, [0.38, 0.53, 1], ["70%", "0%", "0%"]);
   // На телефоне кадр сверху всегда едет слева, подпись снизу — справа.
   const imageX = wide && !imageLeft ? fromRight : fromLeft;
   const copyX = wide && !imageLeft ? fromLeft : fromRight;
@@ -113,7 +115,7 @@ function MeetSection({ category, index, total }: { category: Category; index: nu
   }
 
   return (
-    <section ref={sectionRef} className="relative h-[120svh] bg-paper md:h-[135svh]">
+    <section ref={sectionRef} className="relative h-[150svh] bg-paper">
       <div className="sticky top-0 flex h-svh flex-col overflow-hidden pt-[4.5rem] md:flex-row md:pt-0">
         <motion.div
           style={{ x: imageX }}

@@ -4,7 +4,7 @@ import { CoverArt } from "@/components/CoverArt";
 import type { Category } from "@/lib/content";
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 
 /**
  * Разделы портфолио на главной: кадр и подпись выезжают навстречу друг другу
@@ -26,22 +26,9 @@ export function MeetSections({ categories }: { categories: Category[] }) {
   );
 }
 
-function useWide() {
-  const [wide, setWide] = useState(false);
-  useEffect(() => {
-    const query = window.matchMedia("(min-width: 768px)");
-    const update = () => setWide(query.matches);
-    update();
-    query.addEventListener("change", update);
-    return () => query.removeEventListener("change", update);
-  }, []);
-  return wide;
-}
-
 function MeetSection({ category, index, total }: { category: Category; index: number; total: number }) {
   const sectionRef = useRef<HTMLElement>(null);
   const reduced = useReducedMotion();
-  const wide = useWide();
   const imageLeft = index % 2 === 0;
   const number = `${String(index + 1).padStart(2, "0")} / ${String(total).padStart(2, "0")}`;
 
@@ -50,28 +37,37 @@ function MeetSection({ category, index, total }: { category: Category; index: nu
     offset: ["start end", "end start"],
   });
 
-  // Секция 150svh, прилипший экран держится от progress 0.4 до 0.6. Съезд
-  // идёт на 0.4–0.53 — когда секция уже целиком на экране, иначе на телефоне
-  // подпись въезжала за нижним краем экрана и её движения никто не видел.
-  // Съезжаются к центру и остаются: разъезд обратно оставлял пустой экран.
-  const fromLeft = useTransform(scrollYProgress, [0.38, 0.53, 1], ["-70%", "0%", "0%"]);
-  const fromRight = useTransform(scrollYProgress, [0.38, 0.53, 1], ["70%", "0%", "0%"]);
-  // На телефоне кадр сверху всегда едет слева, подпись снизу — справа.
-  const imageX = wide && !imageLeft ? fromRight : fromLeft;
-  const copyX = wide && !imageLeft ? fromLeft : fromRight;
+  // Десктоп: половины съезжаются плавно всё время, пока раздел поднимается
+  // снизу (progress 0 — верх раздела у нижнего края окна, 0.4 — раздел занял
+  // экран и прилип). К моменту прилипания они встретились и дальше стоят:
+  // разъезд обратно оставлял пустой экран между разделами. Секция 150svh.
+  const fromLeft = useTransform(scrollYProgress, [0.02, 0.42, 1], ["-100%", "0%", "0%"]);
+  const fromRight = useTransform(scrollYProgress, [0.02, 0.42, 1], ["100%", "0%", "0%"]);
+  const imageX = imageLeft ? fromLeft : fromRight;
+  const copyX = imageLeft ? fromRight : fromLeft;
+  const ease = [0.16, 1, 0.3, 1] as const;
 
   const image = (
     <Link
       href={`/portfolio/${category.slug}`}
-      className="group relative flex h-full w-full items-center justify-center overflow-hidden bg-paper px-4 pt-2 pb-1 md:bg-void md:p-0"
+      className="group relative flex h-auto w-full items-center justify-center overflow-hidden bg-paper px-4 pt-2 pb-1 md:h-full md:bg-void md:p-0"
       aria-label={`Открыть ${category.menu}`}
     >
       {category.cover ? (
-        <div className="tile-zoom relative h-full w-full">
-          <CoverArt slug={category.slug} title={category.menu} src={category.cover} contain coverFromMd />
-        </div>
+        <>
+          {/* Телефон: рамка по высоте самого кадра, без бежевых полос над и под горизонтальным фото. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={category.cover}
+            alt={category.menu}
+            className="block max-h-[58svh] w-full object-contain md:hidden"
+          />
+          <div className="tile-zoom relative hidden h-full w-full md:block">
+            <CoverArt slug={category.slug} title={category.menu} src={category.cover} />
+          </div>
+        </>
       ) : (
-        <div className="flex aspect-[2/3] h-full max-w-full items-center justify-center border border-line px-6 text-center text-[11px] tracking-[0.2em] text-muted uppercase">
+        <div className="flex aspect-[3/2] w-full items-center justify-center border border-line px-6 text-center text-[11px] tracking-[0.2em] text-muted uppercase md:aspect-auto md:h-full">
           Раздел наполняется
         </div>
       )}
@@ -84,7 +80,7 @@ function MeetSection({ category, index, total }: { category: Category; index: nu
   );
 
   const copy = (
-    <div className="flex min-h-0 min-w-0 flex-col justify-start bg-paper px-5 pt-4 pb-6 md:h-full md:justify-center md:px-12 md:py-10 lg:px-16">
+    <div className="flex min-h-0 min-w-0 flex-col justify-start bg-paper px-5 pt-3 pb-2 md:h-full md:justify-center md:px-12 md:py-10 lg:px-16">
       <p className="eyebrow text-muted">{number}</p>
       <h2 className="mt-2 font-display text-[clamp(1.35rem,6vw,2rem)] leading-[1.1] text-ink md:mt-4 md:text-[clamp(1.6rem,3.2vw,2.75rem)]">
         {category.menu}
@@ -103,33 +99,72 @@ function MeetSection({ category, index, total }: { category: Category; index: nu
     </div>
   );
 
+  // Телефон: без прилипания. Панель во весь экран с контентом на полэкрана
+  // давала пустые бежевые экраны между разделами. Здесь разделы идут
+  // обычным потоком, кадр въезжает слева и подпись справа, когда попадают
+  // в окно.
+  const mobile = reduced ? (
+    <section className="border-t border-line py-5 md:hidden">
+      {image}
+      {copy}
+    </section>
+  ) : (
+    // Наблюдение за окном — на секции: сдвинутый на 100% блок стоит за краем
+    // экрана, и «в окне» для него самого не наступило бы никогда.
+    <motion.section
+      className="overflow-hidden border-t border-line py-5 md:hidden"
+      initial="hidden"
+      whileInView="shown"
+      viewport={{ once: true, amount: 0.25 }}
+    >
+      <motion.div
+        variants={{ hidden: { x: "-100%", opacity: 0 }, shown: { x: 0, opacity: 1 } }}
+        transition={{ duration: 0.75, ease }}
+      >
+        {image}
+      </motion.div>
+      <motion.div
+        variants={{ hidden: { x: "100%", opacity: 0 }, shown: { x: 0, opacity: 1 } }}
+        transition={{ duration: 0.75, ease, delay: 0.1 }}
+      >
+        {copy}
+      </motion.div>
+    </motion.section>
+  );
+
   if (reduced) {
     return (
-      <section className="border-t border-line">
-        <div className="grid md:min-h-[80svh] md:grid-cols-2">
-          <div className={`h-[56svh] md:h-auto ${imageLeft ? "md:order-1" : "md:order-2"}`}>{image}</div>
-          <div className={imageLeft ? "md:order-2" : "md:order-1"}>{copy}</div>
-        </div>
-      </section>
+      <>
+        {mobile}
+        <section className="hidden border-t border-line md:block">
+          <div className="grid md:min-h-[80svh] md:grid-cols-2">
+            <div className={imageLeft ? "md:order-1" : "md:order-2"}>{image}</div>
+            <div className={imageLeft ? "md:order-2" : "md:order-1"}>{copy}</div>
+          </div>
+        </section>
+      </>
     );
   }
 
   return (
-    <section ref={sectionRef} className="relative h-[150svh] bg-paper">
-      <div className="sticky top-0 flex h-svh flex-col overflow-hidden pt-[4.5rem] md:flex-row md:pt-0">
-        <motion.div
-          style={{ x: imageX }}
-          className={`h-[54svh] w-full shrink-0 will-change-transform md:h-full md:w-1/2 ${imageLeft ? "md:order-1" : "md:order-2"}`}
-        >
-          {image}
-        </motion.div>
-        <motion.div
-          style={{ x: copyX }}
-          className={`min-h-0 w-full flex-1 will-change-transform md:h-full md:w-1/2 ${imageLeft ? "md:order-2" : "md:order-1"}`}
-        >
-          {copy}
-        </motion.div>
-      </div>
-    </section>
+    <>
+      {mobile}
+      <section ref={sectionRef} className="relative hidden h-[150svh] bg-paper md:block">
+        <div className="sticky top-0 flex h-svh overflow-hidden">
+          <motion.div
+            style={{ x: imageX }}
+            className={`h-full w-1/2 will-change-transform ${imageLeft ? "order-1" : "order-2"}`}
+          >
+            {image}
+          </motion.div>
+          <motion.div
+            style={{ x: copyX }}
+            className={`h-full w-1/2 min-w-0 will-change-transform ${imageLeft ? "order-2" : "order-1"}`}
+          >
+            {copy}
+          </motion.div>
+        </div>
+      </section>
+    </>
   );
 }

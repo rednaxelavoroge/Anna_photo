@@ -1,4 +1,5 @@
 import { AlbumGrid } from "@/components/AlbumGrid";
+import { SiteVideo } from "@/components/SiteVideo";
 import { getSite } from "@/lib/content";
 import { getGalleryPhotos } from "@/lib/photos";
 import type { Metadata } from "next";
@@ -37,7 +38,7 @@ export default function TrainingPage() {
           <div className="mt-8 grid gap-6 md:grid-cols-2">
             {videos.map((video) => (
               <figure key={video.src} className="border border-line bg-snow p-4">
-                <video src={video.src} controls playsInline preload="metadata" className="aspect-video w-full bg-paper object-contain" />
+                <SiteVideo src={video.src} className="aspect-video w-full bg-paper object-contain" />
                 <figcaption className="mt-3 text-sm font-medium text-ink">{video.title}</figcaption>
               </figure>
             ))}

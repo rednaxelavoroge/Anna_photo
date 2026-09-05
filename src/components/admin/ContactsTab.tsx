@@ -57,7 +57,6 @@ export function ContactsTab({ state, setState, persist, busy }: TabProps) {
         {text("email", "Почта")}
         {text("instagram", "Instagram", "Без @ — только имя профиля")}
         {text("facebook", "Facebook", "Ссылка на профиль или страницу; пусто — не показывать")}
-        {text("city", "Город / локация", "Мелкая надпись над заголовком страницы «Контакты»")}
       </Card>
       <button type="button" disabled={busy} className={BTN} onClick={() => void persist(state, "Сохраняю контакты…")}>
         Сохранить контакты →

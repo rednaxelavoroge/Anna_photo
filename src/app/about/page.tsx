@@ -2,6 +2,7 @@ import { AlbumGrid } from "@/components/AlbumGrid";
 import { CoverArt } from "@/components/CoverArt";
 import { PublicationsSection } from "@/components/PublicationsSection";
 import { RichText } from "@/components/RichText";
+import { SiteVideo } from "@/components/SiteVideo";
 import { getAboutVideos, getPressLinks, getPublications, getSite } from "@/lib/content";
 import { getPressPhotos } from "@/lib/photos";
 import type { Metadata } from "next";
@@ -55,13 +56,7 @@ export default function AboutPage() {
         <div className="mt-10 grid gap-[var(--frame-gap)] md:grid-cols-2">
           {localVideos.map((video) => (
             <figure key={video.src} className="bg-snow p-[var(--print-mat)]">
-              <video
-                src={video.src}
-                controls
-                playsInline
-                preload="metadata"
-                className="aspect-video w-full bg-void object-contain"
-              />
+              <SiteVideo src={video.src} className="aspect-video w-full bg-void object-contain" />
               <figcaption className="mt-3 text-xs leading-relaxed text-muted">{video.title}</figcaption>
             </figure>
           ))}

@@ -1,142 +1,184 @@
-import { getPhotos as getPlaceholderPhotos, getBackstagePhotos as getPlaceholderBackstage, getTaggedPhotos, getAllTaggedPhotos, getBackstageEntries, getCategories, getPublications, type Photo } from "@/lib/content";
+import {
+  getBackstageEntries,
+  getCategories,
+  getGalleries,
+  getPhotoEntries,
+  getPublications,
+  getStudioTags,
+  type GalleryItem,
+  type GalleryKey,
+  type Photo,
+  type PhotoTag,
+  type StudioTag,
+} from "@/lib/content";
+import { FOLDER_ALIASES, MEDIA_EXT, VIDEO_EXT } from "@/lib/folders";
 import { getPreviewCover } from "@/lib/preview";
 import fs from "node:fs";
 import path from "node:path";
 
-const PHOTO_EXT = /\.(jpe?g|png|webp|avif)$/i;
-const VIDEO_EXT = /\.(mp4|webm|mov)$/i;
-const MEDIA_EXT = /\.(jpe?g|png|webp|avif|mp4|webm|mov)$/i;
+/**
+ * Откуда сайт берёт кадры.
+ *
+ * Источник — данные панели (`src/data/*.json`): порядок, подписи, разделы и
+ * подразделы задаёт заказчица. Папки `public/photos` — хранилище файлов.
+ *
+ * Файл, который лежит в папке, но в данных не упомянут (положили руками через
+ * git, не через панель), не пропадает: он дописывается в конец своего раздела.
+ * Панель умеет такие файлы «подобрать» и сделать обычными кадрами.
+ */
 
-const FOLDER_ALIASES: Record<string, string[]> = {
-  bloom: ["bloom", "blooming"],
-  blooming: ["blooming", "bloom"],
-  product: ["product", "objects"],
-  objects: ["objects", "product"],
+export { FOLDER_ALIASES };
+
+const GALLERY_FOLDERS: Record<GalleryKey, string> = {
+  reviews: "reviews",
+  workshops: "workshops",
+  press: "press",
 };
 
-function resolveDir(segments: string[]): { dir: string; segs: string[] } | null {
-  const primary = path.join(process.cwd(), "public", "photos", ...segments);
-  if (fs.existsSync(primary) && fs.statSync(primary).isDirectory()) {
-    return { dir: primary, segs: segments };
-  }
-  const last = segments[segments.length - 1];
-  const aliases = FOLDER_ALIASES[last] || [];
-  for (const alias of aliases) {
-    const candidate = [...segments.slice(0, -1), alias];
-    const candDir = path.join(process.cwd(), "public", "photos", ...candidate);
-    if (fs.existsSync(candDir) && fs.statSync(candDir).isDirectory()) {
-      return { dir: candDir, segs: candidate };
-    }
-  }
-  return null;
+function isVideo(src: string) {
+  return VIDEO_EXT.test(src);
 }
 
-function readAlbumDir(segments: string[], altPrefix: string): Photo[] | null {
-  const resolved = resolveDir(segments);
-  if (!resolved) return null;
-
-  const files = fs
-    .readdirSync(resolved.dir)
-    .filter((name) => MEDIA_EXT.test(name))
-    .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
-  if (files.length === 0) return null;
-
-  return files.map((file, index) => ({
-    id: `${resolved.segs.join("/")}/${file}`,
-    src: `/photos/${[...resolved.segs, file].join("/")}`,
-    alt: `${altPrefix} — ${index + 1}`,
+function toPhoto(src: string, alt: string, index: number, tags?: string[]): Photo {
+  const video = isVideo(src);
+  return {
+    id: src,
+    src,
+    alt,
     width: 1600,
-    height: VIDEO_EXT.test(file) ? 900 : 1200,
+    height: video ? 900 : 1200,
     featured: index === 0,
-    kind: VIDEO_EXT.test(file) ? "video" : "image",
-  }));
+    kind: video ? "video" : "image",
+    tags,
+  };
 }
 
-function previewAsAlbum(slug: string, alt: string): Photo[] | null {
+/** Файлы папки public/photos/<name> по имени, с числами по порядку. */
+export function listFolder(name: string): string[] {
+  const dir = path.join(process.cwd(), "public", "photos", name);
+  if (!fs.existsSync(dir) || !fs.statSync(dir).isDirectory()) return [];
+  return fs
+    .readdirSync(dir)
+    .filter((file) => MEDIA_EXT.test(file) && fs.statSync(path.join(dir, file)).isFile())
+    .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }))
+    .map((file) => `/photos/${name}/${file}`);
+}
+
+/** Все файлы, которые упомянуты в кадрах портфолио. */
+function referencedByEntries(entries: PhotoTag[]): Set<string> {
+  return new Set(entries.flatMap((item) => (item.images?.length ? item.images : [item.src])));
+}
+
+/** Запись панели → кадры на сайте: каждый файл кадра виден, не только обложка. */
+function expandEntry(item: PhotoTag, out: Photo[], seen: Set<string>) {
+  const files = item.images?.length ? item.images : [item.src];
+  for (const src of files) {
+    if (!src || seen.has(src)) continue;
+    seen.add(src);
+    out.push(toPhoto(src, item.alt, out.length, item.tags ?? []));
+  }
+}
+
+function folderOf(categorySlug: string) {
+  return FOLDER_ALIASES[categorySlug] ?? categorySlug;
+}
+
+/** Не упомянутые в данных файлы папки раздела — в конец, чтобы не потерялись. */
+function strayFiles(folder: string, referenced: Set<string>): string[] {
+  return listFolder(folder).filter((src) => !referenced.has(src));
+}
+
+function previewAsAlbum(slug: string, alt: string): Photo[] {
   const src = getPreviewCover(slug);
-  if (!src) return null;
-  return [
-    {
-      id: `preview-${slug}`,
-      src,
-      alt,
-      width: 1600,
-      height: 1200,
-      featured: true,
-    },
-  ];
+  return src ? [{ id: `preview-${slug}`, src, alt, width: 1600, height: 1200, featured: true }] : [];
 }
 
-function mergePhotos(...lists: Photo[][]): Photo[] {
-  const byKey = new Map<string, Photo>();
-  for (const list of lists) {
-    for (const photo of list) {
-      const key = photo.src ?? photo.id;
-      if (!byKey.has(key)) byKey.set(key, photo);
-    }
-  }
-  return [...byKey.values()];
-}
-
-export function getLibraryPhotos(): Photo[] {
-  const tagged = getAllTaggedPhotos();
-  if (tagged.length > 0) return tagged;
-  const categories = getCategories();
-  const collected: Photo[] = [];
-  for (const cat of categories) {
-    const albumPhotos = getPhotos(cat.slug);
-    if (albumPhotos.length > 0) {
-      collected.push(...albumPhotos.slice(0, 2));
-    }
-  }
-  if (collected.length > 0) return collected;
-  return getPlaceholderPhotos("portfolio");
-}
-
+/** Кадры раздела в порядке панели плюс файлы, которых панель ещё не видела. */
 export function getPhotos(categorySlug: string): Photo[] {
-  const fromFolder = readAlbumDir([categorySlug], categorySlug) ?? [];
-  const tagged = getTaggedPhotos(categorySlug);
-  const merged = mergePhotos(fromFolder, tagged);
-  if (merged.length > 0) return merged;
-  return previewAsAlbum(categorySlug, categorySlug) ?? getPlaceholderPhotos(categorySlug);
+  const entries = getPhotoEntries();
+  const out: Photo[] = [];
+  const seen = new Set<string>();
+  for (const item of entries) {
+    if (item.categories.includes(categorySlug)) expandEntry(item, out, seen);
+  }
+  for (const src of strayFiles(folderOf(categorySlug), referencedByEntries(entries))) {
+    if (!seen.has(src)) {
+      seen.add(src);
+      out.push(toPhoto(src, `${categorySlug} — ${out.length + 1}`, out.length));
+    }
+  }
+  return out.length > 0 ? out : previewAsAlbum(categorySlug, categorySlug);
 }
 
-/**
- * Вторая копия статьи «Голос Армении» (снята 06.11.2015): те же страницы, что
- * уже показаны в публикации со снимков от 05.09.2015. В архив не идут.
- */
-const PRESS_DUPLICATES = new Set([
-  "/photos/press/2015-11-06_133419.jpg",
-  "/photos/press/2015-11-06_133438.jpg",
-  "/photos/press/2015-11-06_133502.jpg",
-  "/photos/press/2015-11-06_133515.jpg",
-]);
+/** Кадры раздела с меткой подраздела. */
+export function getTagPhotos(categorySlug: string, tagSlug: string): Photo[] {
+  const out: Photo[] = [];
+  const seen = new Set<string>();
+  for (const item of getPhotoEntries()) {
+    if (item.categories.includes(categorySlug) && (item.tags ?? []).includes(tagSlug)) expandEntry(item, out, seen);
+  }
+  return out;
+}
 
-/**
- * Фотоархив на странице «Обо мне»: только фотографии с телевидения, выставок и
- * встреч (public/photos/press). Страницы изданий и скриншоты статей отданы
- * публикациям («Пресса обо мне») и здесь не повторяются — заказчица просила
- * оставить в архиве одни фото (05.09.2026).
- */
-export function getPressPhotos(): Photo[] {
-  const list = readAlbumDir(["press"], "Пресса и эфиры") ?? [];
-  const taken = new Set(getPublications().flatMap((pub) => pub.images ?? []));
-  return list.filter(
-    (photo) => photo.kind !== "video" && !(photo.src && (taken.has(photo.src) || PRESS_DUPLICATES.has(photo.src))),
+/** Подразделы, у которых в этом разделе есть хотя бы один кадр — в порядке панели. */
+export function getCategoryTags(categorySlug: string): StudioTag[] {
+  const used = new Set<string>();
+  for (const item of getPhotoEntries()) {
+    if (item.categories.includes(categorySlug)) (item.tags ?? []).forEach((tag) => used.add(tag));
+  }
+  return getStudioTags().filter((tag) => used.has(tag.slug));
+}
+
+/** Все кадры портфолио: лента «Все кадры». */
+export function getLibraryPhotos(): Photo[] {
+  const entries = getPhotoEntries();
+  const out: Photo[] = [];
+  const seen = new Set<string>();
+  for (const item of entries) expandEntry(item, out, seen);
+  const referenced = referencedByEntries(entries);
+  for (const category of getCategories()) {
+    for (const src of strayFiles(folderOf(category.slug), referenced)) {
+      if (!seen.has(src)) {
+        seen.add(src);
+        out.push(toPhoto(src, category.menu, out.length));
+      }
+    }
+  }
+  return out;
+}
+
+function galleryToPhotos(items: GalleryItem[], folder: string, alt: string, exclude: Set<string> = new Set()): Photo[] {
+  const out: Photo[] = [];
+  const seen = new Set<string>();
+  for (const item of items) {
+    if (!item.src || seen.has(item.src)) continue;
+    seen.add(item.src);
+    out.push(toPhoto(item.src, item.alt, out.length));
+  }
+  for (const src of listFolder(folder)) {
+    if (seen.has(src) || exclude.has(src)) continue;
+    seen.add(src);
+    out.push(toPhoto(src, `${alt} — ${out.length + 1}`, out.length));
+  }
+  return out;
+}
+
+/** Отзывы, воркшопы, фотоархив прессы — из панели, плюс неучтённые файлы папки. */
+export function getGalleryPhotos(key: GalleryKey): Photo[] {
+  const galleries = getGalleries();
+  // Страницы изданий отданы публикациям («Пресса обо мне») и в архиве не повторяются.
+  const exclude = key === "press" ? new Set(getPublications().flatMap((pub) => pub.images ?? [])) : new Set<string>();
+  const alt = key === "reviews" ? "Отзыв" : key === "workshops" ? "Воркшоп" : "Выставки и эфиры";
+  return galleryToPhotos(galleries[key], GALLERY_FOLDERS[key], alt, exclude).filter(
+    (photo) => key !== "press" || photo.kind !== "video",
   );
 }
 
+export function getPressPhotos(): Photo[] {
+  return getGalleryPhotos("press");
+}
+
 export function getBackstagePhotos(): Photo[] {
-  const fromJson = getBackstageEntries();
-  if (fromJson.length > 0) {
-    return fromJson.map((item, index) => ({
-      id: item.src,
-      src: item.src,
-      alt: item.alt,
-      width: 1600,
-      height: 1200,
-      featured: index === 0,
-    }));
-  }
-  return readAlbumDir(["backstage"], "Бэкстейдж") ?? previewAsAlbum("backstage", "Бэкстейдж") ?? getPlaceholderBackstage();
+  const list = galleryToPhotos(getBackstageEntries(), "backstage", "Бэкстейдж");
+  return list.length > 0 ? list : previewAsAlbum("backstage", "Бэкстейдж");
 }

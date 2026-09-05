@@ -14,15 +14,6 @@ export const metadata: Metadata = {
   keywords: ["фотограф Анна Манасарян", "детский фотограф Ереван", "семейный фотограф Армения"],
 };
 
-/** Ролики из архива заказчицы, лежат на сайте, не на YouTube. */
-const LOCAL_VIDEOS = [
-  { src: "/videos/press-news-2015.mp4", title: "Новости — выставка фотографий новорождённых, 2015" },
-  {
-    src: "/videos/press-medical-congress-2015.mp4",
-    title: "IV Международный медицинский конгресс Армении — выставка «Из роддома в фотокадр», 2015",
-  },
-];
-
 export default function AboutPage() {
   const site = getSite();
   const { about } = site;
@@ -30,6 +21,8 @@ export default function AboutPage() {
   const publications = getPublications();
   const pressLinks = getPressLinks();
   const pressPhotos = getPressPhotos();
+  // Ролики из архива заказчицы, лежат на сайте, не на YouTube; список правится в панели.
+  const localVideos = about.videos ?? [];
 
   return (
     <article className="px-5 pt-28 pb-24 md:px-8">
@@ -60,7 +53,7 @@ export default function AboutPage() {
           Эфиры и сюжеты армянских и российских телеканалов о фотографе и её проектах.
         </p>
         <div className="mt-10 grid gap-[var(--frame-gap)] md:grid-cols-2">
-          {LOCAL_VIDEOS.map((video) => (
+          {localVideos.map((video) => (
             <figure key={video.src} className="bg-snow p-[var(--print-mat)]">
               <video
                 src={video.src}

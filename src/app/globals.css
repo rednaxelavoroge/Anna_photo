@@ -441,3 +441,16 @@
     }
   }
 }
+
+/* Панель: полоска «идёт работа» без процентов — движущийся блик. */
+@keyframes admin-slide {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(300%);
+  }
+}
+.admin-indeterminate {
+  animation: admin-slide 1.4s ease-in-out infinite;
+}

@@ -1,6 +1,6 @@
 import { AlbumGrid } from "@/components/AlbumGrid";
 import { getReviews } from "@/lib/content";
-import { getPhotos } from "@/lib/photos";
+import { getGalleryPhotos } from "@/lib/photos";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function ReviewsPage() {
   const reviews = getReviews();
-  const reviewPhotos = getPhotos("reviews");
+  const reviewPhotos = getGalleryPhotos("reviews");
 
   return (
     <article className="px-5 pt-28 pb-24 md:px-8">

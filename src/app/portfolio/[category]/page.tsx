@@ -1,8 +1,9 @@
 import { PhotoTape } from "@/components/PhotoTape";
 import { PortfolioNav } from "@/components/PortfolioNav";
+import { TagStrip } from "@/components/TagStrip";
 import { LEGACY_CATEGORY_REDIRECTS } from "@/lib/legacy-routes";
 import { getCategories, getCategory } from "@/lib/content";
-import { getPhotos } from "@/lib/photos";
+import { getCategoryTags, getPhotos } from "@/lib/photos";
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 
@@ -37,11 +38,13 @@ export default async function CategoryPage({ params }: { params: Promise<Params>
 
   const photos = getPhotos(slug);
   const categories = getCategories();
+  const tags = getCategoryTags(slug);
   const hasRealPhotos = photos.some((photo) => Boolean(photo.src));
 
   return (
     <article className="tape-page">
       <PortfolioNav categories={categories} activeSlug={slug} categoryName={category.menu} />
+      <TagStrip categorySlug={slug} tags={tags} />
       {hasRealPhotos ? (
         <PhotoTape photos={photos} slug={slug} />
       ) : (

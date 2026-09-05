@@ -13,8 +13,8 @@ export const metadata: Metadata = {
 
 export default function PhototourPage() {
   const { phototour, contacts } = getSite();
-  // Обложка — первый кадр раздела «Путешествия»; пока папка пуста, стоит образец.
-  const cover = getPhotos("travel").find((photo) => Boolean(photo.src))?.src;
+  // Обложка из панели; если не задана — первый кадр раздела «Путешествия».
+  const cover = phototour.cover || getPhotos("travel").find((photo) => Boolean(photo.src))?.src;
 
   return (
     <article className="pt-20">

@@ -1,6 +1,6 @@
 import { AlbumGrid } from "@/components/AlbumGrid";
 import { getSite } from "@/lib/content";
-import { getPhotos } from "@/lib/photos";
+import { getGalleryPhotos } from "@/lib/photos";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -17,7 +17,8 @@ export const metadata: Metadata = {
  */
 export default function TrainingPage() {
   const { training } = getSite();
-  const workshopPhotos = getPhotos("workshops");
+  const workshopPhotos = getGalleryPhotos("workshops");
+  const videos = training.videos ?? [];
 
   return (
     <article className="px-5 pt-28 pb-24 md:px-8">
@@ -29,36 +30,20 @@ export default function TrainingPage() {
       <p className="mt-10 max-w-3xl font-display text-2xl leading-snug text-ink md:text-3xl">{training.stat}</p>
       <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted md:text-base">{training.statNote}</p>
 
-      <section className="mt-20 border-t border-line pt-14">
-        <p className="eyebrow">Мастер-классы</p>
-        <h2 className="mt-3 font-display text-3xl md:text-4xl">Видео с мастер-класса</h2>
-        <div className="mt-8 grid gap-6 md:grid-cols-2">
-          <figure className="border border-line bg-snow p-4">
-            <video
-              src="/videos/masterclass-2015-1.mp4"
-              controls
-              playsInline
-              preload="metadata"
-              className="aspect-video w-full bg-paper object-contain"
-            />
-            <figcaption className="mt-3 text-sm font-medium text-ink">
-              Мастер-класс «Секреты съёмки новорождённых», 2015 — часть 1
-            </figcaption>
-          </figure>
-          <figure className="border border-line bg-snow p-4">
-            <video
-              src="/videos/masterclass-2015-2.mp4"
-              controls
-              playsInline
-              preload="metadata"
-              className="aspect-video w-full bg-paper object-contain"
-            />
-            <figcaption className="mt-3 text-sm font-medium text-ink">
-              Мастер-класс «Секреты съёмки новорождённых», 2015 — часть 2
-            </figcaption>
-          </figure>
-        </div>
-      </section>
+      {videos.length > 0 ? (
+        <section className="mt-20 border-t border-line pt-14">
+          <p className="eyebrow">Мастер-классы</p>
+          <h2 className="mt-3 font-display text-3xl md:text-4xl">Видео с мастер-класса</h2>
+          <div className="mt-8 grid gap-6 md:grid-cols-2">
+            {videos.map((video) => (
+              <figure key={video.src} className="border border-line bg-snow p-4">
+                <video src={video.src} controls playsInline preload="metadata" className="aspect-video w-full bg-paper object-contain" />
+                <figcaption className="mt-3 text-sm font-medium text-ink">{video.title}</figcaption>
+              </figure>
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       {workshopPhotos.length > 0 ? (
         <section className="mt-20 border-t border-line pt-14">

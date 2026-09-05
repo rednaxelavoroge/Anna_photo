@@ -1,0 +1,676 @@
+{
+  "reviews": [
+    {
+      "src": "/photos/reviews/1520-2015-02-02_161057.jpg",
+      "alt": "Отзыв — 1"
+    },
+    {
+      "src": "/photos/reviews/1521-2015-02-02_170838.jpg",
+      "alt": "Отзыв — 2"
+    },
+    {
+      "src": "/photos/reviews/1522-2015-02-02_171013.jpg",
+      "alt": "Отзыв — 3"
+    },
+    {
+      "src": "/photos/reviews/1523-2015-06-17_123956.jpg",
+      "alt": "Отзыв — 4"
+    },
+    {
+      "src": "/photos/reviews/1524-2015-06-18_232927.jpg",
+      "alt": "Отзыв — 5"
+    },
+    {
+      "src": "/photos/reviews/1525-pol459.jpg",
+      "alt": "Отзыв — 6"
+    },
+    {
+      "src": "/photos/reviews/1526-Screenshot_20171020-141842.jpg",
+      "alt": "Отзыв — 7"
+    },
+    {
+      "src": "/photos/reviews/1527-Screenshot_20171212-192454.jpg",
+      "alt": "Отзыв — 8"
+    },
+    {
+      "src": "/photos/reviews/2022-10-17_220911.jpg",
+      "alt": "Отзыв — 9"
+    },
+    {
+      "src": "/photos/reviews/3417-pol401.jpg",
+      "alt": "Отзыв — 10"
+    },
+    {
+      "src": "/photos/reviews/3418-2015-11-06_160128.jpg",
+      "alt": "Отзыв — 11"
+    },
+    {
+      "src": "/photos/reviews/3419-2015-11-06_155321.jpg",
+      "alt": "Отзыв — 12"
+    },
+    {
+      "src": "/photos/reviews/3420-Screenshot_20190317-191109_WhatsApp.jpg",
+      "alt": "Отзыв — 13"
+    },
+    {
+      "src": "/photos/reviews/3421-20190402_021709.jpg",
+      "alt": "Отзыв — 14"
+    },
+    {
+      "src": "/photos/reviews/3422-20190327_110150.jpg",
+      "alt": "Отзыв — 15"
+    },
+    {
+      "src": "/photos/reviews/3423-20190327_110204.jpg",
+      "alt": "Отзыв — 16"
+    },
+    {
+      "src": "/photos/reviews/3424-20190402_021736.jpg",
+      "alt": "Отзыв — 17"
+    },
+    {
+      "src": "/photos/reviews/3425-20190402_021809.jpg",
+      "alt": "Отзыв — 18"
+    },
+    {
+      "src": "/photos/reviews/3426-20190323_131343.jpg",
+      "alt": "Отзыв — 19"
+    },
+    {
+      "src": "/photos/reviews/3427-20190314_223207.jpg",
+      "alt": "Отзыв — 20"
+    },
+    {
+      "src": "/photos/reviews/3428-20190314_223116.jpg",
+      "alt": "Отзыв — 21"
+    },
+    {
+      "src": "/photos/reviews/3429-20190227_212108.jpg",
+      "alt": "Отзыв — 22"
+    },
+    {
+      "src": "/photos/reviews/3430-20190225_224004.jpg",
+      "alt": "Отзыв — 23"
+    },
+    {
+      "src": "/photos/reviews/3431-20190227_204718.jpg",
+      "alt": "Отзыв — 24"
+    },
+    {
+      "src": "/photos/reviews/20190423_180501.jpg",
+      "alt": "Отзыв — 25"
+    },
+    {
+      "src": "/photos/reviews/20190423_180530.jpg",
+      "alt": "Отзыв — 26"
+    },
+    {
+      "src": "/photos/reviews/20190423_180609.jpg",
+      "alt": "Отзыв — 27"
+    },
+    {
+      "src": "/photos/reviews/20190504_123044.jpg",
+      "alt": "Отзыв — 28"
+    },
+    {
+      "src": "/photos/reviews/20190504_123057.jpg",
+      "alt": "Отзыв — 29"
+    },
+    {
+      "src": "/photos/reviews/20190504_123125.jpg",
+      "alt": "Отзыв — 30"
+    },
+    {
+      "src": "/photos/reviews/20190504_123147.jpg",
+      "alt": "Отзыв — 31"
+    },
+    {
+      "src": "/photos/reviews/20190504_123207.jpg",
+      "alt": "Отзыв — 32"
+    },
+    {
+      "src": "/photos/reviews/20190504_123228.jpg",
+      "alt": "Отзыв — 33"
+    },
+    {
+      "src": "/photos/reviews/20190504_184050.jpg",
+      "alt": "Отзыв — 34"
+    },
+    {
+      "src": "/photos/reviews/20191031_094437.jpg",
+      "alt": "Отзыв — 35"
+    },
+    {
+      "src": "/photos/reviews/20191124_173249.jpg",
+      "alt": "Отзыв — 36"
+    },
+    {
+      "src": "/photos/reviews/20191124_173308.jpg",
+      "alt": "Отзыв — 37"
+    },
+    {
+      "src": "/photos/reviews/20191126_015717.jpg",
+      "alt": "Отзыв — 38"
+    },
+    {
+      "src": "/photos/reviews/20191126_015738.jpg",
+      "alt": "Отзыв — 39"
+    },
+    {
+      "src": "/photos/reviews/20191126_015749.jpg",
+      "alt": "Отзыв — 40"
+    },
+    {
+      "src": "/photos/reviews/20191126_015805.jpg",
+      "alt": "Отзыв — 41"
+    },
+    {
+      "src": "/photos/reviews/20191126_015832.jpg",
+      "alt": "Отзыв — 42"
+    },
+    {
+      "src": "/photos/reviews/20191126_015857.jpg",
+      "alt": "Отзыв — 43"
+    },
+    {
+      "src": "/photos/reviews/20191126_095710.jpg",
+      "alt": "Отзыв — 44"
+    },
+    {
+      "src": "/photos/reviews/20191201_195020.jpg",
+      "alt": "Отзыв — 45"
+    },
+    {
+      "src": "/photos/reviews/20191207_095517.jpg",
+      "alt": "Отзыв — 46"
+    },
+    {
+      "src": "/photos/reviews/20191207_095544.jpg",
+      "alt": "Отзыв — 47"
+    },
+    {
+      "src": "/photos/reviews/20191207_095604.jpg",
+      "alt": "Отзыв — 48"
+    },
+    {
+      "src": "/photos/reviews/20191208_220143.jpg",
+      "alt": "Отзыв — 49"
+    },
+    {
+      "src": "/photos/reviews/20191208_220159.jpg",
+      "alt": "Отзыв — 50"
+    },
+    {
+      "src": "/photos/reviews/20191208_220246.jpg",
+      "alt": "Отзыв — 51"
+    },
+    {
+      "src": "/photos/reviews/20191208_220305.jpg",
+      "alt": "Отзыв — 52"
+    },
+    {
+      "src": "/photos/reviews/20191208_220343.jpg",
+      "alt": "Отзыв — 53"
+    },
+    {
+      "src": "/photos/reviews/20191208_220400.jpg",
+      "alt": "Отзыв — 54"
+    },
+    {
+      "src": "/photos/reviews/20200217_073638.jpg",
+      "alt": "Отзыв — 55"
+    },
+    {
+      "src": "/photos/reviews/20200217_073659.jpg",
+      "alt": "Отзыв — 56"
+    },
+    {
+      "src": "/photos/reviews/20200217_073734.jpg",
+      "alt": "Отзыв — 57"
+    },
+    {
+      "src": "/photos/reviews/20200217_073809.jpg",
+      "alt": "Отзыв — 58"
+    },
+    {
+      "src": "/photos/reviews/20200217_073853.jpg",
+      "alt": "Отзыв — 59"
+    },
+    {
+      "src": "/photos/reviews/20200217_073921.jpg",
+      "alt": "Отзыв — 60"
+    },
+    {
+      "src": "/photos/reviews/20200218_094116.jpg",
+      "alt": "Отзыв — 61"
+    },
+    {
+      "src": "/photos/reviews/20200218_094138.jpg",
+      "alt": "Отзыв — 62"
+    },
+    {
+      "src": "/photos/reviews/20200218_094155.jpg",
+      "alt": "Отзыв — 63"
+    },
+    {
+      "src": "/photos/reviews/20200218_094214.jpg",
+      "alt": "Отзыв — 64"
+    },
+    {
+      "src": "/photos/reviews/pol506.jpg",
+      "alt": "Отзыв — 65"
+    },
+    {
+      "src": "/photos/reviews/pol514.jpg",
+      "alt": "Отзыв — 66"
+    },
+    {
+      "src": "/photos/reviews/pol589.jpg",
+      "alt": "Отзыв — 67"
+    },
+    {
+      "src": "/photos/reviews/Screenshot_20190422-093127_Instagram.jpg",
+      "alt": "Отзыв — 68"
+    },
+    {
+      "src": "/photos/reviews/Screenshot_20190831-001510_WhatsApp.jpg",
+      "alt": "Отзыв — 69"
+    },
+    {
+      "src": "/photos/reviews/Screenshot_20190910-191314_Instagram.jpg",
+      "alt": "Отзыв — 70"
+    },
+    {
+      "src": "/photos/reviews/Screenshot_20190911-235957_Instagram.jpg",
+      "alt": "Отзыв — 71"
+    },
+    {
+      "src": "/photos/reviews/Screenshot_20190923-144741_VK.jpg",
+      "alt": "Отзыв — 72"
+    },
+    {
+      "src": "/photos/reviews/Screenshot_20190924-115359_WhatsApp.jpg",
+      "alt": "Отзыв — 73"
+    },
+    {
+      "src": "/photos/reviews/Screenshot_20190930-235204_Instagram.jpg",
+      "alt": "Отзыв — 74"
+    },
+    {
+      "src": "/photos/reviews/Screenshot_20191003-012226_Instagram.jpg",
+      "alt": "Отзыв — 75"
+    },
+    {
+      "src": "/photos/reviews/Screenshot_20191004-112320_Instagram.jpg",
+      "alt": "Отзыв — 76"
+    },
+    {
+      "src": "/photos/reviews/Screenshot_20191018-202358_Instagram.jpg",
+      "alt": "Отзыв — 77"
+    },
+    {
+      "src": "/photos/reviews/Screenshot_20191022-165311_Instagram.jpg",
+      "alt": "Отзыв — 78"
+    },
+    {
+      "src": "/photos/reviews/Screenshot_20191022-165414_Instagram.jpg",
+      "alt": "Отзыв — 79"
+    },
+    {
+      "src": "/photos/reviews/Screenshot_20191022-165424_Instagram.jpg",
+      "alt": "Отзыв — 80"
+    },
+    {
+      "src": "/photos/reviews/Screenshot_20191223-180902_Instagram.jpg",
+      "alt": "Отзыв — 81"
+    }
+  ],
+  "workshops": [
+    {
+      "src": "/photos/workshops/01.jpg",
+      "alt": "Воркшоп — 1"
+    },
+    {
+      "src": "/photos/workshops/02.jpg",
+      "alt": "Воркшоп — 2"
+    },
+    {
+      "src": "/photos/workshops/03.jpg",
+      "alt": "Воркшоп — 3"
+    },
+    {
+      "src": "/photos/workshops/04-1.jpg",
+      "alt": "Воркшоп — 4"
+    },
+    {
+      "src": "/photos/workshops/04.jpg",
+      "alt": "Воркшоп — 5"
+    },
+    {
+      "src": "/photos/workshops/05.jpg",
+      "alt": "Воркшоп — 6"
+    },
+    {
+      "src": "/photos/workshops/06.jpg",
+      "alt": "Воркшоп — 7"
+    },
+    {
+      "src": "/photos/workshops/07.jpg",
+      "alt": "Воркшоп — 8"
+    },
+    {
+      "src": "/photos/workshops/08.jpg",
+      "alt": "Воркшоп — 9"
+    },
+    {
+      "src": "/photos/workshops/09-1.jpg",
+      "alt": "Воркшоп — 10"
+    },
+    {
+      "src": "/photos/workshops/09.jpg",
+      "alt": "Воркшоп — 11"
+    },
+    {
+      "src": "/photos/workshops/10.jpg",
+      "alt": "Воркшоп — 12"
+    },
+    {
+      "src": "/photos/workshops/11.jpg",
+      "alt": "Воркшоп — 13"
+    },
+    {
+      "src": "/photos/workshops/12.jpg",
+      "alt": "Воркшоп — 14"
+    },
+    {
+      "src": "/photos/workshops/13 2.jpg",
+      "alt": "Воркшоп — 15"
+    },
+    {
+      "src": "/photos/workshops/13.jpg",
+      "alt": "Воркшоп — 16"
+    },
+    {
+      "src": "/photos/workshops/14.jpg",
+      "alt": "Воркшоп — 17"
+    },
+    {
+      "src": "/photos/workshops/15.jpg",
+      "alt": "Воркшоп — 18"
+    },
+    {
+      "src": "/photos/workshops/16.jpg",
+      "alt": "Воркшоп — 19"
+    },
+    {
+      "src": "/photos/workshops/17.jpg",
+      "alt": "Воркшоп — 20"
+    },
+    {
+      "src": "/photos/workshops/18.jpg",
+      "alt": "Воркшоп — 21"
+    },
+    {
+      "src": "/photos/workshops/19.jpg",
+      "alt": "Воркшоп — 22"
+    },
+    {
+      "src": "/photos/workshops/20.jpg",
+      "alt": "Воркшоп — 23"
+    },
+    {
+      "src": "/photos/workshops/21.jpg",
+      "alt": "Воркшоп — 24"
+    },
+    {
+      "src": "/photos/workshops/22.jpg",
+      "alt": "Воркшоп — 25"
+    },
+    {
+      "src": "/photos/workshops/23.jpg",
+      "alt": "Воркшоп — 26"
+    },
+    {
+      "src": "/photos/workshops/24.jpg",
+      "alt": "Воркшоп — 27"
+    },
+    {
+      "src": "/photos/workshops/25.jpg",
+      "alt": "Воркшоп — 28"
+    },
+    {
+      "src": "/photos/workshops/26.jpg",
+      "alt": "Воркшоп — 29"
+    },
+    {
+      "src": "/photos/workshops/27.jpg",
+      "alt": "Воркшоп — 30"
+    },
+    {
+      "src": "/photos/workshops/28.jpg",
+      "alt": "Воркшоп — 31"
+    },
+    {
+      "src": "/photos/workshops/29.jpg",
+      "alt": "Воркшоп — 32"
+    },
+    {
+      "src": "/photos/workshops/30.jpg",
+      "alt": "Воркшоп — 33"
+    },
+    {
+      "src": "/photos/workshops/31.jpg",
+      "alt": "Воркшоп — 34"
+    },
+    {
+      "src": "/photos/workshops/32.jpg",
+      "alt": "Воркшоп — 35"
+    },
+    {
+      "src": "/photos/workshops/33.jpg",
+      "alt": "Воркшоп — 36"
+    },
+    {
+      "src": "/photos/workshops/34.jpg",
+      "alt": "Воркшоп — 37"
+    },
+    {
+      "src": "/photos/workshops/35.jpg",
+      "alt": "Воркшоп — 38"
+    },
+    {
+      "src": "/photos/workshops/36.jpg",
+      "alt": "Воркшоп — 39"
+    },
+    {
+      "src": "/photos/workshops/37.jpg",
+      "alt": "Воркшоп — 40"
+    },
+    {
+      "src": "/photos/workshops/38.jpg",
+      "alt": "Воркшоп — 41"
+    },
+    {
+      "src": "/photos/workshops/39.jpg",
+      "alt": "Воркшоп — 42"
+    },
+    {
+      "src": "/photos/workshops/40.jpg",
+      "alt": "Воркшоп — 43"
+    }
+  ],
+  "press": [
+    {
+      "src": "/photos/press/2015-07-15_164649.jpg",
+      "alt": "Выставки и эфиры — 1"
+    },
+    {
+      "src": "/photos/press/2015-07-15_164702.jpg",
+      "alt": "Выставки и эфиры — 2"
+    },
+    {
+      "src": "/photos/press/2015-07-15_164715.jpg",
+      "alt": "Выставки и эфиры — 3"
+    },
+    {
+      "src": "/photos/press/11109716_897211907002405_3020809955545303777_n.jpg",
+      "alt": "Выставки и эфиры — 4"
+    },
+    {
+      "src": "/photos/press/11894626_1659822120925577_7098453978037445237_o.jpg",
+      "alt": "Выставки и эфиры — 5"
+    },
+    {
+      "src": "/photos/press/11958094_1659822237592232_4625949307824801412_o.jpg",
+      "alt": "Выставки и эфиры — 6"
+    },
+    {
+      "src": "/photos/press/FB_IMG_1430451082243.jpg",
+      "alt": "Выставки и эфиры — 7"
+    },
+    {
+      "src": "/photos/press/IMG_1774-1.jpg",
+      "alt": "Выставки и эфиры — 8"
+    },
+    {
+      "src": "/photos/press/IMG_1779.jpg",
+      "alt": "Выставки и эфиры — 9"
+    },
+    {
+      "src": "/photos/press/IMG_1864.jpg",
+      "alt": "Выставки и эфиры — 10"
+    },
+    {
+      "src": "/photos/press/IMG_1865.jpg",
+      "alt": "Выставки и эфиры — 11"
+    },
+    {
+      "src": "/photos/press/IMG_1866.jpg",
+      "alt": "Выставки и эфиры — 12"
+    },
+    {
+      "src": "/photos/press/IMG_1868-8.jpg",
+      "alt": "Выставки и эфиры — 13"
+    },
+    {
+      "src": "/photos/press/IMG_1869.jpg",
+      "alt": "Выставки и эфиры — 14"
+    },
+    {
+      "src": "/photos/press/IMG_1870.jpg",
+      "alt": "Выставки и эфиры — 15"
+    },
+    {
+      "src": "/photos/press/IMG_1871.jpg",
+      "alt": "Выставки и эфиры — 16"
+    },
+    {
+      "src": "/photos/press/IMG_1872.jpg",
+      "alt": "Выставки и эфиры — 17"
+    },
+    {
+      "src": "/photos/press/IMG_1874.jpg",
+      "alt": "Выставки и эфиры — 18"
+    },
+    {
+      "src": "/photos/press/IMG_1875.jpg",
+      "alt": "Выставки и эфиры — 19"
+    },
+    {
+      "src": "/photos/press/IMG_1882.jpg",
+      "alt": "Выставки и эфиры — 20"
+    },
+    {
+      "src": "/photos/press/IMG_1883.jpg",
+      "alt": "Выставки и эфиры — 21"
+    },
+    {
+      "src": "/photos/press/IMG_1884.jpg",
+      "alt": "Выставки и эфиры — 22"
+    },
+    {
+      "src": "/photos/press/IMG_1886.jpg",
+      "alt": "Выставки и эфиры — 23"
+    },
+    {
+      "src": "/photos/press/IMG_1887.jpg",
+      "alt": "Выставки и эфиры — 24"
+    },
+    {
+      "src": "/photos/press/IMG_1888.jpg",
+      "alt": "Выставки и эфиры — 25"
+    },
+    {
+      "src": "/photos/press/IMG_1908.jpg",
+      "alt": "Выставки и эфиры — 26"
+    },
+    {
+      "src": "/photos/press/IMG_1909.jpg",
+      "alt": "Выставки и эфиры — 27"
+    },
+    {
+      "src": "/photos/press/IMG_4064-3.jpg",
+      "alt": "Выставки и эфиры — 28"
+    },
+    {
+      "src": "/photos/press/IMG_4133.jpg",
+      "alt": "Выставки и эфиры — 29"
+    },
+    {
+      "src": "/photos/press/IMG_4134-1.jpg",
+      "alt": "Выставки и эфиры — 30"
+    },
+    {
+      "src": "/photos/press/IMG_4135.jpg",
+      "alt": "Выставки и эфиры — 31"
+    },
+    {
+      "src": "/photos/press/IMG_4291.jpg",
+      "alt": "Выставки и эфиры — 32"
+    },
+    {
+      "src": "/photos/press/IMG_4323.jpg",
+      "alt": "Выставки и эфиры — 33"
+    },
+    {
+      "src": "/photos/press/IMG_4330.jpg",
+      "alt": "Выставки и эфиры — 34"
+    },
+    {
+      "src": "/photos/press/IMG_4339.jpg",
+      "alt": "Выставки и эфиры — 35"
+    },
+    {
+      "src": "/photos/press/IMG_4340.jpg",
+      "alt": "Выставки и эфиры — 36"
+    },
+    {
+      "src": "/photos/press/IMG_4342.jpg",
+      "alt": "Выставки и эфиры — 37"
+    },
+    {
+      "src": "/photos/press/IMG_4343.jpg",
+      "alt": "Выставки и эфиры — 38"
+    },
+    {
+      "src": "/photos/press/IMG_4441-2.jpg",
+      "alt": "Выставки и эфиры — 39"
+    },
+    {
+      "src": "/photos/press/IMG_4443-2.jpg",
+      "alt": "Выставки и эфиры — 40"
+    },
+    {
+      "src": "/photos/press/IMG_4445.jpg",
+      "alt": "Выставки и эфиры — 41"
+    },
+    {
+      "src": "/photos/press/IMG_4447-2.jpg",
+      "alt": "Выставки и эфиры — 42"
+    },
+    {
+      "src": "/photos/press/photo.php.jpg",
+      "alt": "Выставки и эфиры — 43"
+    }
+  ]
+}

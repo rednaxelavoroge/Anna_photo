@@ -29,7 +29,7 @@ export default function HomePage() {
               />
             </div>
             <h1 className="mt-5 font-display text-2xl tracking-tight text-ink sm:mt-6 sm:text-3xl md:text-4xl lg:text-5xl">
-              Мои фотографии
+              {site.heroTitle || "Мои фотографии"}
             </h1>
           </div>
         </div>

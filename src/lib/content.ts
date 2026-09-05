@@ -8,6 +8,7 @@ import siteData from "@/data/site.json";
 import tagsData from "@/data/tags.json";
 import workshopsData from "@/data/workshops.json";
 import publicationsData from "@/data/publications.json";
+import galleriesData from "@/data/galleries.json";
 
 export type Category = {
   slug: string;
@@ -28,7 +29,19 @@ export type Photo = {
   featured?: boolean;
   year?: number;
   kind?: "image" | "video";
+  /** Подразделы (метки) кадра — из панели. */
+  tags?: string[];
 };
+
+/** Кадр галереи без разделов: отзывы, воркшопы, фотоархив, бэкстейдж. */
+export type GalleryItem = { src: string; alt: string };
+
+export type GalleryKey = "reviews" | "workshops" | "press";
+
+export type Galleries = Record<GalleryKey, GalleryItem[]>;
+
+/** Ролик, лежащий на сайте (не YouTube), с подписью. */
+export type VideoClip = { src: string; title: string };
 
 export type AboutVideo = {
   id: string;
@@ -76,7 +89,17 @@ export type SiteData = {
   tagline: string;
   intro: string;
   portrait?: string;
-  about: { eyebrow: string; title: string; lead: string; body: string[]; note: string };
+  /** Подпись под портретом на первом экране главной. */
+  heroTitle?: string;
+  about: {
+    eyebrow: string;
+    title: string;
+    lead: string;
+    body: string[];
+    note: string;
+    /** Ролики с телевидения, лежат на сайте. */
+    videos?: VideoClip[];
+  };
   training: {
     title: string;
     /** Крупная строка под заголовком. */
@@ -89,8 +112,10 @@ export type SiteData = {
     statNote: string;
     /** Заголовок над сеткой воркшопов. */
     galleryTitle: string;
+    /** Видео мастер-классов, лежат на сайте. */
+    videos?: VideoClip[];
   };
-  phototour: { eyebrow: string; title: string; lead: string; cta: string };
+  phototour: { eyebrow: string; title: string; lead: string; cta: string; cover?: string };
   contacts: SiteContacts;
 };
 
@@ -194,7 +219,22 @@ function fallbackFeatured(items: PhotoTag[]): PhotoTag[] {
 }
 
 export function getBackstageEntries() {
-  return (backstageData.items ?? []) as { src: string; alt: string }[];
+  return (backstageData.items ?? []) as GalleryItem[];
+}
+
+/** Все кадры портфолио из панели, в её порядке. */
+export function getPhotoEntries(): PhotoTag[] {
+  return photoTags.items as PhotoTag[];
+}
+
+/** Галереи без разделов, в порядке из панели. */
+export function getGalleries(): Galleries {
+  const data = galleriesData as Partial<Galleries>;
+  return {
+    reviews: data.reviews ?? [],
+    workshops: data.workshops ?? [],
+    press: data.press ?? [],
+  };
 }
 
 export function getPhotos(categorySlug: string): Photo[] {

@@ -3,6 +3,7 @@ import { CoverArt } from "@/components/CoverArt";
 import { PublicationsSection } from "@/components/PublicationsSection";
 import { RichText } from "@/components/RichText";
 import { SiteVideo } from "@/components/SiteVideo";
+import { YoutubeGrid } from "@/components/YoutubeGrid";
 import { getAboutVideos, getPressLinks, getPublications, getSite } from "@/lib/content";
 import { getPressPhotos } from "@/lib/photos";
 import type { Metadata } from "next";
@@ -61,24 +62,9 @@ export default function AboutPage() {
             </figure>
           ))}
         </div>
-        {/* Список эфиров текстом: встроенные плееры YouTube у заказчицы не грузились. */}
-        {videos.length > 0 ? (
-          <ul className="mt-12 max-w-3xl divide-y divide-line border-y border-line">
-            {videos.map((video) => (
-              <li key={video.id}>
-                <a
-                  href={`https://www.youtube.com/watch?v=${video.id}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group flex items-baseline justify-between gap-6 py-3.5"
-                >
-                  <span className="text-sm leading-snug text-ink group-hover:underline md:text-base">{video.title}</span>
-                  <span className="shrink-0 text-[11px] tracking-[0.16em] text-muted uppercase">Смотреть ↗</span>
-                </a>
-              </li>
-            ))}
-          </ul>
-        ) : null}
+        {/* Эфиры плитками с превью из YouTube; плеер появляется только у
+            того ролика, по которому нажали, — см. YoutubeGrid. */}
+        <YoutubeGrid videos={videos} />
       </section>
 
       {pressPhotos.length > 0 ? (

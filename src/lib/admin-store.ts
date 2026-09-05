@@ -270,7 +270,14 @@ export async function saveStudio(
 }
 
 export async function saveUpload(filename: string, data: Buffer) {
-  const safe = filename.replace(/[^a-zA-Z0-9._-]/g, "-");
+  // Кириллица в имени файла раньше превращалась в цепочку дефисов
+  // («Обложка.jpg» → «--------.jpg»): по такому имени в репозитории потом
+  // ничего не найти. Переводим на латиницу тем же способом, что и адреса
+  // разделов.
+  const dot = filename.lastIndexOf(".");
+  const stem = dot > 0 ? filename.slice(0, dot) : filename;
+  const ext = (dot > 0 ? filename.slice(dot + 1) : "jpg").toLowerCase().replace(/[^a-z0-9]/g, "");
+  const safe = `${slugifyRu(stem)}.${ext || "jpg"}`;
   const rel = `public/photos/uploads/${Date.now()}-${safe}`;
   if (process.env.GITHUB_TOKEN) {
     await writeGithub([{ path: rel, content: data }], `Фото: ${safe}`);

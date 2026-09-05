@@ -29,14 +29,14 @@ export function PortfolioNav({ categories, activeSlug, categoryName }: Portfolio
         <p className="eyebrow flex items-center gap-2">
           {categoryName ? (
             <>
-              <Link href="/#portfolio" className="hover:text-ink transition-colors">
+              <Link href="/portfolio" className="hover:text-ink transition-colors">
                 Портфолио
               </Link>
               <span className="text-line">/</span>
               <span className="text-ink font-medium">{categoryName}</span>
             </>
           ) : (
-            <span className="text-ink font-medium">Портфолио · Все съёмки</span>
+            <span className="text-ink font-medium">Портфолио · Все кадры</span>
           )}
         </p>
       </div>
@@ -47,10 +47,10 @@ export function PortfolioNav({ categories, activeSlug, categoryName }: Portfolio
           className="portfolio-category-strip flex items-center gap-2 overflow-x-auto pb-1 text-[11px] tracking-[0.14em] uppercase no-scrollbar md:flex-wrap md:gap-x-4 md:gap-y-2 md:overflow-visible"
         >
           <Link
-            href="/portfolio"
-            ref={!activeSlug || activeSlug === "portfolio" ? activeItemRef : undefined}
+            href="/portfolio/all"
+            ref={!activeSlug || activeSlug === "all" ? activeItemRef : undefined}
             className={`shrink-0 rounded-full px-3 py-1.5 transition-all md:rounded-none md:p-0 ${
-              !activeSlug || activeSlug === "portfolio"
+              !activeSlug || activeSlug === "all"
                 ? "bg-ink text-snow font-medium md:bg-transparent md:text-ink md:border-b md:border-ink"
                 : "bg-snow/60 text-muted hover:text-ink hover:bg-snow md:bg-transparent md:hover:bg-transparent"
             }`}

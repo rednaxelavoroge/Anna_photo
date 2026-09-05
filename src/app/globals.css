@@ -13,8 +13,11 @@
   --color-muted: #a39e96;
   --color-ash: #c9c4bb;
   --color-void: #1a1815;
+  /* Один шрифт на весь сайт — правка заказчицы 05.09.2026. Manrope убран
+     целиком: и заголовки, и текст идут Unbounded. Две переменные оставлены
+     не для красоты — на них завязаны десятки классов font-display. */
   --font-display: "Unbounded", system-ui, sans-serif;
-  --font-sans: "Manrope", system-ui, sans-serif;
+  --font-sans: "Unbounded", system-ui, sans-serif;
 }
 
 @layer base {
@@ -40,7 +43,11 @@
     background-color: var(--color-paper);
     color: var(--color-ink);
     font-family: var(--font-sans);
-    font-weight: 400;
+    /* Unbounded шире Manrope: в 400 сплошной текст выглядит тяжело, поэтому
+       основной вес 300 и лёгкое поджатие трекинга. Заголовкам это не
+       касается — у них свой вес ниже. */
+    font-weight: 300;
+    letter-spacing: -0.012em;
     -webkit-font-smoothing: antialiased;
     overflow-x: clip;
     max-width: 100%;

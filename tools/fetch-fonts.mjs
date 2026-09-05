@@ -6,9 +6,9 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const OUT_DIR = join(ROOT, "public", "fonts");
 const CSS_OUT = join(ROOT, "src", "app", "fonts.css");
 
+// Один шрифт на весь сайт — правка заказчицы 05.09.2026. Manrope убран.
 const FAMILIES = [
-  "Unbounded:wght@300;400;500",
-  "Manrope:wght@300;400;500;600",
+  "Unbounded:wght@300;400;500;600",
 ];
 
 const UA =

@@ -4,6 +4,7 @@ import { TagStrip } from "@/components/TagStrip";
 import { LEGACY_CATEGORY_REDIRECTS } from "@/lib/legacy-routes";
 import { getCategories, getCategory } from "@/lib/content";
 import { getCategoryTags, getPhotos } from "@/lib/photos";
+import { extrasFor } from "@/lib/portfolio-extras";
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 
@@ -44,7 +45,7 @@ export default async function CategoryPage({ params }: { params: Promise<Params>
   return (
     <article className="tape-page">
       <PortfolioNav categories={categories} activeSlug={slug} categoryName={category.menu} />
-      <TagStrip categorySlug={slug} tags={tags} />
+      <TagStrip categorySlug={slug} tags={tags} extras={extrasFor(slug)} />
       {hasRealPhotos ? (
         <PhotoTape photos={photos} slug={slug} />
       ) : (

@@ -11,6 +11,7 @@ import { TrainingTab } from "@/components/admin/TrainingTab";
 import type { TabProps } from "@/components/admin/types";
 import { BTN_GHOST } from "@/components/admin/ui";
 import type { StudioState } from "@/lib/admin-store";
+import { rememberUpload } from "@/lib/media-url";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -24,13 +25,13 @@ const TABS: { id: Tab; label: string }[] = [
   { id: "backstage", label: "Бэкстейдж" },
   { id: "reviews", label: "Отзывы" },
   { id: "training", label: "Обучение" },
-  { id: "about", label: "Обо мне и пресса" },
+  { id: "about", label: "Обо мне и СМИ" },
   { id: "phototour", label: "Фототуры" },
   { id: "contacts", label: "Контакты" },
 ];
 
 /** Фото ужимается в браузере до отправки: на хостинг уезжает уже лёгкий файл. */
-async function compress(file: File, max = 2000, quality = 0.85): Promise<string> {
+async function compress(file: File, max = 2000, quality = 0.85): Promise<Blob> {
   const dataUrl = await new Promise<string>((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(String(reader.result));
@@ -60,7 +61,31 @@ async function compress(file: File, max = 2000, quality = 0.85): Promise<string>
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("Ошибка конвертации изображения");
   ctx.drawImage(image, 0, 0, width, height);
-  return canvas.toDataURL("image/jpeg", quality);
+  // Blob, а не строка base64: файл уезжает телом запроса как есть — на треть
+  // меньше байт и без мегабайтной строки в JSON. toBlob есть везде, кроме
+  // совсем старых браузеров, поэтому запасной путь через toDataURL оставлен.
+  const blob = await new Promise<Blob | null>((resolve) => {
+    if (typeof canvas.toBlob !== "function") return resolve(null);
+    canvas.toBlob(resolve, "image/jpeg", quality);
+  });
+  if (blob) return blob;
+  const encoded = canvas.toDataURL("image/jpeg", quality).split(",")[1] ?? "";
+  const bytes = Uint8Array.from(atob(encoded), (char) => char.charCodeAt(0));
+  return new Blob([bytes], { type: "image/jpeg" });
+}
+
+/** Что ответил сервер: разбираем JSON, а если пришло не оно — говорим прямо. */
+async function readAnswer(res: Response) {
+  const text = await res.text();
+  try {
+    return { ok: res.ok, ...(JSON.parse(text) as { src?: string; error?: string }) };
+  } catch {
+    // Хостинг умеет отвечать своей страницей ошибки вместо нашего JSON —
+    // раньше на этом месте панель молча падала и человек видел только,
+    // что «фотография не добавилась».
+    const snippet = text.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim().slice(0, 140);
+    return { ok: false, error: `Хостинг ответил ${res.status}${snippet ? `: ${snippet}` : ""}` };
+  }
 }
 
 export function AdminPanel() {
@@ -126,17 +151,44 @@ export function AdminPanel() {
     for (const file of [...files]) {
       n += 1;
       setNote(`Сжимаю и отправляю фото ${n} из ${files.length}…`);
-      const dataUrl = await compress(file);
-      const res = await fetch("/api/admin/upload", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ dataUrl, filename: file.name }),
-      });
-      const json = (await res.json()) as { src?: string; error?: string };
-      if (!res.ok || !json.src) throw new Error(json.error || "Ошибка загрузки фото");
-      srcs.push(json.src);
+      const blob = await compress(file);
+
+      // Основной способ — файл телом запроса, как у роликов.
+      let answer = await readAnswer(
+        await fetch("/api/admin/upload", {
+          method: "POST",
+          headers: { "Content-Type": blob.type || "image/jpeg", "X-Filename": encodeURIComponent(file.name) },
+          body: blob,
+        }),
+      );
+
+      // Не прошло — пробуем по-старому, строкой в JSON. Способы ломаются на
+      // хостинге по разным причинам, и терять фотографию из-за одного из них
+      // незачем.
+      if (!answer.ok || !answer.src) {
+        const dataUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(String(reader.result));
+          reader.onerror = () => reject(new Error("Ошибка чтения файла"));
+          reader.readAsDataURL(blob);
+        });
+        answer = await readAnswer(
+          await fetch("/api/admin/upload", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ dataUrl, filename: file.name }),
+          }),
+        );
+      }
+
+      if (!answer.ok || !answer.src) throw new Error(answer.error || "Ошибка загрузки фото");
+      // На сайт файл попадёт выкладкой, минуты через две-три. Чтобы всё это
+      // время панель не показывала на его месте пустоту, превью берётся из
+      // выбранного файла.
+      rememberUpload(answer.src, blob);
+      srcs.push(answer.src);
     }
-    setNote(`Фото загружены: ${srcs.length}. Не забудьте сохранить.`);
+    setNote(`Фото загружены: ${srcs.length}. Не забудьте нажать «Сохранить».`);
     return srcs;
   }
 

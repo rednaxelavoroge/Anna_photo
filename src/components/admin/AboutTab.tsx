@@ -14,7 +14,7 @@ function youtubeId(value: string) {
   return (match?.[1] || match?.[2] || value).trim();
 }
 
-/** Вкладка «Обо мне и пресса»: главная, биография, публикации, ссылки, ТВ, фотоархив. */
+/** Вкладка «Обо мне и СМИ»: главная, биография, публикации, ссылки, ТВ, фотоархив. */
 export function AboutTab(props: TabProps) {
   const { state, setState, persist, busy, upload, notify } = props;
   const site = state.site;
@@ -189,7 +189,7 @@ function emptyPublication(): Publication {
   return { id: "", title: "", media: "", date: "", badge: "Статья", lead: "", paragraphs: [], link: "", images: [] };
 }
 
-/** Публикации в блоке «Пресса обо мне»: карточки со страницами изданий и текстом. */
+/** Публикации в блоке «СМИ обо мне»: карточки со страницами изданий и текстом. */
 function PublicationsEditor({
   publications,
   busy,
@@ -207,7 +207,7 @@ function PublicationsEditor({
   const update = (index: number, next: Partial<Publication>) => onChange(publications.map((row, i) => (i === index ? { ...row, ...next } : row)));
 
   return (
-    <Card title="Пресса обо мне" hint="Каждая карточка — одна статья или страница издания. Откройте карточку, чтобы поправить текст и страницы.">
+    <Card title="СМИ обо мне" hint="Каждая карточка — одна статья или страница издания. Откройте карточку, чтобы поправить текст и страницы. На сайте снимки встают внутрь текста: первый перед статьёй, остальные между абзацами.">
       <ul className="space-y-2">
         {publications.map((pub, index) => {
           const open = openId === pub.id;

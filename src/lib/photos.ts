@@ -166,7 +166,7 @@ function galleryToPhotos(items: GalleryItem[], folder: string, alt: string, excl
 /** Отзывы, воркшопы, фотоархив прессы — из панели, плюс неучтённые файлы папки. */
 export function getGalleryPhotos(key: GalleryKey): Photo[] {
   const galleries = getGalleries();
-  // Страницы изданий отданы публикациям («Пресса обо мне») и в архиве не повторяются.
+  // Страницы изданий отданы публикациям («СМИ обо мне») и в архиве не повторяются.
   const exclude = key === "press" ? new Set(getPublications().flatMap((pub) => pub.images ?? [])) : new Set<string>();
   const alt = key === "reviews" ? "Отзыв" : key === "workshops" ? "Воркшоп" : "Выставки и эфиры";
   return galleryToPhotos(galleries[key], GALLERY_FOLDERS[key], alt, exclude).filter(

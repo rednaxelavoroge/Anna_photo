@@ -33,8 +33,10 @@ export default function TrainingPage() {
 
       {videos.length > 0 ? (
         <section className="mt-20 border-t border-line pt-14">
-          <p className="eyebrow">Мастер-классы</p>
-          <h2 className="mt-3 font-display text-3xl md:text-4xl">Видео с мастер-класса</h2>
+          {/* Правка заказчицы 05.09.2026: «Мастер-классы» — крупно, заголовком;
+              «Видео с мастер-класса» — мелкой строкой под ним. */}
+          <h2 className="font-display text-3xl md:text-4xl">Мастер-классы</h2>
+          <p className="mt-3 text-sm leading-relaxed text-muted md:text-base">Видео с мастер-класса</p>
           <div className="mt-8 grid gap-6 md:grid-cols-2">
             {videos.map((video) => (
               <figure key={video.src} className="border border-line bg-snow p-4">

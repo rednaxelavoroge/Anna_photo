@@ -4,6 +4,7 @@ import { TagStrip } from "@/components/TagStrip";
 import { LEGACY_ALBUM_REDIRECTS, resolveLegacyAlbum } from "@/lib/legacy-routes";
 import { getCategories, getCategory, getStudioTags } from "@/lib/content";
 import { getCategoryTags, getTagPhotos } from "@/lib/photos";
+import { extrasFor } from "@/lib/portfolio-extras";
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 
@@ -59,7 +60,7 @@ export default async function AlbumPage({ params }: { params: Promise<Params> })
     return (
       <article className="tape-page">
         <PortfolioNav categories={getCategories()} activeSlug={slug} categoryName={category.menu} />
-        <TagStrip categorySlug={slug} tags={getCategoryTags(slug)} activeTag={album} />
+        <TagStrip categorySlug={slug} tags={getCategoryTags(slug)} activeTag={album} extras={extrasFor(slug)} />
         <PhotoTape photos={getTagPhotos(slug, album)} slug={`${slug}-${album}`} />
       </article>
     );

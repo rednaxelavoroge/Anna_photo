@@ -83,9 +83,14 @@ function MeetSection({ category, index }: { category: Category; index: number })
       <h2 className="font-display text-[clamp(1.35rem,6vw,2rem)] leading-[1.1] text-ink md:text-[clamp(1.6rem,3.2vw,2.75rem)]">
         {category.menu}
       </h2>
-      <p className="mt-2 text-sm leading-relaxed text-muted md:mt-4 md:max-w-md md:text-base">
-        {category.description}
-      </p>
+      {/* Заказчица сказала, что описания под разделами перепишет сама, а
+          какие-то уберёт. Пустое описание не должно оставлять на главной
+          пустую строку с отступами. */}
+      {category.description ? (
+        <p className="mt-2 text-sm leading-relaxed text-muted md:mt-4 md:max-w-md md:text-base">
+          {category.description}
+        </p>
+      ) : null}
       <div className="mt-3 md:mt-6">
         <Link
           href={`/portfolio/${category.slug}`}

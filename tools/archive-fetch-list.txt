@@ -32,3 +32,19 @@
 /Бэкстейдж/back-25.avi
 /Бэкстейдж/back-26.mp4
 /Бэкстейдж/back-29.mp4
+
+# «Обо мне / Новая папка» — статьи Haute Time, о которых заказчица сказала
+# 05.09.2026: «я специально добавила новую папку, вот это нужно ещё добавить».
+# Одиннадцать файлов, из них два уже лежат в репозитории (Breguet-2 и
+# Parmigiani) — их не берём. Остальные девять: часть парами, с пробелами
+# вокруг дефиса и без, разного размера — это разные версии одной статьи,
+# разбираемся после чтения текста.
+/обо мне/Новая папка/Haute Time - Jaeger-LeCoultre.docx
+/обо мне/Новая папка/Haute Time - Jaquet Droz.docx
+/обо мне/Новая папка/Haute Time-Breguet.docx
+/обо мне/Новая папка/Haute Time-Jaeger-LeCoultre.docx
+/обо мне/Новая папка/Haute Time-Patek Philippe.docx
+/обо мне/Новая папка/Haute Time-Tag Haeur.docx
+/обо мне/Новая папка/Haute Time-Tag Heuer.docx
+/обо мне/Новая папка/Haute Time-Ulysse Nardin.docx
+/обо мне/Новая папка/Haute Time-Vacheron Constantin.docx

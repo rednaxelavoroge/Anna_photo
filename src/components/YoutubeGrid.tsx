@@ -28,9 +28,11 @@ export function YoutubeGrid({ videos }: { videos: AboutVideo[] }) {
   if (videos.length === 0) return null;
 
   return (
-    <ul className="mt-10 grid gap-[var(--frame-gap)] sm:grid-cols-2 lg:grid-cols-3">
+    <ul className="mt-[var(--frame-gap)] grid gap-[var(--frame-gap)] sm:grid-cols-2 lg:grid-cols-3">
       {videos.map((video) => (
-        <li key={video.id}>
+        // Рамка и подпись — те же, что у двух роликов выше: заказчица
+        // просила «такие же квадратики», а не другую сетку.
+        <li key={video.id} className="bg-snow p-[var(--print-mat)]">
           <div className="relative aspect-video w-full overflow-hidden bg-void">
             {playing === video.id ? (
               <iframe
@@ -72,12 +74,12 @@ export function YoutubeGrid({ videos }: { videos: AboutVideo[] }) {
               </button>
             )}
           </div>
-          <p className="mt-3 text-sm leading-snug text-ink">{video.title}</p>
+          <p className="mt-3 text-xs leading-relaxed text-muted">{video.title}</p>
           <a
             href={`https://www.youtube.com/watch?v=${video.id}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="link-line mt-1 inline-block text-[11px] tracking-[0.16em] text-muted uppercase"
+            className="link-line mt-1.5 inline-block text-[10px] tracking-[0.16em] text-muted uppercase"
           >
             Открыть на YouTube ↗
           </a>

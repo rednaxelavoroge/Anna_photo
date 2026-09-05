@@ -54,7 +54,10 @@ export default function AboutPage() {
         <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted md:text-base">
           Эфиры и сюжеты армянских и российских телеканалов о фотографе и её проектах.
         </p>
-        <div className="mt-10 grid gap-[var(--frame-gap)] md:grid-cols-2">
+        {/* Ролики с сайта и эфиры с YouTube показаны одинаковыми плитками:
+            заказчица видела два ролика квадратами, а остальные списком, и
+            просила «такие же квадратики» для всех. */}
+        <div className="mt-10 grid gap-[var(--frame-gap)] sm:grid-cols-2 lg:grid-cols-3">
           {localVideos.map((video) => (
             <figure key={video.src} className="bg-snow p-[var(--print-mat)]">
               <SiteVideo src={video.src} className="aspect-video w-full bg-void object-contain" />

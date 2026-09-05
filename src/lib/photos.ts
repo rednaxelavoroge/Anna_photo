@@ -1,4 +1,4 @@
-import { getPhotos as getPlaceholderPhotos, getBackstagePhotos as getPlaceholderBackstage, getTaggedPhotos, getAllTaggedPhotos, getBackstageEntries, getCategories, type Photo } from "@/lib/content";
+import { getPhotos as getPlaceholderPhotos, getBackstagePhotos as getPlaceholderBackstage, getTaggedPhotos, getAllTaggedPhotos, getBackstageEntries, getCategories, getPublications, type Photo } from "@/lib/content";
 import { getPreviewCover } from "@/lib/preview";
 import fs from "node:fs";
 import path from "node:path";
@@ -101,10 +101,29 @@ export function getPhotos(categorySlug: string): Photo[] {
   return previewAsAlbum(categorySlug, categorySlug) ?? getPlaceholderPhotos(categorySlug);
 }
 
-/** Пресса и эфиры: фотографии с телевидения, выставок и страниц изданий (public/photos/press). */
+/**
+ * Вторая копия статьи «Голос Армении» (снята 06.11.2015): те же страницы, что
+ * уже показаны в публикации со снимков от 05.09.2015. В архив не идут.
+ */
+const PRESS_DUPLICATES = new Set([
+  "/photos/press/2015-11-06_133419.jpg",
+  "/photos/press/2015-11-06_133438.jpg",
+  "/photos/press/2015-11-06_133502.jpg",
+  "/photos/press/2015-11-06_133515.jpg",
+]);
+
+/**
+ * Фотоархив на странице «Обо мне»: только фотографии с телевидения, выставок и
+ * встреч (public/photos/press). Страницы изданий и скриншоты статей отданы
+ * публикациям («Пресса обо мне») и здесь не повторяются — заказчица просила
+ * оставить в архиве одни фото (05.09.2026).
+ */
 export function getPressPhotos(): Photo[] {
   const list = readAlbumDir(["press"], "Пресса и эфиры") ?? [];
-  return list.filter((photo) => photo.kind !== "video");
+  const taken = new Set(getPublications().flatMap((pub) => pub.images ?? []));
+  return list.filter(
+    (photo) => photo.kind !== "video" && !(photo.src && (taken.has(photo.src) || PRESS_DUPLICATES.has(photo.src))),
+  );
 }
 
 export function getBackstagePhotos(): Photo[] {

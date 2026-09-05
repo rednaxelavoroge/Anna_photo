@@ -15,10 +15,9 @@ export default function ReviewsPage() {
 
   return (
     <article className="px-5 pt-28 pb-24 md:px-8">
-      <p className="eyebrow">Голоса клиентов</p>
-      <h1 className="mt-4 font-display text-4xl md:text-6xl">Отзывы о съёмках и воркшопах</h1>
+      <h1 className="font-display text-4xl md:text-6xl">Отзывы о съёмках и воркшопах</h1>
       <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted md:text-base">
-        Сообщения и впечатления родителей, семей и учеников из WhatsApp, Instagram и VK. Нажмите на любой скриншот, чтобы открыть его в полном размере.
+        Сообщения и впечатления родителей, семей и учеников из WhatsApp, Instagram и VK.
       </p>
 
       {reviewPhotos.length > 0 ? (

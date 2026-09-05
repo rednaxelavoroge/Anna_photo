@@ -18,19 +18,18 @@ import { useRef } from "react";
  */
 export function MeetSections({ categories }: { categories: Category[] }) {
   return (
-    <div className="relative bg-paper">
+    <div id="portfolio" className="relative bg-paper">
       {categories.map((category, index) => (
-        <MeetSection key={category.slug} category={category} index={index} total={categories.length} />
+        <MeetSection key={category.slug} category={category} index={index} />
       ))}
     </div>
   );
 }
 
-function MeetSection({ category, index, total }: { category: Category; index: number; total: number }) {
+function MeetSection({ category, index }: { category: Category; index: number }) {
   const sectionRef = useRef<HTMLElement>(null);
   const reduced = useReducedMotion();
   const imageLeft = index % 2 === 0;
-  const number = `${String(index + 1).padStart(2, "0")} / ${String(total).padStart(2, "0")}`;
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -81,8 +80,7 @@ function MeetSection({ category, index, total }: { category: Category; index: nu
 
   const copy = (
     <div className="flex min-h-0 min-w-0 flex-col justify-start bg-paper px-5 pt-3 pb-2 md:h-full md:justify-center md:px-12 md:py-10 lg:px-16">
-      <p className="eyebrow text-muted">{number}</p>
-      <h2 className="mt-2 font-display text-[clamp(1.35rem,6vw,2rem)] leading-[1.1] text-ink md:mt-4 md:text-[clamp(1.6rem,3.2vw,2.75rem)]">
+      <h2 className="font-display text-[clamp(1.35rem,6vw,2rem)] leading-[1.1] text-ink md:text-[clamp(1.6rem,3.2vw,2.75rem)]">
         {category.menu}
       </h2>
       <p className="mt-2 text-sm leading-relaxed text-muted md:mt-4 md:max-w-md md:text-base">

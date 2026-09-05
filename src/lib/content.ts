@@ -78,11 +78,17 @@ export type SiteData = {
   portrait?: string;
   about: { eyebrow: string; title: string; lead: string; body: string[]; note: string };
   training: {
-    eyebrow: string;
     title: string;
-    stat: string;
+    /** Крупная строка под заголовком. */
     lead: string;
-    formats: { title: string; text: string }[];
+    /** Мелкая строка под ней. */
+    leadNote: string;
+    /** Крупная строка про воркшопы. */
+    stat: string;
+    /** Мелкая строка под ней. */
+    statNote: string;
+    /** Заголовок над сеткой воркшопов. */
+    galleryTitle: string;
   };
   phototour: { eyebrow: string; title: string; lead: string; cta: string };
   contacts: SiteContacts;

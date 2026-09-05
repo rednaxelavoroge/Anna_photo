@@ -29,7 +29,7 @@ export function PortfolioNav({ categories, activeSlug, categoryName }: Portfolio
         <p className="eyebrow flex items-center gap-2">
           {categoryName ? (
             <>
-              <Link href="/portfolio" className="hover:text-ink transition-colors">
+              <Link href="/#portfolio" className="hover:text-ink transition-colors">
                 Портфолио
               </Link>
               <span className="text-line">/</span>

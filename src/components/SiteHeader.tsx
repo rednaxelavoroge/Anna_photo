@@ -1,12 +1,16 @@
 "use client";
 
+import { ThemeSwitch } from "@/components/ThemeSwitch";
 import { getSite } from "@/lib/content";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+// «Портфолио» ведёт на первую страницу к разделам, не на ленту всех кадров:
+// заказчица хочет попадать на список из 19 разделов.
 const NAV = [
-  { href: "/portfolio", label: "Портфолио" },
+  { href: "/#portfolio", label: "Портфолио" },
   { href: "/training", label: "Обучение" },
+  { href: "/phototour", label: "Фототуры" },
   { href: "/backstage", label: "Бэкстейдж" },
   { href: "/reviews", label: "Отзывы" },
   { href: "/about", label: "Обо мне" },
@@ -67,6 +71,7 @@ export function SiteHeader() {
                 {item.label}
               </Link>
             ))}
+            <ThemeSwitch className="ml-2" />
           </nav>
 
           <button
@@ -109,6 +114,10 @@ export function SiteHeader() {
               </Link>
             ))}
           </nav>
+          <div className="mt-10 flex items-center gap-4 border-t border-line pt-6 text-[11px] tracking-[0.18em] text-muted uppercase">
+            <span>Цвет сайта</span>
+            <ThemeSwitch />
+          </div>
         </div>
       ) : null}
     </>

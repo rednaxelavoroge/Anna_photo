@@ -1,6 +1,7 @@
 import { AlbumGrid } from "@/components/AlbumGrid";
 import { CoverArt } from "@/components/CoverArt";
 import { PublicationsSection } from "@/components/PublicationsSection";
+import { RichText } from "@/components/RichText";
 import { getAboutVideos, getPressLinks, getPublications, getSite } from "@/lib/content";
 import { getPressPhotos } from "@/lib/photos";
 import type { Metadata } from "next";
@@ -40,9 +41,12 @@ export default function AboutPage() {
         <CoverArt slug="home-hero" title={about.title} src={site.portrait} contain />
       </div>
       <p className="mt-8 max-w-2xl text-lg leading-relaxed">{about.lead}</p>
-      <div className="mt-10 max-w-2xl space-y-5 text-sm leading-relaxed text-muted md:text-base">
-        {about.body.map((paragraph) => (
-          <p key={paragraph}>{paragraph}</p>
+      {/* Каждый год — с новой строки: одна запись массива, одна строка. */}
+      <div className="mt-10 max-w-2xl space-y-3 text-sm leading-relaxed text-muted md:text-base">
+        {about.body.map((line) => (
+          <p key={line}>
+            <RichText text={line} />
+          </p>
         ))}
       </div>
       <p className="mt-12 max-w-2xl text-xs leading-relaxed text-ash">{about.note}</p>
@@ -50,10 +54,10 @@ export default function AboutPage() {
       <PublicationsSection publications={publications} links={pressLinks} />
 
       <section className="mt-24 border-t border-line pt-16">
-        <p className="eyebrow">Эфиры и сюжеты</p>
-        <h2 className="mt-4 max-w-2xl font-display text-3xl md:text-4xl">Телевидение о фотографе</h2>
+        <p className="eyebrow">Телевидение</p>
+        <h2 className="mt-4 max-w-2xl font-display text-3xl md:text-4xl">ТВ обо мне</h2>
         <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted md:text-base">
-          Сюжеты армянских и российских каналов о съёмках новорождённых, выставках и проектах.
+          Эфиры и сюжеты армянских и российских телеканалов о фотографе и её проектах.
         </p>
         <div className="mt-10 grid gap-[var(--frame-gap)] md:grid-cols-2">
           {LOCAL_VIDEOS.map((video) => (
@@ -69,32 +73,32 @@ export default function AboutPage() {
             </figure>
           ))}
         </div>
-        <div className="mt-[var(--frame-gap)] grid gap-[var(--frame-gap)] sm:grid-cols-2 lg:grid-cols-3">
-          {videos.map((video) => (
-            <figure key={video.id} className="bg-snow p-[var(--print-mat)]">
-              <div className="relative aspect-video overflow-hidden bg-void">
-                <iframe
-                  title={video.title}
-                  src={`https://www.youtube-nocookie.com/embed/${video.id}`}
-                  className="absolute inset-0 h-full w-full"
-                  allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  referrerPolicy="strict-origin-when-cross-origin"
-                  loading="lazy"
-                  allowFullScreen
-                />
-              </div>
-              <figcaption className="mt-3 text-xs leading-relaxed text-muted">{video.title}</figcaption>
-            </figure>
-          ))}
-        </div>
+        {/* Список эфиров текстом: встроенные плееры YouTube у заказчицы не грузились. */}
+        {videos.length > 0 ? (
+          <ul className="mt-12 max-w-3xl divide-y divide-line border-y border-line">
+            {videos.map((video) => (
+              <li key={video.id}>
+                <a
+                  href={`https://www.youtube.com/watch?v=${video.id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex items-baseline justify-between gap-6 py-3.5"
+                >
+                  <span className="text-sm leading-snug text-ink group-hover:underline md:text-base">{video.title}</span>
+                  <span className="shrink-0 text-[11px] tracking-[0.16em] text-muted uppercase">Смотреть ↗</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        ) : null}
       </section>
 
       {pressPhotos.length > 0 ? (
         <section className="mt-24 border-t border-line pt-16">
           <p className="eyebrow">Фотоархив</p>
-          <h2 className="mt-4 max-w-2xl font-display text-3xl md:text-4xl">Выставки, эфиры, страницы изданий</h2>
+          <h2 className="mt-4 max-w-2xl font-display text-3xl md:text-4xl">Выставки и эфиры</h2>
           <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted md:text-base">
-            Кадры с телевизионных съёмок, открытий выставок и развороты журналов и газет, где выходили публикации.
+            Фотографии с телевизионных съёмок, открытий выставок и встреч.
           </p>
           <div className="mt-10">
             <AlbumGrid photos={pressPhotos} slug="press" />

@@ -877,7 +877,7 @@ function TextsTab({
           <textarea className="mt-1 w-full border border-line px-3 py-2" rows={3} value={site.about.lead} onChange={(event) => patchSite({ about: { ...site.about, lead: event.target.value } })} />
         </label>
         <label className="block">
-          <span className="text-[10px] tracking-[0.16em] text-muted uppercase">Рассказ (абзац с новой строки)</span>
+          <span className="text-[10px] tracking-[0.16em] text-muted uppercase">Рассказ (каждая строка через пустую строку; **жирный** — двумя звёздочками)</span>
           <textarea
             className="mt-1 w-full border border-line px-3 py-2"
             rows={6}
@@ -915,26 +915,34 @@ function TextsTab({
 
       <div className="max-w-2xl space-y-3 border border-line bg-surface p-5">
         <h2 className="font-display text-2xl">Обучение</h2>
-        <input className="w-full border border-line px-3 py-2" value={site.training.eyebrow} onChange={(event) => patchSite({ training: { ...site.training, eyebrow: event.target.value } })} />
-        <input className="w-full border border-line px-3 py-2" value={site.training.title} onChange={(event) => patchSite({ training: { ...site.training, title: event.target.value } })} />
-        <input className="w-full border border-line px-3 py-2" value={site.training.stat} onChange={(event) => patchSite({ training: { ...site.training, stat: event.target.value } })} />
-        <textarea className="w-full border border-line px-3 py-2" rows={3} value={site.training.lead} onChange={(event) => patchSite({ training: { ...site.training, lead: event.target.value } })} />
-        {site.training.formats.map((item, index) => (
-          <div key={index} className="grid gap-2 sm:grid-cols-2">
-            <input className="border border-line px-3 py-2" value={item.title} onChange={(event) => {
-              const formats = site.training.formats.map((row, i) => (i === index ? { ...row, title: event.target.value } : row));
-              patchSite({ training: { ...site.training, formats } });
-            }} />
-            <textarea className="border border-line px-3 py-2" rows={2} value={item.text} onChange={(event) => {
-              const formats = site.training.formats.map((row, i) => (i === index ? { ...row, text: event.target.value } : row));
-              patchSite({ training: { ...site.training, formats } });
-            }} />
-          </div>
-        ))}
+        <label className="block">
+          <span className="text-[10px] tracking-[0.16em] text-muted uppercase">Заголовок</span>
+          <input className="mt-1 w-full border border-line px-3 py-2" value={site.training.title} onChange={(event) => patchSite({ training: { ...site.training, title: event.target.value } })} />
+        </label>
+        <label className="block">
+          <span className="text-[10px] tracking-[0.16em] text-muted uppercase">Крупная строка под заголовком</span>
+          <input className="mt-1 w-full border border-line px-3 py-2" value={site.training.lead} onChange={(event) => patchSite({ training: { ...site.training, lead: event.target.value } })} />
+        </label>
+        <label className="block">
+          <span className="text-[10px] tracking-[0.16em] text-muted uppercase">Мелкая строка под ней</span>
+          <input className="mt-1 w-full border border-line px-3 py-2" value={site.training.leadNote} onChange={(event) => patchSite({ training: { ...site.training, leadNote: event.target.value } })} />
+        </label>
+        <label className="block">
+          <span className="text-[10px] tracking-[0.16em] text-muted uppercase">Крупная строка про воркшопы</span>
+          <input className="mt-1 w-full border border-line px-3 py-2" value={site.training.stat} onChange={(event) => patchSite({ training: { ...site.training, stat: event.target.value } })} />
+        </label>
+        <label className="block">
+          <span className="text-[10px] tracking-[0.16em] text-muted uppercase">Мелкая строка под ней</span>
+          <input className="mt-1 w-full border border-line px-3 py-2" value={site.training.statNote} onChange={(event) => patchSite({ training: { ...site.training, statNote: event.target.value } })} />
+        </label>
+        <label className="block">
+          <span className="text-[10px] tracking-[0.16em] text-muted uppercase">Заголовок над кадрами воркшопов</span>
+          <input className="mt-1 w-full border border-line px-3 py-2" value={site.training.galleryTitle} onChange={(event) => patchSite({ training: { ...site.training, galleryTitle: event.target.value } })} />
+        </label>
       </div>
 
       <div className="max-w-2xl space-y-3 border border-line bg-surface p-5">
-        <h2 className="font-display text-2xl">Фототур</h2>
+        <h2 className="font-display text-2xl">Фототуры</h2>
         <input className="w-full border border-line px-3 py-2" value={site.phototour.eyebrow} onChange={(event) => patchSite({ phototour: { ...site.phototour, eyebrow: event.target.value } })} />
         <input className="w-full border border-line px-3 py-2" value={site.phototour.title} onChange={(event) => patchSite({ phototour: { ...site.phototour, title: event.target.value } })} />
         <textarea className="w-full border border-line px-3 py-2" rows={3} value={site.phototour.lead} onChange={(event) => patchSite({ phototour: { ...site.phototour, lead: event.target.value } })} />

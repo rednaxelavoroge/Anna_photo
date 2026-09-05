@@ -29,9 +29,9 @@ export function PublicationsSection({
   return (
     <section className="mt-24 border-t border-line pt-16">
       <p className="eyebrow">Публикации и СМИ</p>
-      <h2 className="mt-4 max-w-2xl font-display text-3xl md:text-5xl">Пресса о фотографе</h2>
+      <h2 className="mt-4 max-w-2xl font-display text-3xl md:text-5xl">Пресса обо мне</h2>
       <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted md:text-base">
-        Статьи, интервью и фоторяды в изданиях. Тексты и кадры публикаций сохранены здесь целиком,
+        Статьи, интервью и фоторяды в изданиях. Тексты и страницы публикаций сохранены здесь,
         ссылки ведут на оригиналы.
       </p>
 
@@ -93,13 +93,17 @@ export function PublicationsSection({
               </div>
 
               <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-line/60 pt-4">
-                <button
-                  type="button"
-                  onClick={() => setActiveId(isOpen ? null : pub.id)}
-                  className="link-line text-xs font-medium tracking-[0.16em] text-ink uppercase"
-                >
-                  {isOpen ? "Свернуть статью ↑" : "Читать статью ↓"}
-                </button>
+                {pub.paragraphs.length > 0 ? (
+                  <button
+                    type="button"
+                    onClick={() => setActiveId(isOpen ? null : pub.id)}
+                    className="link-line text-xs font-medium tracking-[0.16em] text-ink uppercase"
+                  >
+                    {isOpen ? "Свернуть статью ↑" : "Читать статью ↓"}
+                  </button>
+                ) : (
+                  <span className="text-[11px] tracking-[0.16em] text-muted uppercase">Страница издания</span>
+                )}
 
                 {pub.link ? (
                   <a
@@ -118,19 +122,22 @@ export function PublicationsSection({
       </div>
 
       {links.length > 0 ? (
-        <div className="mt-14">
-          <p className="eyebrow">Ссылки на публикации</p>
-          <ul className="mt-5 divide-y divide-line border-y border-line">
+        <div className="mt-20 border-t border-line pt-14">
+          <h3 className="font-display text-2xl md:text-3xl">Ссылки на публикации</h3>
+          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted">
+            Статьи и новости на сайтах изданий — открываются на сайте самого издания.
+          </p>
+          <ul className="mt-8 max-w-4xl divide-y divide-line border-y border-line">
             {links.map((item) => (
               <li key={item.id}>
                 <a
                   href={item.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group flex flex-col gap-1 py-4 md:flex-row md:items-baseline md:justify-between md:gap-6"
+                  className="group flex flex-col gap-1.5 py-5 md:flex-row md:items-baseline md:justify-between md:gap-8"
                 >
-                  <span className="text-sm leading-snug text-ink group-hover:underline md:text-base">{item.title}</span>
-                  <span className="shrink-0 text-[11px] tracking-[0.16em] text-muted uppercase">{item.media} ↗</span>
+                  <span className="font-display text-base leading-snug text-ink group-hover:underline md:text-lg">{item.title}</span>
+                  <span className="shrink-0 text-xs tracking-[0.16em] text-muted uppercase">{item.media} ↗</span>
                 </a>
               </li>
             ))}

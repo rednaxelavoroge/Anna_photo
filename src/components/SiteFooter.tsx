@@ -15,8 +15,9 @@ export function SiteFooter() {
         <div>
           <p className="eyebrow">Меню</p>
           <div className="mt-4 flex flex-col gap-2 text-sm">
-            <Link href="/portfolio">Портфолио</Link>
+            <Link href="/#portfolio">Портфолио</Link>
             <Link href="/training">Обучение</Link>
+            <Link href="/phototour">Фототуры</Link>
             <Link href="/backstage">Бэкстейдж</Link>
             <Link href="/reviews">Отзывы</Link>
             <Link href="/about">Обо мне</Link>

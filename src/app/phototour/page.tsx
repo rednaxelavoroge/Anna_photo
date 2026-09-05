@@ -1,17 +1,20 @@
 import { CoverArt } from "@/components/CoverArt";
 import { getSite } from "@/lib/content";
+import { getPhotos } from "@/lib/photos";
 import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Фототур в Армению",
+  title: "Фототуры",
   description:
-    "Фототур в Армению: travel-съёмка для гостей Еревана. Не обучение, а путешествие с фотографом.",
-  keywords: ["фототур в Армению", "фотосессия для туристов Ереван", "travel фотограф Армения"],
+    "Фототуры с Анной Манасарян: Италия, Армения, Испания, Грузия. Не обучение, а путешествие с фотографом и ваша съёмка в дороге.",
+  keywords: ["фототур", "фототур в Армению", "фототур Италия", "фототур Грузия", "travel фотограф"],
 };
 
 export default function PhototourPage() {
   const { phototour, contacts } = getSite();
+  // Обложка — первый кадр раздела «Путешествия»; пока папка пуста, стоит образец.
+  const cover = getPhotos("travel").find((photo) => Boolean(photo.src))?.src;
 
   return (
     <article className="pt-20">
@@ -33,9 +36,9 @@ export default function PhototourPage() {
             </Link>
           </div>
         </div>
-        <div className="relative min-h-[50svh] bg-paper flex items-center justify-center p-4">
+        <div className="relative flex min-h-[50svh] items-center justify-center bg-paper p-4">
           <div className="relative aspect-[2/3] w-full max-w-md overflow-hidden bg-paper shadow-xs">
-            <CoverArt slug="phototour" title={phototour.title} contain />
+            <CoverArt slug="phototour" title={phototour.title} src={cover} />
           </div>
         </div>
       </div>

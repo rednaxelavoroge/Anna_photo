@@ -51,6 +51,21 @@ function layout(photos: Photo[], paragraphCount: number) {
   return { slots, rest };
 }
 
+/**
+ * Подзаголовок внутри статьи — название модели часов или главки.
+ *
+ * В статьях Haute Time они идут обычными абзацами: короткая строка без
+ * точки на конце, а сразу за ней — длинный абзац. Подписи вроде «Фотограф:
+ * Анна Манасарян специально для Haute Time» под правило не попадают: за
+ * ними ничего не следует, они стоят последними.
+ */
+function isHeading(paragraphs: string[], index: number) {
+  const text = paragraphs[index];
+  if (text.length >= 70 || /[.!?…»)]$/.test(text)) return false;
+  const next = paragraphs[index + 1];
+  return Boolean(next) && next.length > 120;
+}
+
 export function PublicationsSection({
   publications,
   links,
@@ -147,7 +162,13 @@ export function PublicationsSection({
                     {slots[0] ? <div className="mb-6">{frame(slots[0], true)}</div> : null}
                     {body.map((para, i) => (
                       <div key={i}>
-                        <p className={i === 0 ? "" : "mt-4"}>{para}</p>
+                        {isHeading(body, i) ? (
+                          <p className={`font-display text-base leading-snug text-ink md:text-lg ${i === 0 ? "" : "mt-6"}`}>
+                            {para}
+                          </p>
+                        ) : (
+                          <p className={i === 0 ? "" : "mt-4"}>{para}</p>
+                        )}
                         {slots[i + 1] ? <div className="mt-6 mb-6">{frame(slots[i + 1]!, true)}</div> : null}
                       </div>
                     ))}

@@ -1,6 +1,18 @@
 {
   "items": [
     {
+      "src": "/photos/uploads/1788714411243-torino2026-53.jpg",
+      "alt": "турин 1",
+      "categories": [
+        "travel"
+      ],
+      "tags": [],
+      "images": [
+        "/photos/uploads/1788714411243-torino2026-53.jpg"
+      ],
+      "video": ""
+    },
+    {
       "src": "/photos/newborn/neonati-1-41.jpg",
       "alt": "Новорождённые 0–1 мес — 1",
       "categories": [

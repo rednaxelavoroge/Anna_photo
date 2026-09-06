@@ -1,17 +1,6 @@
 {
   "items": [
     {
-      "src": "/photos/newborn/neonati-1-41.jpg",
-      "alt": "Новорождённые 0–1 мес — 1",
-      "categories": [
-        "newborn"
-      ],
-      "tags": [],
-      "images": [
-        "/photos/newborn/neonati-1-41.jpg"
-      ]
-    },
-    {
       "src": "/photos/newborn/neonati-1.jpg",
       "alt": "Новорождённые 0–1 мес — 2",
       "categories": [
@@ -20,6 +9,17 @@
       "tags": [],
       "images": [
         "/photos/newborn/neonati-1.jpg"
+      ]
+    },
+    {
+      "src": "/photos/newborn/neonati-1-41.jpg",
+      "alt": "Новорождённые 0–1 мес — 1",
+      "categories": [
+        "newborn"
+      ],
+      "tags": [],
+      "images": [
+        "/photos/newborn/neonati-1-41.jpg"
       ]
     },
     {

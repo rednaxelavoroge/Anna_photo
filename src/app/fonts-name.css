@@ -1,0 +1,31 @@
+/**
+ * Имя «Anna Manasaryan» — восемь букв, вшитых прямо в стили.
+ *
+ * Зачем. Хостинг заказчицы отвечает медленно: страница приходит за полторы
+ * секунды, файл шрифта — ещё за секунду с лишним. Всё это время браузер
+ * честно рисует запасным шрифтом (font-display: swap), и имя в шапке и на
+ * первом экране стояло чужим, системным. Заказчица именно это и увидела:
+ * «шрифты разные наверху и внизу».
+ *
+ * Здесь тот же самый Unbounded, урезанный до букв A M a n r s y и пробела —
+ * 2,7 КБ. Лежит в самих стилях, отдельным запросом не едет, поэтому имя
+ * рисуется своим шрифтом с первой отрисовки. Ось веса сохранена, так что
+ * и 300 в шапке, и 500 на первом экране выглядят как надо.
+ *
+ * Правило стоит ПОСЛЕ fonts.css намеренно: при равном покрытии выигрывает
+ * последнее, и эти восемь знаков берутся отсюда, а не из большого файла.
+ * Остальной текст — как был.
+ *
+ * Собрано: pyftsubset public/fonts/unbounded-latin.woff2
+ *   --unicodes="U+0020,U+0041,U+004D,U+0061,U+006E,U+0072,U+0073,U+0079"
+ *   --flavor=woff2 --no-hinting
+ */
+
+@font-face {
+  font-family: "Unbounded";
+  font-style: normal;
+  font-weight: 300 600;
+  font-display: block;
+  src: url("data:font/woff2;base64,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") format("woff2");
+  unicode-range: U+0020, U+0041, U+004D, U+0061, U+006E, U+0072, U+0073, U+0079;
+}

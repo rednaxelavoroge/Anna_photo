@@ -7,8 +7,15 @@ const OUT_DIR = join(ROOT, "public", "fonts");
 const CSS_OUT = join(ROOT, "src", "app", "fonts.css");
 
 // Один шрифт на весь сайт — правка заказчицы 05.09.2026. Manrope убран.
+//
+// Веса просим диапазоном (300..600), а не по одному. Unbounded — шрифт
+// с осью веса, и на «300;400;500;600» Google отдаёт четыре одинаковых
+// до последнего байта файла под четырьмя именами. Браузер о родстве не
+// знает и качал их порознь: восемь запросов вместо двух, и всё это перед
+// первым экраном. Диапазон даёт по одному файлу на алфавит и
+// `font-weight: 300 600` в правиле.
 const FAMILIES = [
-  "Unbounded:wght@300;400;500;600",
+  "Unbounded:wght@300..600",
 ];
 
 const UA =
@@ -36,13 +43,13 @@ for (const raw of blocks) {
   if (!WANTED_SUBSETS.has(subset)) continue;
 
   const family = body.match(/font-family:\s*'([^']+)'/)?.[1];
-  const weight = body.match(/font-weight:\s*(\d+)/)?.[1];
+  const weight = body.match(/font-weight:\s*([\d\s]+);/)?.[1]?.trim();
   const style = body.match(/font-style:\s*(\w+)/)?.[1] ?? "normal";
   const src = body.match(/url\((https:[^)]+)\)/)?.[1];
   const range = body.match(/unicode-range:\s*([^;]+);/)?.[1];
   if (!family || !weight || !src) continue;
 
-  const name = `${family.toLowerCase().replace(/\s+/g, "-")}-${weight}-${subset}.woff2`;
+  const name = `${family.toLowerCase().replace(/\s+/g, "-")}-${subset}.woff2`;
   const bytes = Buffer.from(await fetch(src).then((r) => r.arrayBuffer()));
   await writeFile(join(OUT_DIR, name), bytes);
   saved += 1;

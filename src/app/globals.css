@@ -1,5 +1,8 @@
 @import "tailwindcss";
 @import "./fonts.css";
+/* Только после fonts.css: восемь букв имени вшиты в стили и должны
+   выигрывать у большого файла. Почему — в самом файле. */
+@import "./fonts-name.css";
 
 @theme {
   --color-paper: #f3efe8;

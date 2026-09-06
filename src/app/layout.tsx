@@ -65,20 +65,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="ru" suppressHydrationWarning>
       <head>
         {/*
-          Начертания, которые нужны первому экрану, просим заранее.
+          Оба алфавита шрифта просим заранее: страница на этом хостинге
+          приходит за полторы секунды, и без предзагрузки шрифт вставал в
+          очередь за всем остальным. Файлов ровно два — Unbounded с осью
+          веса, один файл на алфавит (см. tools/fetch-fonts.mjs).
 
-          Без этого имя на первом экране успевало показаться чужим шрифтом:
-          у «шторок» вес 500, а его файл — отдельный, и до его загрузки
-          браузер честно рисует запасным (font-display: swap). Заказчица
-          именно это и увидела: «наверху шрифт другой». Шапка тем временем
-          уже своя — у неё вес 300, он приходит первым.
+          Имя «Anna Manasaryan» этого ожидания не ждёт вовсе: восемь его
+          букв вшиты в стили, см. src/app/fonts-name.css.
         */}
-        {[
-          "unbounded-300-latin",
-          "unbounded-300-cyrillic",
-          "unbounded-400-cyrillic",
-          "unbounded-500-latin",
-        ].map((font) => (
+        {["unbounded-latin", "unbounded-cyrillic"].map((font) => (
           <link
             key={font}
             rel="preload"

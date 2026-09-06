@@ -1,5 +1,5 @@
 import { isAdmin } from "@/lib/admin-auth";
-import { loadStudio, saveStudio, scanUnlisted, type StudioState } from "@/lib/admin-store";
+import { STALE_STATE, loadStudio, saveStudio, scanUnlisted, type StudioState } from "@/lib/admin-store";
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
@@ -44,9 +44,27 @@ export async function PUT(request: Request) {
     pressLinks: rest.pressLinks ?? [],
   };
   try {
-    await saveStudio(state, "Обновление с панели управления", Array.isArray(deleteFiles) ? deleteFiles : []);
-    return json({ ok: true });
+    const saved = await saveStudio(
+      state,
+      "Обновление с панели управления",
+      Array.isArray(deleteFiles) ? deleteFiles : [],
+      body.revision,
+    );
+    return json({ ok: true, revision: saved.revision });
   } catch (error) {
+    // Данные успели измениться под панелью. Это не поломка и не вина
+    // человека: 409 говорит панели показать своё окно с «обновить страницу»,
+    // а не ронять всё в общую строку ошибки.
+    if (error instanceof Error && error.message === STALE_STATE) {
+      return json(
+        {
+          error:
+            "Содержимое сайта изменилось с тех пор, как вы открыли панель. Обновите страницу, иначе это сохранение затрёт свежие правки.",
+          stale: true,
+        },
+        409,
+      );
+    }
     return json({ error: error instanceof Error ? error.message : "Не удалось сохранить" }, 500);
   }
 }

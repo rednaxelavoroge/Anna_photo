@@ -95,6 +95,8 @@ export function AdminPanel() {
   const [loadError, setLoadError] = useState("");
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState("");
+  /** Данные под панелью изменились: сохранять нельзя, надо обновить страницу. */
+  const [stale, setStale] = useState("");
 
   useEffect(() => {
     let cancelled = false;
@@ -131,11 +133,20 @@ export function AdminPanel() {
       const res = await fetch("/api/admin/state", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...next, deleteFiles }),
+        // revision — отпечаток данных, с которыми панель работает. По нему
+        // сервер видит, не изменилось ли содержимое сайта у неё за спиной.
+        body: JSON.stringify({ ...next, revision: state?.revision, deleteFiles }),
       });
-      const json = (await res.json()) as { error?: string };
+      const json = (await res.json()) as { error?: string; revision?: string; stale?: boolean };
+      // 409 — данные под панелью успели измениться. Сохранять нельзя: запись
+      // поверх стёрла бы чужое. Показываем это отдельным окном, а не строкой
+      // в углу, которую легко не заметить.
+      if (res.status === 409 || json.stale) {
+        setStale(json.error || "Содержимое сайта изменилось. Обновите страницу.");
+        return;
+      }
       if (!res.ok) throw new Error(json.error || "Ошибка сохранения");
-      setState(next);
+      setState({ ...next, revision: json.revision ?? next.revision });
       setNote("✓ Сохранено. На сайте обновится через несколько минут");
     } catch (error) {
       setNote(error instanceof Error ? error.message : "Ошибка сети при сохранении");
@@ -224,6 +235,33 @@ export function AdminPanel() {
 
   return (
     <div className="mx-auto max-w-[1100px] px-4 pb-24 pt-8 md:px-8">
+      {/*
+        Окно во весь экран, а не строчка в углу. Раньше панель в такой
+        ситуации молчала и писала поверх: так 06.09.2026 пропали семь статей.
+        Закрыть это окно нельзя — из него один выход, обновить страницу, и
+        это единственный правильный выход.
+      */}
+      {stale ? (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-ink/50 p-5">
+          <div className="max-w-md bg-paper p-6 text-center">
+            <p className="eyebrow">Панель управления</p>
+            <h2 className="mt-3 font-display text-2xl">Страницу нужно обновить</h2>
+            <p className="mt-4 text-sm leading-relaxed text-muted">{stale}</p>
+            <p className="mt-3 text-sm leading-relaxed text-muted">
+              Обычно так бывает, когда панель открыта во второй вкладке или пока
+              вы работали, на сайт вышла правка. Обновите страницу и повторите —
+              то, что вы сейчас не сохранили, придётся сделать заново.
+            </p>
+            <button
+              type="button"
+              className="mt-6 rounded-full bg-ink px-6 py-3 text-xs tracking-[0.16em] text-snow uppercase"
+              onClick={() => window.location.reload()}
+            >
+              Обновить страницу
+            </button>
+          </div>
+        </div>
+      ) : null}
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="eyebrow">Панель управления</p>

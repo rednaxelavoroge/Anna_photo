@@ -19,6 +19,7 @@ import type {
 } from "@/lib/content";
 import { MEDIA_EXT, folderOfCategory } from "@/lib/folders";
 import { slugifyRu } from "@/lib/slugify";
+import { createHash } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 
@@ -33,6 +34,12 @@ export type BackstageItem = GalleryItem;
  * так не бывает половинчатых состояний, когда кадр записан, а раздел нет.
  */
 export type StudioState = {
+  /**
+   * Отпечаток данных на момент загрузки. Панель возвращает его при
+   * сохранении, и по нему видно, не изменилось ли содержимое сайта у неё
+   * за спиной. Заполняется на сервере — руками не трогать.
+   */
+  revision?: string;
   categories: Category[];
   tags: Tag[];
   photos: PhotoItem[];
@@ -120,18 +127,42 @@ async function readText(rel: string) {
   }
 }
 
+/**
+ * Отпечаток содержимого данных сайта.
+ *
+ * Панель читает всё состояние при открытии и на «Сохранить» пишет все файлы
+ * целиком. Если между открытием и сохранением данные изменились — вышла
+ * правка, или сама заказчица работает во второй вкладке, — устаревшая копия
+ * ложилась поверх свежего, молча. Так 06.09.2026 пропали семь статей.
+ *
+ * Отпечаток берётся с содержимого файлов, а не с ветки: загрузка фотографии
+ * тоже двигает ветку, но данных не трогает, и ругаться на неё незачем.
+ */
+function fingerprint(raws: string[]) {
+  const hash = createHash("sha1");
+  for (const raw of raws) hash.update(raw).update("\u0000");
+  return hash.digest("hex").slice(0, 16);
+}
+
+/** Так узнаём, что несёт в себе отказ сохранять: панель показывает своё окно. */
+export const STALE_STATE = "STALE_STATE";
+
+async function readAllData() {
+  return Promise.all([
+    readText(FILES.portfolio),
+    readText(FILES.tags),
+    readText(FILES.photos),
+    readText(FILES.site),
+    readText(FILES.backstage),
+    readText(FILES.galleries).catch(() => JSON.stringify({ reviews: [], workshops: [], press: [] })),
+    readText(FILES.aboutVideos).catch(() => JSON.stringify({ items: [] })),
+    readText(FILES.publications).catch(() => JSON.stringify({ items: [], links: [] })),
+  ]);
+}
+
 export async function loadStudio(): Promise<StudioState> {
-  const [portfolioRaw, tagsRaw, photosRaw, siteRaw, backstageRaw, galleriesRaw, videosRaw, publicationsRaw] =
-    await Promise.all([
-      readText(FILES.portfolio),
-      readText(FILES.tags),
-      readText(FILES.photos),
-      readText(FILES.site),
-      readText(FILES.backstage),
-      readText(FILES.galleries).catch(() => JSON.stringify({ reviews: [], workshops: [], press: [] })),
-      readText(FILES.aboutVideos).catch(() => JSON.stringify({ items: [] })),
-      readText(FILES.publications).catch(() => JSON.stringify({ items: [], links: [] })),
-    ]);
+  const raws = await readAllData();
+  const [portfolioRaw, tagsRaw, photosRaw, siteRaw, backstageRaw, galleriesRaw, videosRaw, publicationsRaw] = raws;
   const portfolio = JSON.parse(portfolioRaw) as { categories: Category[] };
   const tags = JSON.parse(tagsRaw) as { items: Tag[] };
   const photos = JSON.parse(photosRaw) as { items: PhotoItem[] };
@@ -141,6 +172,7 @@ export async function loadStudio(): Promise<StudioState> {
   const videos = JSON.parse(videosRaw) as { items: AboutVideo[] };
   const publications = JSON.parse(publicationsRaw) as { items?: Publication[]; links?: PressLink[] };
   return {
+    revision: fingerprint(raws),
     categories: portfolio.categories,
     tags: tags.items ?? [],
     photos: (photos.items ?? []).map((item) => ({
@@ -244,7 +276,15 @@ export async function saveStudio(
   state: StudioState,
   message = "Обновление с панели управления",
   deleteSrcs: string[] = [],
-) {
+  expectedRevision?: string,
+): Promise<{ revision: string }> {
+  // Панель прислала отпечаток данных, с которыми она работала. Если сейчас
+  // они другие — кто-то успел раньше, и запись поверх стёрла бы чужое.
+  // Отказываемся и говорим об этом прямо; разбирается панель.
+  if (expectedRevision) {
+    const now = fingerprint(await readAllData());
+    if (now !== expectedRevision) throw new Error(STALE_STATE);
+  }
   const json = (data: unknown) => Buffer.from(`${JSON.stringify(data, null, 2)}\n`);
   const files: FileWrite[] = [
     { path: FILES.portfolio, content: json({ categories: state.categories }) },
@@ -259,14 +299,17 @@ export async function saveStudio(
   const deletions = toRepoPaths(deleteSrcs);
   if (process.env.GITHUB_TOKEN) {
     await writeGithub(files, message, deletions);
-    return;
-  }
-  if (process.env.VERCEL) {
+  } else if (process.env.VERCEL) {
     throw new Error(
       "На Vercel задайте GITHUB_TOKEN (право repo), GITHUB_REPO=rednaxelavoroge/Anna_photo и GITHUB_BRANCH — иначе сохранения не попадут в GitHub",
     );
+  } else {
+    await writeLocal(files, deletions);
   }
-  await writeLocal(files, deletions);
+  // Новый отпечаток — тот, что панель будет присылать со следующим
+  // сохранением. Считаем по тому, что записали, а не перечитываем: у GitHub
+  // свежая запись видна не мгновенно.
+  return { revision: fingerprint(files.map((file) => file.content.toString("utf8"))) };
 }
 
 export async function saveUpload(filename: string, data: Buffer) {

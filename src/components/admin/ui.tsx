@@ -168,14 +168,56 @@ export function VideoUploader({
   );
 }
 
-/** Миниатюра файла: ролик — проигрывателем без звука, иначе он выглядит как битая картинка. */
+/**
+ * Миниатюра файла. Ролик — проигрывателем без звука, иначе он выглядит как
+ * битая картинка.
+ *
+ * Отдельно разобран случай «файла ещё нет на сайте». Панель показывает
+ * миниатюры прямо с боевого сайта, а туда файл попадает выкладкой — это
+ * несколько минут. Всё это время браузер рисовал на его месте значок битой
+ * картинки, и заказчица делала единственный разумный вывод: обложка слетела.
+ * Она никуда не девалась — просто ещё едет. Теперь так и написано.
+ */
 export function Thumb({ src, className = "" }: { src: string; className?: string }) {
+  const [broken, setBroken] = useState(false);
+
   if (!src) return <div className={`flex items-center justify-center bg-void text-xs text-snow/50 ${className}`}>Нет файла</div>;
+
+  if (broken) {
+    return (
+      <div className={`flex items-center justify-center border border-line bg-paper px-2 text-center text-[10px] leading-tight text-muted ${className}`}>
+        Файл сохранён,
+        <br />
+        появится на сайте
+        <br />
+        через пару минут
+      </div>
+    );
+  }
+
   if (isVideoFile(src)) {
-    return <video src={mediaUrl(src)} className={`bg-void object-cover ${className}`} muted playsInline preload="metadata" />;
+    return (
+      <video
+        src={mediaUrl(src)}
+        className={`bg-void object-cover ${className}`}
+        muted
+        playsInline
+        preload="metadata"
+        onError={() => setBroken(true)}
+      />
+    );
   }
   // eslint-disable-next-line @next/next/no-img-element
-  return <img src={mediaUrl(src)} alt="" loading="lazy" decoding="async" className={`bg-void object-cover ${className}`} />;
+  return (
+    <img
+      src={mediaUrl(src)}
+      alt=""
+      loading="lazy"
+      decoding="async"
+      onError={() => setBroken(true)}
+      className={`bg-void object-cover ${className}`}
+    />
+  );
 }
 
 export function Arrows({ onUp, onDown, disabled, horizontal }: { onUp: () => void; onDown: () => void; disabled?: boolean; horizontal?: boolean }) {

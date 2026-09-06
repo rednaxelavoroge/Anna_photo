@@ -15,3 +15,7 @@ tsconfig.tsbuildinfo
 annamanasaryan-com.zip
 .export-stash
 .claude/
+
+# Шаблон для другого фотографа: собирается скриптом, в историю не нужен.
+template/
+template.zip

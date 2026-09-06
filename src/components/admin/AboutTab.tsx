@@ -75,12 +75,12 @@ export function AboutTab(props: TabProps) {
         <Field label="Первый абзац крупно">
           <textarea className={INPUT} rows={3} value={about.lead} onChange={(event) => patchAbout({ lead: event.target.value })} />
         </Field>
-        <Field label="Биография" hint="Каждая строка — через пустую строку. Выделить жирным: **две звёздочки** по краям.">
+        <Field label="Биография" hint="Каждый абзац — с новой строки. Выделить жирным: **две звёздочки** по краям.">
           <textarea
             className={INPUT}
             rows={10}
             value={about.body.join("\n\n")}
-            onChange={(event) => patchAbout({ body: event.target.value.split(/\n\s*\n/).map((item) => item.trim()).filter(Boolean) })}
+            onChange={(event) => patchAbout({ body: toParagraphs(event.target.value) })}
           />
         </Field>
         <Field label="Примечание мелким внизу">
@@ -183,6 +183,26 @@ export function AboutTab(props: TabProps) {
       </div>
     </section>
   );
+}
+
+/**
+ * Текст из поля — в абзацы.
+ *
+ * Абзацем считается каждая непустая строка, а не кусок между пустыми
+ * строками, как было раньше. Причина простая: статьи заказчица держит в
+ * Word, а оттуда абзацы копируются обычными переносами, без пустой строки
+ * между ними. По старому правилу вся статья слипалась в один сплошной кусок,
+ * и человек честно решал, что панель сломалась.
+ *
+ * Пустые строки по-прежнему допустимы — они просто отбрасываются, поэтому
+ * уже сохранённые тексты (их показывают через пустую строку) читаются
+ * так же, как читались.
+ */
+function toParagraphs(value: string): string[] {
+  return value
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
 }
 
 function emptyPublication(): Publication {
@@ -288,8 +308,11 @@ function PublicationFields({
       <Field label="Короткое описание — видно всегда">
         <textarea className={INPUT} rows={3} value={pub.lead} onChange={(event) => onChange({ lead: event.target.value })} />
       </Field>
-      <Field label="Полный текст статьи" hint="Абзацы через пустую строку. Пусто — кнопки «Читать статью» не будет, останутся страницы издания.">
-        <textarea className={INPUT} rows={6} value={pub.paragraphs.join("\n\n")} onChange={(event) => onChange({ paragraphs: event.target.value.split(/\n\s*\n/).map((item) => item.trim()).filter(Boolean) })} />
+      <Field
+        label="Полный текст статьи"
+        hint="Можно просто вставить текст из Word: каждый абзац с новой строки. Пусто — кнопки «Читать статью» не будет, останутся страницы издания."
+      >
+        <textarea className={INPUT} rows={6} value={pub.paragraphs.join("\n\n")} onChange={(event) => onChange({ paragraphs: toParagraphs(event.target.value) })} />
       </Field>
       <p className="text-[10px] tracking-[0.16em] text-muted uppercase">Страницы и кадры публикации</p>
       <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">

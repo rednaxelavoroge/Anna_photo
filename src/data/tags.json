@@ -3,6 +3,10 @@
     {
       "slug": "armeniya",
       "name": "Армения"
+    },
+    {
+      "slug": "proverka-podrazdel",
+      "name": "ПРОВЕРКА-подраздел"
     }
   ]
 }

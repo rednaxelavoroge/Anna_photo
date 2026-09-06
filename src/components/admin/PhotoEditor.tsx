@@ -29,7 +29,7 @@ export function PhotoEditor({
   busy: boolean;
   onClose: () => void;
   onSave: (photo: PhotoItem, removedFiles: string[]) => void;
-  onUpload: (files: FileList | null) => Promise<string[]>;
+  onUpload: (files: File[] | null) => Promise<string[]>;
   onCreateTag: (name: string) => string;
 }) {
   const [draft, setDraft] = useState(photo);
@@ -41,6 +41,14 @@ export function PhotoEditor({
   const videoBusy = videoStage === "sending" || videoStage === "working";
 
   const setImages = (next: string[]) => setDraft({ ...draft, images: next, src: next[0] ?? "" });
+
+  function addTag() {
+    const slug = onCreateTag(tagCreate.trim());
+    if (!slug) return;
+    setTagCreate("");
+    setDraft({ ...draft, tags: [...new Set([...(draft.tags ?? []), slug])] });
+  }
+
   const imageDrag = useDragOrder((from, to) => setImages(withMoved(images, from, to)));
 
   return (
@@ -93,17 +101,20 @@ export function PhotoEditor({
         })}
       </div>
       <div className="mt-2 flex gap-2">
-        <input className="flex-1 border border-line bg-surface px-3 py-2 text-sm" placeholder="Новый подраздел" value={tagCreate} onChange={(event) => setTagCreate(event.target.value)} />
-        <button
-          type="button"
-          className={BTN_TEXT}
-          onClick={() => {
-            const slug = onCreateTag(tagCreate.trim());
-            if (!slug) return;
-            setTagCreate("");
-            setDraft({ ...draft, tags: [...new Set([...(draft.tags ?? []), slug])] });
+        <input
+          className="flex-1 border border-line bg-surface px-3 py-2 text-sm"
+          placeholder="Новый подраздел"
+          value={tagCreate}
+          onChange={(event) => setTagCreate(event.target.value)}
+          // Клавиша ввода делает то же, что кнопка рядом: набрать название и
+          // нажать Enter — первое, что делает человек.
+          onKeyDown={(event) => {
+            if (event.key !== "Enter") return;
+            event.preventDefault();
+            addTag();
           }}
-        >
+        />
+        <button type="button" className={BTN_TEXT} onClick={addTag}>
           + Создать
         </button>
       </div>

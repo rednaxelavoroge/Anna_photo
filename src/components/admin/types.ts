@@ -9,7 +9,7 @@ export type TabProps = {
   persist: (state: StudioState, message?: string, deleteFiles?: string[]) => Promise<void>;
   busy: boolean;
   /** Сжать и загрузить фотографии, вернуть их пути. */
-  upload: (files: FileList | null) => Promise<string[]>;
+  upload: (files: File[] | null) => Promise<string[]>;
   notify: (message: string) => void;
 };
 

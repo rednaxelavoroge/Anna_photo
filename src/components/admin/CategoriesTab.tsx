@@ -116,7 +116,7 @@ function CategoryEditor({
   busy: boolean;
   onClose: () => void;
   onSave: (category: Category) => void;
-  onUpload: (files: FileList | null) => Promise<string[]>;
+  onUpload: (files: File[] | null) => Promise<string[]>;
 }) {
   const [draft, setDraft] = useState(category);
   const isNew = !category.slug;

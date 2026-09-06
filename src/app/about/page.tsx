@@ -72,8 +72,9 @@ export default function AboutPage() {
 
       {pressPhotos.length > 0 ? (
         <section className="mt-24 border-t border-line pt-16">
+          {/* Заголовок «Выставки и эфиры» убран по правке заказчицы
+              06.09.2026: над лентой остаётся «Фотоархив» и строка описания. */}
           <p className="eyebrow">Фотоархив</p>
-          <h2 className="mt-4 max-w-2xl font-display text-3xl md:text-4xl">Выставки и эфиры</h2>
           <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted md:text-base">
             Фотографии с телевизионных съёмок, открытий выставок и встреч.
           </p>

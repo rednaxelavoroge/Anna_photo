@@ -57,7 +57,7 @@ export function FilePick({
   accept: string;
   multiple?: boolean;
   disabled?: boolean;
-  onFiles: (files: FileList) => void | Promise<void>;
+  onFiles: (files: File[]) => void | Promise<void>;
   ghost?: boolean;
 }) {
   const id = useId();
@@ -76,12 +76,20 @@ export function FilePick({
         disabled={disabled}
         className="sr-only"
         onChange={async (event) => {
-          const files = event.target.files;
-          // Поле очищаем сразу: иначе повторный выбор того же файла браузер
-          // не считает изменением и ничего не произойдёт.
-          const list = files && files.length ? files : null;
-          event.target.value = "";
-          if (list) await onFiles(list);
+          const input = event.currentTarget;
+          // Файлы забираем ОТДЕЛЬНЫМ списком, и только потом чистим поле.
+          //
+          // Здесь и была поломка «фотография не добавляется, и ни слова в
+          // ответ»: `input.value = ""` опустошает тот же самый FileList,
+          // ссылку на который мы держали, — наружу уходил пустой список,
+          // загрузка молча заканчивалась ничем, и «Сохранить кадр» потом
+          // честно отвечала «добавьте хотя бы одну фотографию».
+          //
+          // Поле всё равно надо очистить, иначе повторный выбор того же
+          // файла браузер не считает изменением. Делаем это после копии.
+          const picked = input.files ? Array.from(input.files) : [];
+          input.value = "";
+          if (picked.length) await onFiles(picked);
         }}
       />
     </label>

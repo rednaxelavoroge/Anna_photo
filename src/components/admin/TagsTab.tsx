@@ -13,6 +13,17 @@ export function TagsTab({ state, setState, persist, busy, notify }: TabProps) {
     void persist({ ...state, tags: withMoved(state.tags, from, to) }, "Меняю порядок…");
   }, !busy);
 
+  // Заводится и кнопкой, и клавишей ввода: заказчица набирает название и
+  // жмёт Enter, а поле раньше на это не отвечало — выглядело как «не
+  // реагирует».
+  function create() {
+    const name = draft.trim();
+    if (!name) return notify("Впишите название подраздела");
+    if (state.tags.some((item) => item.name.toLowerCase() === name.toLowerCase())) return notify("Такой подраздел уже есть");
+    void persist({ ...state, tags: [...state.tags, { slug: slugifyRu(name), name }] }, `Создаю подраздел «${name}»…`);
+    setDraft("");
+  }
+
   return (
     <section className="mt-8">
       <h2 className="font-display text-2xl">Подразделы</h2>
@@ -20,19 +31,18 @@ export function TagsTab({ state, setState, persist, busy, notify }: TabProps) {
         Подраздел — это метка на кадре. Внутри раздела на сайте появляется полоска «Все · Армения · Италия…», как только метку получил хотя бы один кадр этого раздела. Метку кадру ставят в окне кадра. {DRAG_HINT}
       </p>
       <div className="mt-6 flex flex-wrap gap-2">
-        <input value={draft} onChange={(event) => setDraft(event.target.value)} placeholder="Новый подраздел, например Италия" className="border border-line bg-surface px-3 py-2 text-sm" />
-        <button
-          type="button"
-          className={BTN}
-          disabled={busy}
-          onClick={() => {
-            const name = draft.trim();
-            if (!name) return;
-            if (state.tags.some((item) => item.name.toLowerCase() === name.toLowerCase())) return notify("Такой подраздел уже есть");
-            void persist({ ...state, tags: [...state.tags, { slug: slugifyRu(name), name }] });
-            setDraft("");
+        <input
+          value={draft}
+          onChange={(event) => setDraft(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key !== "Enter") return;
+            event.preventDefault();
+            if (!busy) create();
           }}
-        >
+          placeholder="Новый подраздел, например Италия"
+          className="border border-line bg-surface px-3 py-2 text-sm"
+        />
+        <button type="button" className={BTN} disabled={busy} onClick={create}>
           + Создать подраздел
         </button>
       </div>

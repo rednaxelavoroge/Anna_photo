@@ -199,7 +199,7 @@ function PublicationsEditor({
 }: {
   publications: Publication[];
   busy: boolean;
-  upload: (files: FileList | null) => Promise<string[]>;
+  upload: (files: File[] | null) => Promise<string[]>;
   notify: (message: string) => void;
   onChange: (publications: Publication[], removedSrcs?: string[]) => void;
 }) {
@@ -264,7 +264,7 @@ function PublicationFields({
 }: {
   pub: Publication;
   busy: boolean;
-  upload: (files: FileList | null) => Promise<string[]>;
+  upload: (files: File[] | null) => Promise<string[]>;
   notify: (message: string) => void;
   onChange: (next: Partial<Publication>, removedSrcs?: string[]) => void;
 }) {

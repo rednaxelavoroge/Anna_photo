@@ -144,7 +144,7 @@ export function AdminPanel() {
     }
   }
 
-  async function upload(files: FileList | null) {
+  async function upload(files: File[] | null) {
     if (!files?.length) return [] as string[];
     const srcs: string[] = [];
     let n = 0;

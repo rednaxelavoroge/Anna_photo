@@ -57,10 +57,12 @@ export function SiteHeader() {
         }`}
       >
         <div className="mx-auto flex max-w-[1500px] items-center justify-between px-5 py-5 md:px-8">
-          <Link
-            href="/"
-            className="font-display text-sm tracking-[0.18em] text-ink uppercase md:text-base"
-          >
+          {/* Имя в шапке пишется так же, как в подвале: обычными буквами и
+              с тем же поджатием. Заказчица показывала на подвал — «шрифты
+              разные наверху и внизу, вот такой хочу». Шрифт был один и тот
+              же (Unbounded), но в ПРОПИСНЫХ и с разрядкой он читается как
+              другой: у Unbounded вся округлость — в строчных. */}
+          <Link href="/" className="font-display text-base tracking-tight text-ink md:text-lg">
             {site.brand}
           </Link>
 
@@ -98,7 +100,7 @@ export function SiteHeader() {
           className="mobile-nav-panel fixed inset-0 z-[100] overflow-y-auto px-6 py-6"
         >
           <div className="flex items-center justify-between border-b border-line pb-5">
-            <span className="font-display tracking-[0.16em] text-ink uppercase">{site.brand}</span>
+            <span className="font-display text-base tracking-tight text-ink">{site.brand}</span>
             <button type="button" onClick={() => setOpen(false)} aria-label="Закрыть меню" className="text-ink">
               <svg viewBox="0 0 24 24" className="h-6 w-6 stroke-current" fill="none" strokeWidth="1.4">
                 <path d="M6 18L18 6M6 6l12 12" />

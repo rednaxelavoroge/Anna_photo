@@ -18,10 +18,12 @@ export default function HomePage() {
 
   return (
     <>
-      {/* Имя на первом экране — латиницей, как в шапке и в подвале: правка
-          заказчицы 06.09.2026 («слева по-английски, а тут по-русски — как-то
-          не очень»). Шрифт тот же Unbounded, что и на всём сайте. */}
-      <SplitReveal wordLeft="ANNA" wordRight="MANASARYAN">
+      {/* Имя на первом экране — латиницей и обычными буквами, слово в слово
+          как в шапке и в подвале: правка заказчицы 06.09.2026 («слева
+          по-английски, а тут по-русски — как-то не очень»; «шрифт хочу как
+          внизу»). Шрифт и раньше был один и тот же — Unbounded, — но
+          в ПРОПИСНЫХ он читается как другой: округлость у него в строчных. */}
+      <SplitReveal wordLeft="Anna" wordRight="Manasaryan">
         <div className="relative flex min-h-svh w-full flex-col items-center justify-center bg-paper px-4 py-16 sm:px-6 md:px-12">
           <div className="flex flex-col items-center justify-center text-center">
             <div className="relative aspect-[928/1216] h-[52svh] max-h-[540px] w-auto overflow-hidden rounded-xs shadow-md shadow-ink/10 ring-1 ring-ink/10 transition-transform duration-700 hover:scale-[1.01] sm:h-[56svh] md:h-[60svh]">

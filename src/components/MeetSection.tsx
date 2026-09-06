@@ -56,9 +56,19 @@ function MeetSection({ category, index }: { category: Category; index: number })
         <>
           {/* Телефон: рамка по высоте самого кадра, без бежевых полос над и под горизонтальным фото. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
+          {/*
+            loading="lazy" здесь обязателен. Без него картинка считается
+            нужной сразу, и браузер просил все девятнадцать обложек разделов
+            вперёд всего остального — включая шрифты. На живом сайте с пустым
+            кэшем шрифт доезжал только к пятой-шестой секунде, и всё это
+            время имя на первом экране стояло чужим, системным. Разделы
+            лежат ниже первого экрана, торопиться им некуда.
+          */}
           <img
             src={category.cover}
             alt={category.menu}
+            loading="lazy"
+            decoding="async"
             className="block max-h-[58svh] w-full object-contain md:hidden"
           />
           <div className="tile-zoom relative hidden h-full w-full md:block">

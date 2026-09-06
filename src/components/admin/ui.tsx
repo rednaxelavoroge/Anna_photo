@@ -222,6 +222,14 @@ const RETRY_MS = 30000;
 const RETRIES = 40;
 
 /**
+ * Сколько раз пробовать обложку ролика. Меньше, чем для только что
+ * загруженного файла: обложка уже на сайте, и повтор нужен на случай
+ * оборвавшейся связи, а не выкладки. Роликов до сорока — столько повторов
+ * сеть переживёт.
+ */
+const POSTER_RETRIES = 3;
+
+/**
  * Адрес файла на сайте. На повторных попытках к нему приписывается номер
  * попытки: без этого браузер отдаёт уже полученный отказ из своей памяти и
  * никуда не ходит.
@@ -244,73 +252,56 @@ function posterFile(src: string) {
 }
 
 /**
- * Адрес ролика с отметкой времени — `#t=0.5`.
- *
- * Проигрыватель без обложки рисует чёрный прямоугольник: браузер сам кадр
- * не показывает, пока ролик не тронули. Именно поэтому в «Бэкстейдже»
- * половина клеток была чёрной — это не поломанные файлы, это 29 роликов
- * из 49. С отметкой времени браузер отматывает ролик на полсекунды и
- * рисует настоящий кадр (полсекунды, а не начало: первый кадр часто чёрный
- * сам по себе).
- *
- * У только что загруженных роликов обложка своя — кадр, снятый в браузере
- * при загрузке; там отметка не нужна.
- */
-function videoFrameUrl(url: string) {
-  return url.includes("#") ? url : `${url}#t=0.5`;
-}
-
-/**
  * Миниатюра файла.
  *
- * Три слоя, и все три нужны:
+ * Правило одно: чёрных прямоугольников быть не должно. Проигрыватель без
+ * обложки рисует именно чёрный прямоугольник — браузер не показывает кадр,
+ * пока ролик не тронули, — поэтому проигрывателя в миниатюре нет вовсе.
+ * В клетке 80×80 ролики и не смотрят.
  *
- * 1. Мини-копия загруженного файла (`usePreview`). Она лежит в браузере и
- *    переживает обновление страницы. Пока настоящий файл едет на сайт —
- *    несколько минут, — заказчица видит то, что залила, а не пустое место.
- * 2. Сам файл с боевого сайта. Доехал — рисуется поверх мини-копии; разницы
- *    на глаз нет, это одна и та же картинка.
- * 3. Подпись, если файла на сайте ещё нет. Раньше на этом месте браузер
- *    рисовал значок битой картинки, и вывод напрашивался сам: обложка
- *    слетела. Она никуда не девалась — просто ещё едет.
+ * Что показывается, по порядку:
  *
- * Ролик показывается проигрывателем, а мини-копия идёт ему обложкой: без неё
- * он выглядит чёрным прямоугольником, пока не доедет.
+ * 1. Мини-копия загруженного файла (`usePreview`). Лежит в браузере и
+ *    переживает обновление страницы: пока файл едет на сайт — несколько
+ *    минут, — видно то, что залили, а не пустое место.
+ * 2. Сам файл с сайта: фотография — как есть, ролик — обложкой рядом с ним
+ *    (`back-7.mp4` → `back-7.jpg`, их делает `tools/make-posters.mjs`).
+ * 3. Если обложки-файла нет — кадр, снятый с ролика в браузере; он тут же
+ *    ложится в хранилище, чтобы больше не сниматься.
+ * 4. Если не вышло и это — светлая клетка со значком, а не чернота:
+ *    «Ролик», «файл едет на сайт» или «файл не выбран», смотря что случилось.
  */
 export function Thumb({ src, className = "" }: { src: string; className?: string }) {
   const preview = usePreview(src);
   const [missing, setMissing] = useState(false);
-  /** Браузер файл получил, но показать не может: незнакомый кодек. */
-  const [unplayable, setUnplayable] = useState(false);
-  /** Картинки-обложки рядом с роликом нет — показываем сам ролик. */
+  /** Картинки-обложки рядом с роликом нет. */
   const [noPoster, setNoPoster] = useState(false);
-  /** Клетка побывала на экране: до этого ролик не трогаем. */
+  /** Клетка побывала на экране: до этого за файлами не ходим. */
   const [seen, setSeen] = useState(false);
   /** Которая по счёту попытка достать файл с сайта. */
   const [attempt, setAttempt] = useState(0);
   const boxRef = useRef<HTMLDivElement>(null);
 
   const video = isVideoFile(src);
+  /** Что показываем в клетке: мини-копия, если она есть, иначе файл с сайта. */
+  const fileUrl = video ? retryUrl(posterFile(src), attempt) : retryUrl(src, attempt);
 
   // Сменился файл — пробуем снова: прошлый мог не доехать, этот может быть
   // на месте.
   useEffect(() => {
     setMissing(false);
-    setUnplayable(false);
     setNoPoster(false);
     setAttempt(0);
   }, [src]);
 
   /*
-    Проигрыватель заводится, только когда клетка доехала до экрана.
-
-    В «Бэкстейдже» тридцать роликов; тридцать проигрывателей, разом
-    полезших за своими файлами, — это минуты ожидания и десятки мегабайт
-    по мобильной сети. У фотографий то же самое делает сам браузер
-    (loading="lazy"), у роликов такого нет.
+    Клетка доехала до экрана — можно ходить за файлами. У фотографий это
+    делает сам браузер (loading="lazy"), у роликов такого нет, а их в
+    «Бэкстейдже» тридцать: тридцать проигрывателей, разом полезших за своими
+    файлами, — это минуты ожидания на мобильной сети.
   */
   useEffect(() => {
-    if (!video || preview || seen || !noPoster) return;
+    if (!video || preview || seen) return;
     const node = boxRef.current;
     if (!node || typeof IntersectionObserver === "undefined") return setSeen(true);
     const watcher = new IntersectionObserver(
@@ -324,20 +315,18 @@ export function Thumb({ src, className = "" }: { src: string; className?: string
     );
     watcher.observe(node);
     return () => watcher.disconnect();
-  }, [video, preview, seen, noPoster]);
+  }, [video, preview, seen]);
 
   /*
-    Кадр с ролика снимается один раз и ложится в хранилище браузера. Дальше
-    миниатюра — обычная картинка в несколько килобайт, и за файлом ролика
-    панель больше не ходит вовсе.
-
-    Не вышло (сайт не разрешил читать чужой файл — заголовок в
-    `public/.htaccess`) — останется кадр из самого проигрывателя.
+    Обложки-картинки рядом с роликом нет (ролик старый, обложки ещё не
+    делали) — снимаем кадр с самого ролика и кладём в хранилище браузера.
+    Сайт для этого должен разрешать читать свой файл (заголовок в
+    `public/.htaccess`); не разрешает — останется светлая клетка со значком.
   */
   useEffect(() => {
-    if (!src || !video || preview || missing || unplayable || !seen || !noPoster) return;
+    if (!src || !video || preview || !noPoster || !seen) return;
     capturePoster(src, mediaUrl(src));
-  }, [src, video, preview, missing, unplayable, seen, noPoster]);
+  }, [src, video, preview, noPoster, seen]);
 
   /*
     Файла на сайте ещё нет — пробуем снова через полминуты, пока выкладка
@@ -355,6 +344,19 @@ export function Thumb({ src, className = "" }: { src: string; className?: string
     }, RETRY_MS);
     return () => window.clearTimeout(timer);
   }, [missing, preview, attempt]);
+
+  /*
+    Обложка ролика не пришла — пробуем ещё пару раз. Обычно это оборвавшаяся
+    связь: сама обложка на сайте лежит рядом с роликом и никуда не денется.
+  */
+  useEffect(() => {
+    if (!video || !noPoster || preview || attempt >= POSTER_RETRIES) return;
+    const timer = window.setTimeout(() => {
+      setNoPoster(false);
+      setAttempt((value) => value + 1);
+    }, RETRY_MS);
+    return () => window.clearTimeout(timer);
+  }, [video, noPoster, preview, attempt]);
 
   /*
     Пустое место — цвета страницы, а не почти чёрное. Чёрные прямоугольники
@@ -375,6 +377,9 @@ export function Thumb({ src, className = "" }: { src: string; className?: string
   // Подложку задаёт вызывающий, если ему нужна своя (белая под коллажами).
   const ground = classes.some((item) => item.startsWith("bg-")) ? "" : "bg-paper";
 
+  /** Файл с сайта не показать: у ролика нет обложки, у фотографии — её самой. */
+  const blank = video ? noPoster : missing;
+
   return (
     <div ref={boxRef} className={`relative overflow-hidden ${ground} ${box}`}>
       {preview ? (
@@ -382,88 +387,35 @@ export function Thumb({ src, className = "" }: { src: string; className?: string
         <img src={preview} alt="" aria-hidden className={`absolute inset-0 h-full w-full ${fit}`} />
       ) : null}
 
-      {/*
-        Обложка ролика уже есть — показываем её картинкой, а проигрыватель
-        не заводим вовсе: в клетке 80×80 ролики не смотрят, а файл он тянет
-        настоящий. Что это ролик, видно по значку.
-      */}
-      {video && (preview || !noPoster) ? (
-        <span className="absolute right-1 bottom-1 bg-ink/70 px-1 text-[10px] leading-tight text-snow">▶</span>
-      ) : null}
-
-      {/*
-        Ролик без своей мини-копии: сначала пробуем картинку-обложку рядом с
-        ним. Её нет (старый ролик, обложки ещё не сделали) — заводим
-        проигрыватель, он покажет кадр сам.
-      */}
-      {video && !preview && !noPoster && !missing ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={retryUrl(posterFile(src), attempt)}
-          alt=""
-          loading="lazy"
-          decoding="async"
-          onError={() => setNoPoster(true)}
-          className={`absolute inset-0 h-full w-full ${fit}`}
-        />
-      ) : null}
-
-      {missing || unplayable || (video && !noPoster && !preview) ? null : video ? (
-        preview || !seen ? null : (
-          <video
-            key={attempt}
-            src={videoFrameUrl(retryUrl(src, attempt))}
-            className={`absolute inset-0 h-full w-full ${fit}`}
-            muted
-            playsInline
-            preload="metadata"
-            /*
-              Отметка `#t=0.5` в адресе — просьба показать кадр с половины
-              секунды, но её понимают не все браузеры. Здесь то же самое
-              делается руками: как только известна длительность, ролик
-              отматывается — и рисуется настоящий кадр, а не чернота.
-            */
-            onLoadedMetadata={(event) => {
-              const node = event.currentTarget;
-              if (node.currentTime > 0.05) return;
-              const at = Math.min(0.5, (Number.isFinite(node.duration) ? node.duration : 1) / 3);
-              if (at > 0) node.currentTime = at;
-            }}
-            onError={(event) => {
-              // 3 — не смог раскодировать, 4 — не знает такого кодека. Файл
-              // при этом на месте: писать «появится через пару минут» нельзя,
-              // это неправда.
-              const code = event.currentTarget.error?.code ?? 0;
-              if (code === 3 || code === 4) setUnplayable(true);
-              else setMissing(true);
-            }}
-          />
-        )
-      ) : (
+      {preview || blank || (video && !seen) ? null : (
         // eslint-disable-next-line @next/next/no-img-element
         <img
           key={attempt}
-          src={retryUrl(src, attempt)}
+          src={fileUrl}
           alt=""
           loading="lazy"
           decoding="async"
-          onError={() => setMissing(true)}
+          onError={() => (video ? setNoPoster(true) : setMissing(true))}
           className={`absolute inset-0 h-full w-full ${fit}`}
         />
       )}
 
-      {unplayable ? (
+      {video && !(blank && !preview) ? (
+        <span className="absolute right-1 bottom-1 bg-ink/70 px-1 text-[10px] leading-tight text-snow">▶</span>
+      ) : null}
+
+      {video && blank && !preview ? (
         <span className="absolute inset-0 flex flex-col items-center justify-center gap-1 border border-line bg-paper text-[10px] leading-tight text-muted">
           <span className="text-base">▶</span>
           Ролик
         </span>
       ) : null}
-      {missing && preview ? (
+      {!video && missing && preview ? (
         <span className="absolute inset-x-0 bottom-0 bg-ink/70 px-1 py-0.5 text-center text-[9px] leading-tight text-snow">
           Загружено, едет на сайт
         </span>
       ) : null}
-      {missing && !preview ? (
+      {!video && missing && !preview ? (
         <span className="absolute inset-0 flex flex-col items-center justify-center border border-line bg-paper px-2 text-center text-[10px] leading-tight text-muted">
           Файл сохранён,
           <br />

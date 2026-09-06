@@ -49,7 +49,10 @@ function MeetSection({ category, index }: { category: Category; index: number })
   const image = (
     <Link
       href={`/portfolio/${category.slug}`}
-      className="group relative flex h-auto w-full items-center justify-center overflow-hidden bg-paper px-4 pt-2 pb-1 md:h-full md:bg-void md:p-0"
+      // Подложка светлая и на широком экране: кадр закрывает её целиком, а
+      // пока он едет — на его месте было чёрное полполосы. Подробнее — в
+      // комментарии в CoverArt.
+      className="group relative flex h-auto w-full items-center justify-center overflow-hidden bg-paper px-4 pt-2 pb-1 md:h-full md:p-0"
       aria-label={`Открыть ${category.menu}`}
     >
       {category.cover ? (

@@ -1,6 +1,62 @@
 {
   "items": [
     {
+      "src": "/photos/travel/fototur-1.jpg",
+      "alt": "Фототур — 1",
+      "categories": [
+        "travel"
+      ],
+      "tags": [
+        "fototur"
+      ],
+      "images": [
+        "/photos/travel/fototur-1.jpg"
+      ],
+      "video": ""
+    },
+    {
+      "src": "/photos/travel/fototur-2.jpg",
+      "alt": "Фототур — 2",
+      "categories": [
+        "travel"
+      ],
+      "tags": [
+        "fototur"
+      ],
+      "images": [
+        "/photos/travel/fototur-2.jpg"
+      ],
+      "video": ""
+    },
+    {
+      "src": "/photos/travel/fototur-3.jpg",
+      "alt": "Фототур — 3",
+      "categories": [
+        "travel"
+      ],
+      "tags": [
+        "fototur"
+      ],
+      "images": [
+        "/photos/travel/fototur-3.jpg"
+      ],
+      "video": ""
+    },
+    {
+      "src": "/photos/travel/fototur-4.jpg",
+      "alt": "Фототур — 4",
+      "categories": [
+        "travel"
+      ],
+      "tags": [
+        "fototur"
+      ],
+      "images": [
+        "/photos/travel/fototur-4.jpg"
+      ],
+      "video": ""
+    },
+    {
       "src": "/photos/uploads/1788714411243-torino2026-53.jpg",
       "alt": "турин 1",
       "categories": [

@@ -43,10 +43,12 @@ export function extrasFor(categorySlug: string, where: Where): TagStripExtra[] {
     return [{ href: "/phototour", name: "Фототуры", active: Boolean(where.onPhototourPage) }];
   }
 
-  // Кадры есть. Ссылку на описание показываем только там, где она к месту:
-  // внутри самого подраздела и на самой странице описания.
-  if (where.album === PHOTOTOUR_TAG || where.onPhototourPage) {
-    return [{ href: "/phototour", name: "О фототурах", active: Boolean(where.onPhototourPage) }];
+  // Кадры есть. В строке остаются одни метки: внутри подраздела ссылка на
+  // описание и так стоит под текстом, вторая в строке — лишнее слово.
+  // Исключение — сама страница описания: там строка должна показывать, где
+  // человек находится.
+  if (where.onPhototourPage) {
+    return [{ href: "/phototour", name: "О фототурах", active: true }];
   }
 
   return [];

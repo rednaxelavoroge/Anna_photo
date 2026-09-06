@@ -1,6 +1,6 @@
 "use client";
 
-import { imageThumb, videoThumb } from "@/lib/thumbnail";
+import { imageThumb, posterFromUrl, videoThumb } from "@/lib/thumbnail";
 import { useSyncExternalStore } from "react";
 
 /**
@@ -186,6 +186,43 @@ export async function forgetPreviews(srcs: string[]): Promise<void> {
     list.forEach((src) => store.delete(src));
     return true;
   });
+}
+
+/**
+ * Снять обложку с ролика, уже лежащего на сайте, и запомнить её.
+ *
+ * Зачем. Проигрыватель в миниатюре кадр показывает, но тянет ради него кусок
+ * файла каждый раз заново, а в «Бэкстейдже» роликов почти тридцать. Снятый
+ * один раз кадр ложится в хранилище, и дальше миниатюра — обычная картинка.
+ *
+ * Роликов много, поэтому кадры снимаются по два за раз и каждый ролик —
+ * один раз за заход: тридцать проигрывателей, разом тянущих файл, на
+ * телефоне заказчицы ничем не лучше чёрных прямоугольников.
+ */
+const asked = new Set<string>();
+const queue: Array<() => Promise<void>> = [];
+let running = 0;
+
+function pump() {
+  while (running < 2 && queue.length) {
+    const job = queue.shift();
+    if (!job) return;
+    running += 1;
+    void job().finally(() => {
+      running -= 1;
+      pump();
+    });
+  }
+}
+
+export function capturePoster(src: string, url: string): void {
+  if (!src || !url || asked.has(src) || URLS.has(src)) return;
+  asked.add(src);
+  queue.push(async () => {
+    const poster = await posterFromUrl(url);
+    if (poster) await rememberPreview(src, poster);
+  });
+  pump();
 }
 
 /**

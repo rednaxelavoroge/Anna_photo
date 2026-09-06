@@ -6,6 +6,11 @@ import { useEffect, useRef } from "react";
  * Ролик в сетке альбома. Не грузится целиком заранее: браузер берёт только
  * заголовок файла и первый кадр (preload="metadata").
  *
+ * Обложка — картинка рядом с роликом (`back-7.mp4` → `back-7.jpg`, их делает
+ * `tools/make-posters.mjs`). Без неё на телефоне, где ролик сам не играет,
+ * в сетке стоял чёрный прямоугольник: браузер не рисует кадр, пока ролик не
+ * тронули.
+ *
  * На широком экране ролик без звука сам играет, пока виден, и
  * останавливается, когда ушёл из окна. На телефоне и при включённой
  * экономии трафика сам не играет: в бэкстейдже почти тридцать роликов,
@@ -37,5 +42,16 @@ export function GridVideo({ src, className }: { src: string; className?: string 
     return () => observer.disconnect();
   }, []);
 
-  return <video ref={ref} src={src} muted loop playsInline preload="metadata" className={className} />;
+  return (
+    <video
+      ref={ref}
+      src={src}
+      poster={src.replace(/\.(mp4|mov|webm|m4v)$/i, ".jpg")}
+      muted
+      loop
+      playsInline
+      preload="metadata"
+      className={className}
+    />
+  );
 }

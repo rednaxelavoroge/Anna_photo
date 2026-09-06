@@ -14,6 +14,21 @@ function emptyCategory(): Category {
 /** Вкладка «Разделы»: блоки на главной и пункты портфолио. */
 export function CategoriesTab({ state, persist, busy, upload, notify }: TabProps) {
   const [draft, setDraft] = useState<Category | null>(null);
+
+  /*
+    Обложка, которую раздел показывает на сайте, если своя не выбрана, —
+    его первый кадр (`src/app/page.tsx` и `src/app/portfolio/page.tsx`
+    берут её так же).
+
+    Панель показывает то же самое. Раньше на этом месте чернел прямоугольник
+    «нет файла» — у четырнадцати разделов из девятнадцати своя обложка не
+    выбрана, — и получалось, будто у раздела обложки нет вовсе. На сайте
+    она есть.
+  */
+  const autoCover = (slug: string) => {
+    const photo = state.photos.find((item) => item.categories.includes(slug));
+    return photo ? (photo.images?.[0] ?? photo.src) : "";
+  };
   const drag = useDragOrder((from, to) => {
     void persist({ ...state, categories: withMoved(state.categories, from, to) }, "Меняю порядок…");
   }, !busy);
@@ -41,12 +56,13 @@ export function CategoriesTab({ state, persist, busy, upload, notify }: TabProps
               className={`flex flex-col gap-4 border border-line bg-surface p-4 transition md:flex-row md:items-center md:justify-between ${drag.itemClass(index)}`}
             >
               <div className="flex items-start gap-4">
-                <Thumb src={category.cover ?? ""} className="h-16 w-16 shrink-0" />
+                <Thumb src={category.cover || autoCover(category.slug)} className="h-16 w-16 shrink-0" />
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
                     <h3 className="font-display text-lg">{category.menu}</h3>
                     <span className="text-[10px] tracking-[0.14em] text-muted uppercase">
                       /portfolio/{category.slug} · кадров: {count}
+                      {category.cover ? "" : " · обложка: первый кадр"}
                     </span>
                   </div>
                   <p className="mt-1 max-w-xl text-sm text-muted">{category.description}</p>
@@ -85,6 +101,7 @@ export function CategoriesTab({ state, persist, busy, upload, notify }: TabProps
       {draft ? (
         <CategoryEditor
           category={draft}
+          autoCover={autoCover(draft.slug)}
           busy={busy}
           onClose={() => setDraft(null)}
           onUpload={upload}
@@ -107,12 +124,15 @@ export function CategoriesTab({ state, persist, busy, upload, notify }: TabProps
 
 function CategoryEditor({
   category,
+  autoCover,
   busy,
   onClose,
   onSave,
   onUpload,
 }: {
   category: Category;
+  /** Что стоит обложкой на сайте, пока своя не выбрана, — первый кадр раздела. */
+  autoCover: string;
   busy: boolean;
   onClose: () => void;
   onSave: (category: Category) => void;
@@ -138,9 +158,11 @@ function CategoryEditor({
         {isNew ? "Адрес страницы сделается сам из названия; потом он не меняется, ссылки сохранятся." : `Адрес /portfolio/${draft.slug} при переименовании не меняется.`}
       </p>
       <p className="mt-4 text-[10px] tracking-[0.16em] text-muted uppercase">Обложка раздела</p>
-      <p className="mt-1 text-xs text-muted">Пусто — обложкой станет первый кадр раздела.</p>
+      <p className="mt-1 text-xs text-muted">
+        {draft.cover ? "Своя обложка выбрана." : "Своя обложка не выбрана — на сайте стоит первый кадр раздела, он и показан."}
+      </p>
       <div className="mt-2 flex items-center gap-3">
-        {draft.cover ? <Thumb src={draft.cover} className="h-24 w-20" /> : null}
+        {draft.cover || autoCover ? <Thumb src={draft.cover || autoCover} className="h-24 w-20" /> : null}
         <FilePick
           label="Выбрать обложку"
           accept="image/*"

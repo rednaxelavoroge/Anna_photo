@@ -2,7 +2,7 @@
 
 import { mediaUrl } from "@/lib/media-url";
 import { videoThumb } from "@/lib/thumbnail";
-import { rememberPreview, usePreview } from "@/lib/upload-previews";
+import { capturePoster, rememberPreview, usePreview } from "@/lib/upload-previews";
 import { useVideoUpload, type VideoStage } from "@/lib/use-video-upload";
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 
@@ -232,6 +232,35 @@ function retryUrl(src: string, attempt: number) {
 }
 
 /**
+ * Обложка ролика — картинка рядом с ним: `back-7.mp4` → `back-7.jpg`.
+ *
+ * Их делает `tools/make-posters.mjs` для готовых роликов и рабочий процесс
+ * сжатия — для каждого нового. Обложка весит сорок килобайт и рисуется как
+ * обычная картинка: браузеру не надо ни скачивать ролик, ни уметь его
+ * раскодировать. Нет такого файла — ниже есть запасные пути.
+ */
+function posterFile(src: string) {
+  return src.replace(/\.(mp4|mov|webm|m4v)$/i, ".jpg");
+}
+
+/**
+ * Адрес ролика с отметкой времени — `#t=0.5`.
+ *
+ * Проигрыватель без обложки рисует чёрный прямоугольник: браузер сам кадр
+ * не показывает, пока ролик не тронули. Именно поэтому в «Бэкстейдже»
+ * половина клеток была чёрной — это не поломанные файлы, это 29 роликов
+ * из 49. С отметкой времени браузер отматывает ролик на полсекунды и
+ * рисует настоящий кадр (полсекунды, а не начало: первый кадр часто чёрный
+ * сам по себе).
+ *
+ * У только что загруженных роликов обложка своя — кадр, снятый в браузере
+ * при загрузке; там отметка не нужна.
+ */
+function videoFrameUrl(url: string) {
+  return url.includes("#") ? url : `${url}#t=0.5`;
+}
+
+/**
  * Миниатюра файла.
  *
  * Три слоя, и все три нужны:
@@ -251,15 +280,64 @@ function retryUrl(src: string, attempt: number) {
 export function Thumb({ src, className = "" }: { src: string; className?: string }) {
   const preview = usePreview(src);
   const [missing, setMissing] = useState(false);
+  /** Браузер файл получил, но показать не может: незнакомый кодек. */
+  const [unplayable, setUnplayable] = useState(false);
+  /** Картинки-обложки рядом с роликом нет — показываем сам ролик. */
+  const [noPoster, setNoPoster] = useState(false);
+  /** Клетка побывала на экране: до этого ролик не трогаем. */
+  const [seen, setSeen] = useState(false);
   /** Которая по счёту попытка достать файл с сайта. */
   const [attempt, setAttempt] = useState(0);
+  const boxRef = useRef<HTMLDivElement>(null);
+
+  const video = isVideoFile(src);
 
   // Сменился файл — пробуем снова: прошлый мог не доехать, этот может быть
   // на месте.
   useEffect(() => {
     setMissing(false);
+    setUnplayable(false);
+    setNoPoster(false);
     setAttempt(0);
   }, [src]);
+
+  /*
+    Проигрыватель заводится, только когда клетка доехала до экрана.
+
+    В «Бэкстейдже» тридцать роликов; тридцать проигрывателей, разом
+    полезших за своими файлами, — это минуты ожидания и десятки мегабайт
+    по мобильной сети. У фотографий то же самое делает сам браузер
+    (loading="lazy"), у роликов такого нет.
+  */
+  useEffect(() => {
+    if (!video || preview || seen || !noPoster) return;
+    const node = boxRef.current;
+    if (!node || typeof IntersectionObserver === "undefined") return setSeen(true);
+    const watcher = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          setSeen(true);
+          watcher.disconnect();
+        }
+      },
+      { rootMargin: "200px 0px" },
+    );
+    watcher.observe(node);
+    return () => watcher.disconnect();
+  }, [video, preview, seen, noPoster]);
+
+  /*
+    Кадр с ролика снимается один раз и ложится в хранилище браузера. Дальше
+    миниатюра — обычная картинка в несколько килобайт, и за файлом ролика
+    панель больше не ходит вовсе.
+
+    Не вышло (сайт не разрешил читать чужой файл — заголовок в
+    `public/.htaccess`) — останется кадр из самого проигрывателя.
+  */
+  useEffect(() => {
+    if (!src || !video || preview || missing || unplayable || !seen || !noPoster) return;
+    capturePoster(src, mediaUrl(src));
+  }, [src, video, preview, missing, unplayable, seen, noPoster]);
 
   /*
     Файла на сайте ещё нет — пробуем снова через полминуты, пока выкладка
@@ -278,32 +356,89 @@ export function Thumb({ src, className = "" }: { src: string; className?: string
     return () => window.clearTimeout(timer);
   }, [missing, preview, attempt]);
 
-  if (!src) return <div className={`flex items-center justify-center bg-void text-xs text-snow/50 ${className}`}>Нет файла</div>;
+  /*
+    Пустое место — цвета страницы, а не почти чёрное. Чёрные прямоугольники
+    в списке читаются как поломка, хотя означают всего лишь «файл сюда не
+    выбран».
+  */
+  if (!src) {
+    return (
+      <div className={`flex items-center justify-center border border-line bg-paper px-1 text-center text-[10px] leading-tight text-muted ${className}`}>
+        Файл не выбран
+      </div>
+    );
+  }
 
   const classes = className.split(/\s+/).filter(Boolean);
   const fit = classes.find((item) => FIT.test(item)) ?? "object-cover";
   const box = classes.filter((item) => !FIT.test(item)).join(" ");
   // Подложку задаёт вызывающий, если ему нужна своя (белая под коллажами).
-  const ground = classes.some((item) => item.startsWith("bg-")) ? "" : "bg-void";
+  const ground = classes.some((item) => item.startsWith("bg-")) ? "" : "bg-paper";
 
   return (
-    <div className={`relative overflow-hidden ${ground} ${box}`}>
+    <div ref={boxRef} className={`relative overflow-hidden ${ground} ${box}`}>
       {preview ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={preview} alt="" aria-hidden className={`absolute inset-0 h-full w-full ${fit}`} />
       ) : null}
 
-      {missing ? null : isVideoFile(src) ? (
-        <video
-          key={attempt}
-          src={retryUrl(src, attempt)}
-          poster={preview || undefined}
+      {/*
+        Обложка ролика уже есть — показываем её картинкой, а проигрыватель
+        не заводим вовсе: в клетке 80×80 ролики не смотрят, а файл он тянет
+        настоящий. Что это ролик, видно по значку.
+      */}
+      {video && (preview || !noPoster) ? (
+        <span className="absolute right-1 bottom-1 bg-ink/70 px-1 text-[10px] leading-tight text-snow">▶</span>
+      ) : null}
+
+      {/*
+        Ролик без своей мини-копии: сначала пробуем картинку-обложку рядом с
+        ним. Её нет (старый ролик, обложки ещё не сделали) — заводим
+        проигрыватель, он покажет кадр сам.
+      */}
+      {video && !preview && !noPoster && !missing ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={retryUrl(posterFile(src), attempt)}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          onError={() => setNoPoster(true)}
           className={`absolute inset-0 h-full w-full ${fit}`}
-          muted
-          playsInline
-          preload="metadata"
-          onError={() => setMissing(true)}
         />
+      ) : null}
+
+      {missing || unplayable || (video && !noPoster && !preview) ? null : video ? (
+        preview || !seen ? null : (
+          <video
+            key={attempt}
+            src={videoFrameUrl(retryUrl(src, attempt))}
+            className={`absolute inset-0 h-full w-full ${fit}`}
+            muted
+            playsInline
+            preload="metadata"
+            /*
+              Отметка `#t=0.5` в адресе — просьба показать кадр с половины
+              секунды, но её понимают не все браузеры. Здесь то же самое
+              делается руками: как только известна длительность, ролик
+              отматывается — и рисуется настоящий кадр, а не чернота.
+            */
+            onLoadedMetadata={(event) => {
+              const node = event.currentTarget;
+              if (node.currentTime > 0.05) return;
+              const at = Math.min(0.5, (Number.isFinite(node.duration) ? node.duration : 1) / 3);
+              if (at > 0) node.currentTime = at;
+            }}
+            onError={(event) => {
+              // 3 — не смог раскодировать, 4 — не знает такого кодека. Файл
+              // при этом на месте: писать «появится через пару минут» нельзя,
+              // это неправда.
+              const code = event.currentTarget.error?.code ?? 0;
+              if (code === 3 || code === 4) setUnplayable(true);
+              else setMissing(true);
+            }}
+          />
+        )
       ) : (
         // eslint-disable-next-line @next/next/no-img-element
         <img
@@ -317,6 +452,12 @@ export function Thumb({ src, className = "" }: { src: string; className?: string
         />
       )}
 
+      {unplayable ? (
+        <span className="absolute inset-0 flex flex-col items-center justify-center gap-1 border border-line bg-paper text-[10px] leading-tight text-muted">
+          <span className="text-base">▶</span>
+          Ролик
+        </span>
+      ) : null}
       {missing && preview ? (
         <span className="absolute inset-x-0 bottom-0 bg-ink/70 px-1 py-0.5 text-center text-[9px] leading-tight text-snow">
           Загружено, едет на сайт

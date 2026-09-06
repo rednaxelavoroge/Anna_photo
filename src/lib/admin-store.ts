@@ -17,7 +17,7 @@ import type {
   Publication,
   SiteData,
 } from "@/lib/content";
-import { MEDIA_EXT, folderOfCategory } from "@/lib/folders";
+import { MEDIA_EXT, folderOfCategory, withoutPosters } from "@/lib/folders";
 import { slugifyRu } from "@/lib/slugify";
 import { createHash } from "node:crypto";
 import fs from "node:fs/promises";
@@ -272,6 +272,23 @@ function toRepoPaths(srcs: string[]): string[] {
     .map((src) => `public${src}`);
 }
 
+/**
+ * Вместе с роликом убирается его обложка — картинка с тем же именем.
+ *
+ * Проверяем, что она вправду есть: удаление — это запись в дереве коммита с
+ * пустым sha, и GitHub отвергает весь коммит, если такого пути в дереве нет.
+ * Значит, сохранение вместе с удалением упало бы целиком.
+ */
+async function withPosters(paths: string[]): Promise<string[]> {
+  const videos = paths.filter((item) => /\.(mp4|mov|webm|m4v)$/i.test(item));
+  if (!videos.length) return paths;
+  const known = new Set((await listRepoPhotos()).map((src) => `public${src}`));
+  const posters = videos
+    .map((item) => item.replace(/\.[^.]+$/, ".jpg"))
+    .filter((item) => known.has(item) && !paths.includes(item));
+  return [...paths, ...posters];
+}
+
 export async function saveStudio(
   state: StudioState,
   message = "Обновление с панели управления",
@@ -296,7 +313,7 @@ export async function saveStudio(
     { path: FILES.aboutVideos, content: json({ items: state.aboutVideos }) },
     { path: FILES.publications, content: json({ items: state.publications, links: state.pressLinks }) },
   ];
-  const deletions = toRepoPaths(deleteSrcs);
+  const deletions = await withPosters(toRepoPaths(deleteSrcs));
   if (process.env.GITHUB_TOKEN) {
     await writeGithub(files, message, deletions);
   } else if (process.env.VERCEL) {
@@ -377,7 +394,9 @@ const byName = (a: string, b: string) => a.localeCompare(b, undefined, { numeric
  * панель предлагает подобрать их и сделать обычными кадрами.
  */
 export async function scanUnlisted(state: StudioState): Promise<Unlisted> {
-  const all = await listRepoPhotos();
+  // Обложки роликов из списка вон: это служебные картинки, а не кадры,
+  // которые панель должна предлагать добавить.
+  const all = withoutPosters(await listRepoPhotos());
   const known = new Set<string>([
     ...state.photos.flatMap((item) => (item.images?.length ? item.images : [item.src])),
     ...state.backstage.map((item) => item.src),

@@ -78,23 +78,12 @@ export async function imageThumb(source: Blob): Promise<Blob | null> {
 }
 
 /**
- * Первый кадр ролика.
+ * Первый кадр ролика — из проигрывателя, уже получившего файл.
  *
- * С телефона приходит `.mov`, и его кодек браузер знает не всегда: тогда
- * кадра не будет, и это не поломка — панель покажет ролик значком, как
- * показывала раньше. Поэтому здесь всё обёрнуто в срок ожидания: подвиснуть
- * на нечитаемом файле нельзя, человек ждёт загрузку.
+ * Отматываем на полсекунды: начало у телефонных роликов часто чёрное, и
+ * кадр «в ноль» ничем не лучше чёрного прямоугольника.
  */
-export async function videoThumb(source: Blob): Promise<Blob | null> {
-  const url = URL.createObjectURL(source);
-  const video = document.createElement("video");
-  video.muted = true;
-  video.playsInline = true;
-  video.preload = "metadata";
-  // Без этого Safari на телефоне отказывается готовить кадр невидимого ролика.
-  video.setAttribute("muted", "");
-  video.src = url;
-
+async function frameOf(video: HTMLVideoElement): Promise<Blob | null> {
   const wait = (event: string) =>
     new Promise<boolean>((resolve) => {
       const timer = window.setTimeout(() => resolve(false), VIDEO_TIMEOUT_MS);
@@ -106,21 +95,72 @@ export async function videoThumb(source: Blob): Promise<Blob | null> {
       video.addEventListener("error", done(false), { once: true });
     });
 
+  if (!(await wait("loadeddata"))) return null;
+  const at = Math.min(0.6, (Number.isFinite(video.duration) ? video.duration : 1) / 3);
+  if (at > 0) {
+    video.currentTime = at;
+    await wait("seeked");
+  }
+  if (!video.videoWidth || !video.videoHeight) return null;
+  return draw(video, video.videoWidth, video.videoHeight);
+}
+
+function player(): HTMLVideoElement {
+  const video = document.createElement("video");
+  video.muted = true;
+  video.playsInline = true;
+  video.preload = "metadata";
+  // Без этого Safari на телефоне отказывается готовить кадр невидимого ролика.
+  video.setAttribute("muted", "");
+  return video;
+}
+
+/**
+ * Кадр из выбранного файла — им панель показывает, что заливается, ещё до
+ * того, как ролик уехал.
+ *
+ * С телефона приходит `.mov`, и его кодек браузер знает не всегда: тогда
+ * кадра не будет, и это не поломка — панель покажет ролик как показывала.
+ * Поэтому всё обёрнуто в срок ожидания: подвиснуть на нечитаемом файле
+ * нельзя, человек ждёт загрузку.
+ */
+export async function videoThumb(source: Blob): Promise<Blob | null> {
+  const url = URL.createObjectURL(source);
+  const video = player();
+  video.src = url;
   try {
-    if (!(await wait("loadeddata"))) return null;
-    // Первый кадр часто чёрный — берём чуть позже, но не дальше трети ролика,
-    // чтобы у совсем коротких клипов не уехать в конец.
-    const at = Math.min(0.6, (Number.isFinite(video.duration) ? video.duration : 1) / 3);
-    if (at > 0) {
-      video.currentTime = at;
-      await wait("seeked");
-    }
-    if (!video.videoWidth || !video.videoHeight) return null;
-    return await draw(video, video.videoWidth, video.videoHeight);
+    return await frameOf(video);
   } catch {
     return null;
   } finally {
     video.src = "";
     URL.revokeObjectURL(url);
+  }
+}
+
+/**
+ * Кадр из ролика, уже лежащего на сайте.
+ *
+ * Зачем. Проигрыватель в миниатюре кадр рисует, но каждый раз заново тянет
+ * для этого кусок файла — а в «Бэкстейдже» роликов почти тридцать. Снятый
+ * один раз кадр ложится в хранилище браузера, и дальше миниатюра — обычная
+ * картинка в тридцать килобайт.
+ *
+ * `crossOrigin` обязателен: без него браузер запрещает читать чужой файл в
+ * холст. Сайт отдаёт медиафайлы с разрешающим заголовком (`public/.htaccess`).
+ * Если заголовка нет — этот проигрыватель просто не загрузится, вернётся
+ * null, и миниатюра останется прежней, с кадром из самого ролика.
+ */
+export async function posterFromUrl(url: string): Promise<Blob | null> {
+  const video = player();
+  video.crossOrigin = "anonymous";
+  video.src = url;
+  try {
+    return await frameOf(video);
+  } catch {
+    // Холст «испачкан» чужим файлом — заголовка нет. Не беда.
+    return null;
+  } finally {
+    video.src = "";
   }
 }

@@ -11,7 +11,7 @@ import {
   type PhotoTag,
   type StudioTag,
 } from "@/lib/content";
-import { FOLDER_ALIASES, MEDIA_EXT, VIDEO_EXT } from "@/lib/folders";
+import { FOLDER_ALIASES, MEDIA_EXT, VIDEO_EXT, withoutPosters } from "@/lib/folders";
 import { getPreviewCover } from "@/lib/preview";
 import fs from "node:fs";
 import path from "node:path";
@@ -57,11 +57,13 @@ function toPhoto(src: string, alt: string, index: number, tags?: string[]): Phot
 export function listFolder(name: string): string[] {
   const dir = path.join(process.cwd(), "public", "photos", name);
   if (!fs.existsSync(dir) || !fs.statSync(dir).isDirectory()) return [];
-  return fs
+  const files = fs
     .readdirSync(dir)
     .filter((file) => MEDIA_EXT.test(file) && fs.statSync(path.join(dir, file)).isFile())
     .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }))
     .map((file) => `/photos/${name}/${file}`);
+  // Обложки роликов — служебные файлы, кадрами раздела они не являются.
+  return withoutPosters(files);
 }
 
 /** Все файлы, которые упомянуты в кадрах портфолио. */

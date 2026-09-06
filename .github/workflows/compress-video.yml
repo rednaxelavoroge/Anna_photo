@@ -151,6 +151,13 @@ jobs:
             fail "У готового ролика пропал звук — публиковать не стали."
           fi
 
+          # Обложка ролика. Без неё проигрыватель в панели и в сетке сайта
+          # рисует чёрный прямоугольник: браузер сам кадр не показывает, пока
+          # ролик не тронули. Кадр выбирает тот же скрипт, что делал обложки
+          # готовым роликам, — двух разных способов быть не должно.
+          node tools/make-posters.mjs --file ready.mp4 --force \
+            || echo "Обложку сделать не вышло — не беда, панель покажет кадр сама."
+
           SIZE_MB=$(awk -v b="$(stat -c%s ready.mp4)" 'BEGIN{printf "%.1f", b/1048576}')
           echo "size_mb=$SIZE_MB" >> "$GITHUB_OUTPUT"
           echo "ok=true" >> "$GITHUB_OUTPUT"
@@ -163,10 +170,14 @@ jobs:
           set -euo pipefail
           mkdir -p public/photos/uploads
           mv ready.mp4 "public/photos/uploads/$TARGET"
+          # Скрипт кладёт обложку рядом с роликом: ready.mp4 → ready.jpg.
+          POSTER="public/photos/uploads/${TARGET%.*}.jpg"
+          if [ -f ready.jpg ]; then mv ready.jpg "$POSTER"; fi
 
           git config user.name "Claude"
           git config user.email "noreply@anthropic.com"
           git add "public/photos/uploads/$TARGET"
+          if [ -f "$POSTER" ]; then git add "$POSTER"; fi
           git commit -m "Ролик из панели: $TARGET"
 
           # Заказчица правит сайт из панели в это же время, её сохранения

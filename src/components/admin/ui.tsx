@@ -1,8 +1,10 @@
 "use client";
 
 import { mediaUrl } from "@/lib/media-url";
+import { videoThumb } from "@/lib/thumbnail";
+import { rememberPreview, usePreview } from "@/lib/upload-previews";
 import { useVideoUpload, type VideoStage } from "@/lib/use-video-upload";
-import { useEffect, useId, useState, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 
 export const BTN = "rounded-full bg-ink px-5 py-2 text-xs tracking-[0.08em] text-snow uppercase disabled:opacity-40";
 export const BTN_GHOST = "rounded-full border border-line bg-surface px-4 py-2 text-xs tracking-[0.08em] text-ink uppercase disabled:opacity-40";
@@ -143,9 +145,28 @@ export function VideoUploader({
   disabled?: boolean;
 }) {
   const video = useVideoUpload();
+  /** Кадр из выбранного ролика: видно, что именно заливается, пока идёт сжатие. */
+  const [shot, setShot] = useState("");
+  const shotRef = useRef("");
+
   useEffect(() => {
     onStage?.(video.stage);
   }, [video.stage, onStage]);
+
+  // Адрес кадра живёт в браузере до тех пор, пока его показывают; уходя,
+  // прибираем за собой, иначе картинка останется висеть в памяти вкладки.
+  useEffect(() => {
+    return () => {
+      if (shotRef.current) URL.revokeObjectURL(shotRef.current);
+    };
+  }, []);
+
+  const showShot = (url: string) => {
+    if (shotRef.current) URL.revokeObjectURL(shotRef.current);
+    shotRef.current = url;
+    setShot(url);
+  };
+
   const busy = video.stage === "sending" || video.stage === "working";
   return (
     <div>
@@ -155,10 +176,35 @@ export function VideoUploader({
         ghost
         disabled={disabled || busy}
         onFiles={async (files) => {
-          const src = await video.send(files[0]);
-          if (src) onDone(src);
+          const file = files[0];
+          /*
+            Кадр вынимается из ролика параллельно отправке, а не до неё:
+            телефонный `.mov` браузер разбирает не мгновенно, а иногда не
+            умеет вовсе, и ждать этого перед отправкой сорока мегабайт
+            незачем. Не вышло — превью просто не будет, ролик поедет как ехал.
+          */
+          const frame = videoThumb(file).then((blob) => {
+            if (blob) showShot(URL.createObjectURL(blob));
+            return blob;
+          });
+          const src = await video.send(file);
+          const blob = await frame;
+          if (!src) return;
+          // Кадр запоминается под путём готового ролика: пока он едет на сайт,
+          // панель показывает на его месте эту картинку — и после F5 тоже.
+          await rememberPreview(src, blob);
+          onDone(src);
         }}
       />
+      {shot ? (
+        <span className="mt-2 flex items-center gap-2">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={shot} alt="" className="h-14 w-20 border border-line object-cover" />
+          <span className="text-xs text-muted">
+            {busy ? "Этот ролик заливается" : video.stage === "failed" ? "Этот ролик не доехал" : "Ролик загружен"}
+          </span>
+        </span>
+      ) : null}
       {video.note ? (
         <p className={`mt-2 text-xs ${video.stage === "failed" ? "text-ink" : "text-muted"}`}>{video.note}</p>
       ) : null}
@@ -168,55 +214,124 @@ export function VideoUploader({
   );
 }
 
+/** Классы вида `object-cover` относятся к самому файлу, а не к рамке вокруг него. */
+const FIT = /^object-(cover|contain|fill|none|scale-down)$/;
+
+/** Через сколько пробовать достать файл с сайта заново и сколько раз. */
+const RETRY_MS = 30000;
+const RETRIES = 40;
+
 /**
- * Миниатюра файла. Ролик — проигрывателем без звука, иначе он выглядит как
- * битая картинка.
+ * Адрес файла на сайте. На повторных попытках к нему приписывается номер
+ * попытки: без этого браузер отдаёт уже полученный отказ из своей памяти и
+ * никуда не ходит.
+ */
+function retryUrl(src: string, attempt: number) {
+  const url = mediaUrl(src);
+  return attempt ? `${url}${url.includes("?") ? "&" : "?"}try=${attempt}` : url;
+}
+
+/**
+ * Миниатюра файла.
  *
- * Отдельно разобран случай «файла ещё нет на сайте». Панель показывает
- * миниатюры прямо с боевого сайта, а туда файл попадает выкладкой — это
- * несколько минут. Всё это время браузер рисовал на его месте значок битой
- * картинки, и заказчица делала единственный разумный вывод: обложка слетела.
- * Она никуда не девалась — просто ещё едет. Теперь так и написано.
+ * Три слоя, и все три нужны:
+ *
+ * 1. Мини-копия загруженного файла (`usePreview`). Она лежит в браузере и
+ *    переживает обновление страницы. Пока настоящий файл едет на сайт —
+ *    несколько минут, — заказчица видит то, что залила, а не пустое место.
+ * 2. Сам файл с боевого сайта. Доехал — рисуется поверх мини-копии; разницы
+ *    на глаз нет, это одна и та же картинка.
+ * 3. Подпись, если файла на сайте ещё нет. Раньше на этом месте браузер
+ *    рисовал значок битой картинки, и вывод напрашивался сам: обложка
+ *    слетела. Она никуда не девалась — просто ещё едет.
+ *
+ * Ролик показывается проигрывателем, а мини-копия идёт ему обложкой: без неё
+ * он выглядит чёрным прямоугольником, пока не доедет.
  */
 export function Thumb({ src, className = "" }: { src: string; className?: string }) {
-  const [broken, setBroken] = useState(false);
+  const preview = usePreview(src);
+  const [missing, setMissing] = useState(false);
+  /** Которая по счёту попытка достать файл с сайта. */
+  const [attempt, setAttempt] = useState(0);
+
+  // Сменился файл — пробуем снова: прошлый мог не доехать, этот может быть
+  // на месте.
+  useEffect(() => {
+    setMissing(false);
+    setAttempt(0);
+  }, [src]);
+
+  /*
+    Файла на сайте ещё нет — пробуем снова через полминуты, пока выкладка
+    не доедет (3–5 минут; ждём с запасом двадцать).
+
+    Перепроверяются только те файлы, чью мини-копию помнит этот браузер, то
+    есть загруженные только что. Иначе панель с восемьюстами кадрами, у
+    которой пропала связь с сайтом, ходила бы за всеми ними каждые полминуты.
+  */
+  useEffect(() => {
+    if (!missing || !preview || attempt >= RETRIES) return;
+    const timer = window.setTimeout(() => {
+      setMissing(false);
+      setAttempt((value) => value + 1);
+    }, RETRY_MS);
+    return () => window.clearTimeout(timer);
+  }, [missing, preview, attempt]);
 
   if (!src) return <div className={`flex items-center justify-center bg-void text-xs text-snow/50 ${className}`}>Нет файла</div>;
 
-  if (broken) {
-    return (
-      <div className={`flex items-center justify-center border border-line bg-paper px-2 text-center text-[10px] leading-tight text-muted ${className}`}>
-        Файл сохранён,
-        <br />
-        появится на сайте
-        <br />
-        через пару минут
-      </div>
-    );
-  }
+  const classes = className.split(/\s+/).filter(Boolean);
+  const fit = classes.find((item) => FIT.test(item)) ?? "object-cover";
+  const box = classes.filter((item) => !FIT.test(item)).join(" ");
+  // Подложку задаёт вызывающий, если ему нужна своя (белая под коллажами).
+  const ground = classes.some((item) => item.startsWith("bg-")) ? "" : "bg-void";
 
-  if (isVideoFile(src)) {
-    return (
-      <video
-        src={mediaUrl(src)}
-        className={`bg-void object-cover ${className}`}
-        muted
-        playsInline
-        preload="metadata"
-        onError={() => setBroken(true)}
-      />
-    );
-  }
-  // eslint-disable-next-line @next/next/no-img-element
   return (
-    <img
-      src={mediaUrl(src)}
-      alt=""
-      loading="lazy"
-      decoding="async"
-      onError={() => setBroken(true)}
-      className={`bg-void object-cover ${className}`}
-    />
+    <div className={`relative overflow-hidden ${ground} ${box}`}>
+      {preview ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={preview} alt="" aria-hidden className={`absolute inset-0 h-full w-full ${fit}`} />
+      ) : null}
+
+      {missing ? null : isVideoFile(src) ? (
+        <video
+          key={attempt}
+          src={retryUrl(src, attempt)}
+          poster={preview || undefined}
+          className={`absolute inset-0 h-full w-full ${fit}`}
+          muted
+          playsInline
+          preload="metadata"
+          onError={() => setMissing(true)}
+        />
+      ) : (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          key={attempt}
+          src={retryUrl(src, attempt)}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          onError={() => setMissing(true)}
+          className={`absolute inset-0 h-full w-full ${fit}`}
+        />
+      )}
+
+      {missing && preview ? (
+        <span className="absolute inset-x-0 bottom-0 bg-ink/70 px-1 py-0.5 text-center text-[9px] leading-tight text-snow">
+          Загружено, едет на сайт
+        </span>
+      ) : null}
+      {missing && !preview ? (
+        <span className="absolute inset-0 flex flex-col items-center justify-center border border-line bg-paper px-2 text-center text-[10px] leading-tight text-muted">
+          Файл сохранён,
+          <br />
+          появится на сайте
+          <br />
+          через пару минут
+        </span>
+      ) : null}
+    </div>
   );
 }
 

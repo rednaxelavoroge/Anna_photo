@@ -11,7 +11,7 @@ import { TrainingTab } from "@/components/admin/TrainingTab";
 import type { TabProps } from "@/components/admin/types";
 import { BTN_GHOST } from "@/components/admin/ui";
 import type { StudioState } from "@/lib/admin-store";
-import { rememberUpload } from "@/lib/media-url";
+import { forgetPreviews, loadPreviews, rememberUpload } from "@/lib/upload-previews";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -100,6 +100,10 @@ export function AdminPanel() {
 
   useEffect(() => {
     let cancelled = false;
+    // Превью загруженных файлов лежат в браузере и переживают обновление
+    // страницы: поднимаем их сразу, чтобы миниатюры не были пустыми, пока
+    // файлы едут на сайт.
+    void loadPreviews();
     void (async () => {
       try {
         const auth = await fetch("/api/admin/login", { cache: "no-store" });
@@ -147,6 +151,8 @@ export function AdminPanel() {
       }
       if (!res.ok) throw new Error(json.error || "Ошибка сохранения");
       setState({ ...next, revision: json.revision ?? next.revision });
+      // Файлы удалены с сайта — их превью в браузере тоже больше не нужны.
+      if (deleteFiles.length) void forgetPreviews(deleteFiles);
       setNote("✓ Сохранено. На сайте обновится через несколько минут");
     } catch (error) {
       setNote(error instanceof Error ? error.message : "Ошибка сети при сохранении");
@@ -194,9 +200,9 @@ export function AdminPanel() {
 
       if (!answer.ok || !answer.src) throw new Error(answer.error || "Ошибка загрузки фото");
       // На сайт файл попадёт выкладкой, минуты через две-три. Чтобы всё это
-      // время панель не показывала на его месте пустоту, превью берётся из
-      // выбранного файла.
-      rememberUpload(answer.src, blob);
+      // время панель не показывала на его месте пустоту, мини-копия кадра
+      // остаётся в браузере — она переживает и обновление страницы.
+      await rememberUpload(answer.src, blob);
       srcs.push(answer.src);
     }
     setNote(`Фото загружены: ${srcs.length}. Не забудьте нажать «Сохранить».`);

@@ -41,7 +41,7 @@ export default function PhototourPage() {
       <TagStrip
         categorySlug={PHOTOTOUR_CATEGORY}
         tags={getCategoryTags(PHOTOTOUR_CATEGORY)}
-        extras={extrasFor(PHOTOTOUR_CATEGORY, "phototour")}
+        extras={extrasFor(PHOTOTOUR_CATEGORY, { tags: getCategoryTags(PHOTOTOUR_CATEGORY), onPhototourPage: true })}
       />
 
       <div className="grid md:grid-cols-2">

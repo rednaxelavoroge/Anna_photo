@@ -60,7 +60,12 @@ export default async function AlbumPage({ params }: { params: Promise<Params> })
     return (
       <article className="tape-page">
         <PortfolioNav categories={getCategories()} activeSlug={slug} categoryName={category.menu} />
-        <TagStrip categorySlug={slug} tags={getCategoryTags(slug)} activeTag={album} extras={extrasFor(slug)} />
+        <TagStrip
+          categorySlug={slug}
+          tags={getCategoryTags(slug)}
+          activeTag={album}
+          extras={extrasFor(slug, { tags: getCategoryTags(slug), album })}
+        />
         <PhotoTape photos={getTagPhotos(slug, album)} slug={`${slug}-${album}`} />
       </article>
     );

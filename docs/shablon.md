@@ -58,11 +58,11 @@ npm run dev       # http://localhost:3000, панель — /admin
    robots.
 3. **Адрес панели.** `public/.htaccess` — строка с переадресацией `/admin`
    на поддомен панели.
-4. **Репозиторий и ветка.** В `.github/workflows/*.yml` вписаны имя
-   репозитория и рабочая ветка исходного проекта. Найти всё разом:
+4. **Приметы исходного проекта.** В шаблоне рабочая ветка везде `main`, а
+   вместо домена стоит `example.com`. Найти оставшееся разом:
 
    ```bash
-   grep -rn "rednaxelavoroge/Anna_photo\|cursor/namecheap-static-f40b\|annamanasaryan" .github src public/.htaccess
+   grep -rn "example.com\|example.art" .github src public/.htaccess
    ```
 
 5. **Приметы папки сайта.** Выкладка ищет папку на хостинге и отказывается
@@ -81,7 +81,9 @@ npm run dev       # http://localhost:3000, панель — /admin
 
 ## Выкладка
 
-- **Сайт** — сам на каждый push в рабочую ветку, плюс кнопка в Actions.
+- **Сайт** — сам на каждый push в `main`, плюс кнопка в Actions. Пока
+  секреты не заданы, запуск честно скажет «секрет FTP_HOST не задан —
+  выкладка пропущена» и закончится зелёным: это не поломка.
 - **Панель** — только кнопкой в Actions. Тронули что-нибудь в
   `src/components/admin/**`, `src/app/admin/**`, `src/app/api/admin/**` или
   `src/lib/admin-*` — запустите выкладку панели, иначе на хостинге останется

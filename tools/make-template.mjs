@@ -23,7 +23,7 @@ const OUT = path.join(ROOT, "template");
 /** Что уезжает в шаблон как есть. */
 const COPY = [
   "src",
-  ".github/workflows",
+  ".github/workflows",  // лишние процессы отсеиваются ниже, в DROP
   "public/fonts",
   "public/.htaccess",
   "next.config.ts",
@@ -80,6 +80,26 @@ const DATA = {
   },
 };
 
+/**
+ * Процессы, которые существуют только у этого сайта: сверка каталога с
+ * Яндекс.Диском заказчицы и добор файлов из её архива. Новому владельцу они
+ * не нужны, а один из них ещё и ссылается на список, которого в шаблоне нет.
+ */
+const DROP = [".github/workflows/check-site.yml", ".github/workflows/fetch-archive.yml"];
+
+/**
+ * Что заменить в скопированных файлах: имя рабочей ветки и адрес сайта.
+ *
+ * Ветка здесь важнее, чем кажется: процессы выкладки берут код по имени
+ * ветки, и без замены новый репозиторий пытался бы выложить чужой.
+ */
+const REPLACE = [
+  [/cursor\/namecheap-static-f40b/g, "main"],
+  [/https:\/\/annamanasaryan\.com/g, "https://example.com"],
+  [/annamanasaryan\.com/g, "example.com"],
+  [/annamanasaryan\.art/g, "example.art"],
+];
+
 function copy(rel) {
   const from = path.join(ROOT, rel);
   const to = path.join(OUT, rel);
@@ -91,6 +111,14 @@ function copy(rel) {
 fs.rmSync(OUT, { recursive: true, force: true });
 fs.mkdirSync(OUT, { recursive: true });
 COPY.forEach(copy);
+DROP.forEach((rel) => fs.rmSync(path.join(OUT, rel), { force: true }));
+
+// Имя ветки и адрес сайта — на нейтральные, чтобы шаблон не тянул чужое.
+for (const name of fs.readdirSync(path.join(OUT, ".github/workflows"))) {
+  const file = path.join(OUT, ".github/workflows", name);
+  const text = REPLACE.reduce((acc, [from, to]) => acc.replace(from, to), fs.readFileSync(file, "utf8"));
+  fs.writeFileSync(file, text);
+}
 
 // Данные — заготовками. Настоящие в шаблон не едут.
 for (const [name, value] of Object.entries(DATA)) {

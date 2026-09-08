@@ -1,17 +1,28 @@
+import { JsonLd } from "@/components/JsonLd";
 import { getReviews } from "@/lib/content";
+import { breadcrumbJsonLd, graphJsonLd, pageMetadata } from "@/lib/seo";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Отзывы о фотографе в Армении",
   description: "Отзывы семей и учеников о съёмках и воркшопах Анны Манасарян в Армении.",
+  path: "/reviews",
   keywords: ["отзывы фотограф Ереван", "отзывы детский фотограф Армения"],
-};
+});
 
 export default function ReviewsPage() {
   const reviews = getReviews();
 
   return (
     <article className="px-5 pt-28 pb-24 md:px-8">
+      <JsonLd
+        data={graphJsonLd([
+          breadcrumbJsonLd([
+            { name: "Главная", path: "/" },
+            { name: "Отзывы", path: "/reviews" },
+          ]),
+        ])}
+      />
       <p className="eyebrow">Голоса</p>
       <h1 className="mt-4 font-display text-4xl md:text-6xl">Отзывы о фотографе в Армении</h1>
       <div className="mt-14 grid gap-px bg-line md:grid-cols-2">

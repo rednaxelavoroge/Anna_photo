@@ -63,7 +63,13 @@ export function AlbumGrid({
             <div className="tile-zoom">
               {photo.src ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={photo.src} alt={photo.alt} className="w-full" />
+                <img
+                  src={photo.src}
+                  alt={photo.alt}
+                  className="w-full"
+                  loading={index < 2 ? "eager" : "lazy"}
+                  decoding="async"
+                />
               ) : (
                 <CoverArt
                   slug={`${slug}-${photo.id}`}

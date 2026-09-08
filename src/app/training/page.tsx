@@ -1,14 +1,18 @@
 import { CoverArt } from "@/components/CoverArt";
+import { GuideCta } from "@/components/GuideCta";
+import { JsonLd } from "@/components/JsonLd";
 import { getSite, getWorkshops } from "@/lib/content";
+import { breadcrumbJsonLd, graphJsonLd, pageMetadata } from "@/lib/seo";
 import type { Metadata } from "next";
 import Link from "next/link";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Обучение фотографии — 45 воркшопов",
   description:
     "Обучение фотографии в Армении: 45 проведённых воркшопов, направления и форматы. Фототур в Армению — отдельно, это не курс.",
+  path: "/training",
   keywords: ["обучение фотографии Армения", "воркшоп фотографии Ереван"],
-};
+});
 
 export default function TrainingPage() {
   const { training } = getSite();
@@ -16,6 +20,14 @@ export default function TrainingPage() {
 
   return (
     <article className="px-5 pt-28 pb-24 md:px-8">
+      <JsonLd
+        data={graphJsonLd([
+          breadcrumbJsonLd([
+            { name: "Главная", path: "/" },
+            { name: "Обучение", path: "/training" },
+          ]),
+        ])}
+      />
       <p className="eyebrow">{training.eyebrow}</p>
       <h1 className="mt-4 font-display text-4xl md:text-6xl">{training.title}</h1>
       <p className="mt-4 font-display text-2xl text-muted md:text-3xl">{training.stat}</p>
@@ -37,6 +49,7 @@ export default function TrainingPage() {
           Фототур в Армению — для гостей, не для учеников →
         </Link>
       </p>
+      <GuideCta slugs={["kak-zapisatsya-na-fotosessiyu-armeniya-moskva"]} label="Запись" />
 
       <div className="mt-16 grid gap-px bg-line sm:grid-cols-2 lg:grid-cols-3">
         {workshops.map((item) => (

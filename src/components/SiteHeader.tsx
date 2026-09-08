@@ -14,6 +14,8 @@ const NAV = [
   { href: "/contacts", label: "Контакты" },
 ];
 
+const SOFT_NAV = [{ href: "/blog", label: "Статьи" }];
+
 export function SiteHeader() {
   const site = getSite();
   const pathname = usePathname();
@@ -113,6 +115,17 @@ export function SiteHeader() {
                 href={item.href}
                 onClick={() => setOpen(false)}
                 className="font-display text-3xl text-ink"
+              >
+                {item.label}
+              </Link>
+            ))}
+            <p className="eyebrow mt-4">Тексты</p>
+            {SOFT_NAV.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setOpen(false)}
+                className="font-display text-2xl text-muted"
               >
                 {item.label}
               </Link>

@@ -54,15 +54,14 @@ export function getWorkshops() {
   return workshopsData.items;
 }
 
-export function getPhotos(categorySlug: string, albumSlug?: string): Photo[] {
+export function getPhotos(categorySlug: string, albumSlug?: string, altPrefix?: string): Photo[] {
   const seed = `${categorySlug}-${albumSlug ?? "all"}`;
+  const label = altPrefix ?? albumSlug ?? categorySlug;
   return Array.from({ length: albumSlug ? 12 : 16 }, (_, index) => {
     const portrait = (index + seed.length) % 3 !== 0;
     return {
       id: `${seed}-${index + 1}`,
-      alt: albumSlug
-        ? `Образец ритма ${index + 1} — ${albumSlug}`
-        : `Образец ритма ${index + 1} — ${categorySlug}`,
+      alt: `Образец ритма ${index + 1} — ${label}`,
       width: portrait ? 1200 : 1600,
       height: portrait ? 1600 : 1100,
       featured: index === 0,
@@ -74,7 +73,7 @@ export function getPhotos(categorySlug: string, albumSlug?: string): Photo[] {
 export function getBackstagePhotos(): Photo[] {
   return Array.from({ length: 18 }, (_, index) => ({
     id: `backstage-${index + 1}`,
-    alt: `Образец бэкстейджа ${index + 1}`,
+    alt: `Бэкстейдж съёмки — кадр ${index + 1}`,
     width: index % 2 === 0 ? 1600 : 1200,
     height: index % 2 === 0 ? 1100 : 1600,
     year: 2023 + (index % 3),

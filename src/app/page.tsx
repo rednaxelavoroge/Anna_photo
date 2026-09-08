@@ -2,7 +2,22 @@ import { CoverArt } from "@/components/CoverArt";
 import { MeetSections } from "@/components/MeetSection";
 import { SplitReveal } from "@/components/SplitReveal";
 import { getCategories, getSite } from "@/lib/content";
+import { pageMetadata } from "@/lib/seo";
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = pageMetadata({
+  title: "Детский и семейный фотограф в Армении",
+  description:
+    "Анна Манасарян — фотосессии новорождённых, детей и семей в Ереване и Армении. Ньюборн до 20 дней, travel, обучение.",
+  path: "/",
+  keywords: [
+    "Анна Манасарян",
+    "детский фотограф Ереван",
+    "фотосессия новорождённых в Армении",
+    "семейная фотосессия в Армении",
+  ],
+});
 
 const HOME_MEET = ["newborn", "children", "family", "armenian-costumes", "travel", "reportage"];
 

@@ -1,5 +1,6 @@
 import { isAdmin } from "@/lib/admin-auth";
 import { STALE_STATE, loadStudio, saveStudio, scanUnlisted, type StudioState } from "@/lib/admin-store";
+import { refusalText, stateProblems } from "@/lib/state-problems";
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
@@ -43,6 +44,17 @@ export async function PUT(request: Request) {
     publications: rest.publications ?? [],
     pressLinks: rest.pressLinks ?? [],
   };
+  /*
+    Проверка перед записью. Раньше сервер смотрел только, что три списка
+    вообще пришли: кадр без раздела, ролик без ссылки и подпись, которую
+    забыли, уезжали в репозиторий как есть и просто не работали на сайте.
+    Молча — а значит, узнавали мы об этом с её слов через сутки.
+  */
+  const problems = stateProblems(state);
+  if (problems.length > 0) {
+    return json({ error: refusalText(problems), problems }, 400);
+  }
+
   try {
     const saved = await saveStudio(
       state,

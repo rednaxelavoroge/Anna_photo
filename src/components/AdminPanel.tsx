@@ -97,6 +97,9 @@ export function AdminPanel() {
   const [note, setNote] = useState("");
   /** Данные под панелью изменились: сохранять нельзя, надо обновить страницу. */
   const [stale, setStale] = useState("");
+  // Отказ из-за незаполненного: тоже окном, а не строчкой в углу —
+  // строчку в углу не замечают, а «Сохранено» человек ждёт увидеть.
+  const [problems, setProblems] = useState("");
 
   useEffect(() => {
     let cancelled = false;
@@ -141,12 +144,19 @@ export function AdminPanel() {
         // сервер видит, не изменилось ли содержимое сайта у неё за спиной.
         body: JSON.stringify({ ...next, revision: state?.revision, deleteFiles }),
       });
-      const json = (await res.json()) as { error?: string; revision?: string; stale?: boolean };
+      const json = (await res.json()) as { error?: string; revision?: string; stale?: boolean; problems?: string[] };
       // 409 — данные под панелью успели измениться. Сохранять нельзя: запись
       // поверх стёрла бы чужое. Показываем это отдельным окном, а не строкой
       // в углу, которую легко не заметить.
       if (res.status === 409 || json.stale) {
         setStale(json.error || "Содержимое сайта изменилось. Обновите страницу.");
+        return;
+      }
+      // 400 со списком — что-то не дозаполнено. Записи не было, набранное
+      // осталось в панели: окно закрывается, поля правятся, сохраняем снова.
+      if (res.status === 400 && json.problems?.length) {
+        setProblems(json.error || "Не сохранено: что-то не дозаполнено.");
+        setNote("");
         return;
       }
       if (!res.ok) throw new Error(json.error || "Ошибка сохранения");
@@ -247,6 +257,22 @@ export function AdminPanel() {
         Закрыть это окно нельзя — из него один выход, обновить страницу, и
         это единственный правильный выход.
       */}
+      {problems ? (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-ink/50 p-5">
+          <div className="max-h-[80vh] max-w-md overflow-y-auto bg-paper p-6">
+            <p className="eyebrow">Панель управления</p>
+            <h2 className="mt-3 font-display text-2xl">Не сохранено</h2>
+            <p className="mt-4 whitespace-pre-line text-sm leading-relaxed text-muted">{problems}</p>
+            <button
+              type="button"
+              className="mt-6 rounded-full bg-ink px-6 py-3 text-xs tracking-[0.16em] text-snow uppercase"
+              onClick={() => setProblems("")}
+            >
+              Понятно
+            </button>
+          </div>
+        </div>
+      ) : null}
       {stale ? (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-ink/50 p-5">
           <div className="max-w-md bg-paper p-6 text-center">

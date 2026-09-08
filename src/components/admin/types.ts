@@ -5,8 +5,8 @@ export type TabProps = {
   state: StudioState;
   /** Поменять данные на экране, не записывая. */
   setState: (state: StudioState) => void;
-  /** Записать: один запрос, один коммит. deleteFiles — какие файлы убрать из репозитория. */
-  persist: (state: StudioState, message?: string, deleteFiles?: string[]) => Promise<void>;
+  /** Записать: один запрос, один коммит. deleteFiles — какие файлы убрать из репозитория. Возвращает, удалось ли. */
+  persist: (state: StudioState, message?: string, deleteFiles?: string[]) => Promise<boolean>;
   busy: boolean;
   /** Сжать и загрузить фотографии, вернуть их пути. */
   upload: (files: File[] | null) => Promise<string[]>;

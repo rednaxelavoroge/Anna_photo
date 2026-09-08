@@ -91,10 +91,22 @@ async function readAnswer(res: Response) {
 export function AdminPanel() {
   const router = useRouter();
   const [tab, setTab] = useState<Tab>("photos");
-  const [state, setState] = useState<StudioState | null>(null);
+  const [state, setStateRaw] = useState<StudioState | null>(null);
   const [loadError, setLoadError] = useState("");
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState("");
+  // Правки, которые видны на экране, но ещё не записаны: вкладки вроде
+  // «Обо мне» копят их в состоянии и пишут одной кнопкой «Сохранить». Между
+  // правкой и нажатием кнопки заказчица не видит разницы с вкладками, где
+  // всё пишется сразу, — и уходит, решив, что дело сделано. Флаг стоит
+  // здесь, а не в отдельной вкладке: setState общий на всю панель, и правка
+  // остаётся неучтённой при переключении вкладок туда и обратно.
+  const [dirty, setDirty] = useState(false);
+  /** То же, что setState у вкладок, но помечает, что записанное на экране разошлось с сохранённым. */
+  const setState = (next: StudioState) => {
+    setStateRaw(next);
+    setDirty(true);
+  };
   /** Данные под панелью изменились: сохранять нельзя, надо обновить страницу. */
   const [stale, setStale] = useState("");
   // Отказ из-за незаполненного: тоже окном, а не строчкой в углу —
@@ -123,7 +135,7 @@ export function AdminPanel() {
           if (!cancelled) setLoadError(message);
           return;
         }
-        if (!cancelled) setState(payload as StudioState);
+        if (!cancelled) setStateRaw(payload as StudioState);
       } catch (error) {
         if (!cancelled) setLoadError(error instanceof Error ? error.message : "Ошибка сети при загрузке панели");
       }
@@ -133,7 +145,7 @@ export function AdminPanel() {
     };
   }, [router]);
 
-  async function persist(next: StudioState, message?: string, deleteFiles: string[] = []) {
+  async function persist(next: StudioState, message?: string, deleteFiles: string[] = []): Promise<boolean> {
     setBusy(true);
     setNote(message ?? "Сохранение…");
     try {
@@ -150,22 +162,25 @@ export function AdminPanel() {
       // в углу, которую легко не заметить.
       if (res.status === 409 || json.stale) {
         setStale(json.error || "Содержимое сайта изменилось. Обновите страницу.");
-        return;
+        return false;
       }
       // 400 со списком — что-то не дозаполнено. Записи не было, набранное
       // осталось в панели: окно закрывается, поля правятся, сохраняем снова.
       if (res.status === 400 && json.problems?.length) {
         setProblems(json.error || "Не сохранено: что-то не дозаполнено.");
         setNote("");
-        return;
+        return false;
       }
       if (!res.ok) throw new Error(json.error || "Ошибка сохранения");
-      setState({ ...next, revision: json.revision ?? next.revision });
+      setStateRaw({ ...next, revision: json.revision ?? next.revision });
+      setDirty(false);
       // Файлы удалены с сайта — их превью в браузере тоже больше не нужны.
       if (deleteFiles.length) void forgetPreviews(deleteFiles);
       setNote("✓ Сохранено. На сайте обновится через несколько минут");
+      return true;
     } catch (error) {
       setNote(error instanceof Error ? error.message : "Ошибка сети при сохранении");
+      return false;
     } finally {
       setBusy(false);
     }
@@ -332,6 +347,12 @@ export function AdminPanel() {
           </button>
         ))}
       </nav>
+
+      {dirty ? (
+        <p className="mt-6 inline-block border border-ink bg-paper px-3 py-2 text-sm font-medium text-ink" role="status">
+          ● Есть несохранённые правки — нажмите кнопку «Сохранить» внизу вкладки
+        </p>
+      ) : null}
 
       {note ? (
         <p className="sticky top-2 z-30 mt-6 inline-block border border-line bg-paper px-3 py-2 text-sm text-muted shadow-xs" aria-live="polite">

@@ -97,6 +97,14 @@ export function AboutTab(props: TabProps) {
           setState({ ...state, publications });
           if (removedSrcs?.length) setRemoved((prev) => [...prev, ...removedSrcs]);
         }}
+        onDelete={(pub, index) => {
+          const publications = state.publications.filter((_, i) => i !== index);
+          const next = { ...state, publications };
+          // Пишем сразу, как «Удалить» везде в панели: иначе статья исчезает
+          // с экрана, а на сайте остаётся — заказчица уже принимала это за
+          // сделанное дело.
+          void persist(next, "Удаляю статью…", unusedFiles(pub.images ?? [], next));
+        }}
       />
 
       <Card title="Ссылки на публикации" hint="Статьи на сайтах изданий, у которых здесь только ссылка. Показываются списком под публикациями.">
@@ -216,12 +224,15 @@ function PublicationsEditor({
   upload,
   notify,
   onChange,
+  onDelete,
 }: {
   publications: Publication[];
   busy: boolean;
   upload: (files: File[] | null) => Promise<string[]>;
   notify: (message: string) => void;
   onChange: (publications: Publication[], removedSrcs?: string[]) => void;
+  /** Удалить публикацию — пишет сразу, не дожидаясь общей кнопки «Сохранить». */
+  onDelete: (pub: Publication, index: number) => void;
 }) {
   const [openId, setOpenId] = useState<string | null>(null);
   const update = (index: number, next: Partial<Publication>) => onChange(publications.map((row, i) => (i === index ? { ...row, ...next } : row)));
@@ -247,9 +258,10 @@ function PublicationsEditor({
                 <button
                   type="button"
                   className={`${BTN_TEXT} text-muted`}
+                  disabled={busy}
                   onClick={() => {
                     if (!confirm(`Удалить публикацию «${pub.title}»?`)) return;
-                    onChange(publications.filter((_, i) => i !== index), pub.images ?? []);
+                    onDelete(pub, index);
                   }}
                 >
                   Удалить

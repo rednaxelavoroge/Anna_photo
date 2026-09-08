@@ -4,7 +4,7 @@ import { GuideCta } from "@/components/GuideCta";
 import { JsonLd } from "@/components/JsonLd";
 import entity from "@/data/entity.json";
 import { getSite } from "@/lib/content";
-import { breadcrumbJsonLd, faqJsonLd, graphJsonLd, pageMetadata, personJsonLd } from "@/lib/seo";
+import { breadcrumbJsonLd, faqJsonLd, graphJsonLd, pageMetadata } from "@/lib/seo";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -23,7 +23,6 @@ export default function AboutPage() {
     <article className="px-5 pt-28 pb-24 md:px-8">
       <JsonLd
         data={graphJsonLd([
-          personJsonLd(),
           breadcrumbJsonLd([
             { name: "Главная", path: "/" },
             { name: "Обо мне", path: "/about" },

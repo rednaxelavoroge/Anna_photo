@@ -1,6 +1,20 @@
 {
   "items": [
     {
+      "src": "/photos/uploads/inshot-20250524-202213374-1788990512495.mp4",
+      "alt": "й",
+      "categories": [
+        "travel"
+      ],
+      "tags": [
+        "italiya"
+      ],
+      "images": [
+        "/photos/uploads/inshot-20250524-202213374-1788990512495.mp4"
+      ],
+      "video": ""
+    },
+    {
       "src": "/photos/travel/fototur-1.jpg",
       "alt": "Фототур — 1",
       "categories": [

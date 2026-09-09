@@ -22,8 +22,30 @@
 name: Выложить панель на хостинг
 
 on:
-  # Только вручную кнопкой: панель обновляется реже сайта, и лишний раз
-  # дёргать её перезапуском во время работы заказчицы незачем.
+  # Панель уезжает на хостинг сама, как только меняется её код.
+  #
+  # Раньше здесь была только кнопка, и дважды подряд — 05.09 и 08.09.2026 —
+  # правка панели была написана, проверена и запушена, а кнопку никто не
+  # нажал. Заказчица работала со вчерашней сборкой, где ничего не починено,
+  # и со стороны это неотличимо от «нам ничего не исправили». Забывчивость
+  # убрана из процесса, а не переписана правилом в передаче.
+  push:
+    branches:
+      - cursor/namecheap-static-f40b
+    paths:
+      - "src/app/admin/**"
+      - "src/app/api/admin/**"
+      - "src/components/AdminPanel.tsx"
+      - "src/components/admin/**"
+      - "src/lib/admin-*"
+      - "src/lib/use-video-upload.ts"
+      - "src/lib/upload-previews.ts"
+      - "src/lib/preview.ts"
+      - "src/lib/thumbnail.ts"
+      - "src/lib/state-problems.ts"
+      - "src/middleware.ts"
+      - ".github/workflows/deploy-panel.yml"
+  # Кнопка остаётся: иногда нужно выложить ту же сборку заново.
   workflow_dispatch:
   # Кнопка в Actions показывается только с ветки по умолчанию, поэтому там
   # лежит короткий файл-вызов, а вся работа — здесь. Так две копии не
@@ -226,7 +248,7 @@ jobs:
             set ssl:verify-certificate no
             set ftp:ssl-allow yes
             set cmd:fail-exit yes
-            mirror -R --delete --parallel=4 --exclude-glob tmp/ panel-dist "$PANEL_DIR"
+            mirror -R --delete --parallel=2 --exclude-glob tmp/ panel-dist "$PANEL_DIR"
             bye
           LFTP
 

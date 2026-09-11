@@ -39,6 +39,8 @@ on:
       - "src/components/admin/**"
       - "src/lib/admin-*"
       - "src/lib/articles.ts"
+      - "src/lib/blog.ts"
+      - "src/lib/frontmatter.ts"
       - "src/data/articles.json"
       - "src/lib/use-video-upload.ts"
       - "src/lib/upload-previews.ts"

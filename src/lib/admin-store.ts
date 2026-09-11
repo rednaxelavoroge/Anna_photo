@@ -7,7 +7,8 @@ import portfolioFile from "@/data/portfolio.json";
 import publicationsFile from "@/data/publications.json";
 import siteFile from "@/data/site.json";
 import tagsFile from "@/data/tags.json";
-import { getPost, getPostSlugs, type BlogArticleSetting, type BlogSettings } from "@/lib/blog";
+import { type BlogArticleSetting, type BlogSettings } from "@/lib/blog";
+import { parseFrontmatter, serializeFrontmatter, type BlogFrontmatter } from "@/lib/frontmatter";
 import type {
   AboutVideo,
   Category,
@@ -72,6 +73,107 @@ const FILES = {
   publications: "src/data/publications.json",
   articles: "src/data/articles.json",
 };
+
+const BLOG_PREFIX = "content/blog/";
+
+function blogFile(slug: string) {
+  return `${BLOG_PREFIX}${slug}.md`;
+}
+
+function isSafeArticleSlug(slug: string) {
+  return /^[a-z0-9-]+$/.test(slug);
+}
+
+/** В JSON списка статей не кладём текст — он живёт в markdown. */
+function catalogArticleItems(items: BlogArticleSetting[]): BlogArticleSetting[] {
+  return items.map((item) => ({
+    slug: item.slug,
+    title: item.title,
+    date: item.date,
+    draft: Boolean(item.draft),
+    ...(item.cover ? { cover: item.cover } : {}),
+  }));
+}
+
+function settingFromMarkdown(slug: string, raw: string): BlogArticleSetting {
+  try {
+    const { data, body } = parseFrontmatter(raw);
+    return {
+      slug,
+      title: data.title,
+      date: data.date,
+      draft: Boolean(data.draft),
+      cover: data.cover || data.image,
+      body,
+      description: data.description,
+      tags: data.tags,
+      relatedSlugs: data.relatedSlugs,
+      targetQueries: data.targetQueries,
+      portfolioHref: data.portfolioHref,
+      aboutHref: data.aboutHref,
+      contactsHref: data.contactsHref,
+      coverAlt: data.coverAlt,
+    };
+  } catch {
+    return { slug, title: slug, date: "", draft: false, body: raw };
+  }
+}
+
+function mergeArticleItem(item: BlogArticleSetting, fromFile?: BlogArticleSetting): BlogArticleSetting {
+  if (!fromFile) return item;
+  return {
+    ...fromFile,
+    ...item,
+    title: fromFile.title || item.title,
+    date: fromFile.date || item.date,
+    cover: item.cover || fromFile.cover,
+    body: fromFile.body,
+    description: fromFile.description,
+    tags: fromFile.tags,
+    relatedSlugs: fromFile.relatedSlugs,
+    targetQueries: fromFile.targetQueries,
+    portfolioHref: fromFile.portfolioHref,
+    aboutHref: fromFile.aboutHref,
+    contactsHref: fromFile.contactsHref,
+    coverAlt: fromFile.coverAlt,
+  };
+}
+
+function markdownFromItem(item: BlogArticleSetting, previousRaw?: string): string {
+  let prev: BlogFrontmatter = {
+    title: item.title,
+    description: item.description ?? "",
+    date: item.date,
+    draft: Boolean(item.draft),
+    tags: item.tags ?? [],
+    relatedSlugs: item.relatedSlugs ?? [],
+    targetQueries: item.targetQueries ?? [],
+    cover: item.cover,
+    coverAlt: item.coverAlt,
+    portfolioHref: item.portfolioHref,
+    aboutHref: item.aboutHref,
+    contactsHref: item.contactsHref,
+  };
+  if (previousRaw) {
+    try {
+      prev = parseFrontmatter(previousRaw).data;
+    } catch {
+      // оставляем поля из панели
+    }
+  }
+  return serializeFrontmatter(
+    {
+      ...prev,
+      title: item.title,
+      description: item.description ?? prev.description,
+      date: item.date || prev.date,
+      draft: Boolean(item.draft),
+      cover: item.cover ?? prev.cover,
+      coverAlt: item.coverAlt ?? prev.coverAlt,
+    },
+    item.body ?? "",
+  );
+}
 
 // Экспортируются, чтобы приёмник роликов брал те же репозиторий и ветку,
 // а не завёл рядом вторую пару значений, которая однажды разойдётся.
@@ -140,8 +242,8 @@ async function readText(rel: string) {
  * правка, или сама заказчица работает во второй вкладке, — устаревшая копия
  * ложилась поверх свежего, молча. Так 06.09.2026 пропали семь статей.
  *
- * Отпечаток берётся с содержимого файлов, а не с ветки: загрузка фотографии
- * тоже двигает ветку, но данных не трогает, и ругаться на неё незачем.
+ * Отпечаток берётся с содержимого файлов данных и текстов статей, а не с ветки:
+ * загрузка фотографии тоже двигает ветку, но данных не трогает, и ругаться на неё незачем.
  */
 function fingerprint(raws: string[]) {
   const hash = createHash("sha1");
@@ -152,8 +254,54 @@ function fingerprint(raws: string[]) {
 /** Так узнаём, что несёт в себе отказ сохранять: панель показывает своё окно. */
 export const STALE_STATE = "STALE_STATE";
 
-async function readAllData() {
-  return Promise.all([
+async function listBlogSlugs(): Promise<string[]> {
+  const slugs = new Set<string>();
+  const localDir = path.join(process.cwd(), "content", "blog");
+  try {
+    const names = await fs.readdir(localDir);
+    for (const name of names) {
+      if (name.endsWith(".md")) slugs.add(name.slice(0, -3));
+    }
+  } catch {
+    // нет локальной папки — смотрим GitHub
+  }
+  if (process.env.GITHUB_TOKEN) {
+    try {
+      const url = `https://api.github.com/repos/${githubRepo()}/git/trees/${encodeURIComponent(githubBranch())}?recursive=1`;
+      const res = await fetch(url, { headers: githubHeaders(), cache: "no-store" });
+      if (res.ok) {
+        const json = (await res.json()) as { tree: { path: string; type: string }[] };
+        for (const item of json.tree) {
+          if (item.type === "blob" && item.path.startsWith(BLOG_PREFIX) && item.path.endsWith(".md")) {
+            slugs.add(item.path.slice(BLOG_PREFIX.length, -3));
+          }
+        }
+      }
+    } catch {
+      // JSON и так прочитается, статьи просто без текста
+    }
+  }
+  return [...slugs].filter(isSafeArticleSlug).sort();
+}
+
+async function readBlogFiles(): Promise<{ slugs: string[]; raws: string[] }> {
+  const slugs = await listBlogSlugs();
+  const raws = await Promise.all(
+    slugs.map(async (slug) => {
+      try {
+        return await readText(blogFile(slug));
+      } catch {
+        return "";
+      }
+    }),
+  );
+  return { slugs, raws };
+}
+
+type DataSnapshot = { jsonRaws: string[]; blogSlugs: string[]; blogRaws: string[] };
+
+async function readAllData(): Promise<DataSnapshot> {
+  const jsonRaws = await Promise.all([
     readText(FILES.portfolio),
     readText(FILES.tags),
     readText(FILES.photos),
@@ -164,11 +312,17 @@ async function readAllData() {
     readText(FILES.publications).catch(() => JSON.stringify({ items: [], links: [] })),
     readText(FILES.articles).catch(() => JSON.stringify({ enabled: false, articles: {}, items: [] })),
   ]);
+  const blog = await readBlogFiles();
+  return { jsonRaws, blogSlugs: blog.slugs, blogRaws: blog.raws };
+}
+
+function snapshotFingerprint(snapshot: DataSnapshot) {
+  return fingerprint([...snapshot.jsonRaws, ...snapshot.blogRaws]);
 }
 
 export async function loadStudio(): Promise<StudioState> {
-  const raws = await readAllData();
-  const [portfolioRaw, tagsRaw, photosRaw, siteRaw, backstageRaw, galleriesRaw, videosRaw, publicationsRaw, articlesRaw] = raws;
+  const snapshot = await readAllData();
+  const [portfolioRaw, tagsRaw, photosRaw, siteRaw, backstageRaw, galleriesRaw, videosRaw, publicationsRaw, articlesRaw] = snapshot.jsonRaws;
   const portfolio = JSON.parse(portfolioRaw) as { categories: Category[] };
   const tags = JSON.parse(tagsRaw) as { items: Tag[] };
   const photos = JSON.parse(photosRaw) as { items: PhotoItem[] };
@@ -178,29 +332,22 @@ export async function loadStudio(): Promise<StudioState> {
   const videos = JSON.parse(videosRaw) as { items: AboutVideo[] };
   const publications = JSON.parse(publicationsRaw) as { items?: Publication[]; links?: PressLink[] };
   const articles = JSON.parse(articlesRaw) as Partial<BlogSettings>;
-  const articleItems: BlogArticleSetting[] = [...(articles.items ?? [])];
+  const fromFiles = new Map<string, BlogArticleSetting>();
+  snapshot.blogSlugs.forEach((slug, index) => {
+    const raw = snapshot.blogRaws[index];
+    if (!raw) return;
+    fromFiles.set(slug, settingFromMarkdown(slug, raw));
+  });
+  const articleItems: BlogArticleSetting[] = [...(articles.items ?? [])].map((item) =>
+    mergeArticleItem(item, fromFiles.get(item.slug)),
+  );
   const knownSlugs = new Set(articleItems.map((i) => i.slug));
-  try {
-    for (const slug of getPostSlugs()) {
-      if (!knownSlugs.has(slug)) {
-        const post = getPost(slug);
-        if (post) {
-          articleItems.push({
-            slug: post.slug,
-            title: post.title,
-            date: post.date,
-            draft: Boolean(post.draft),
-            cover: post.cover,
-          });
-        }
-      }
-    }
-  } catch {
-    // Если fs недоступна, остаёмся на articleItems из сохранённого JSON
+  for (const [slug, fromFile] of fromFiles) {
+    if (!knownSlugs.has(slug)) articleItems.push(fromFile);
   }
 
   return {
-    revision: fingerprint(raws),
+    revision: snapshotFingerprint(snapshot),
     categories: portfolio.categories,
     tags: tags.items ?? [],
     photos: (photos.items ?? []).map((item) => ({
@@ -331,11 +478,12 @@ export async function saveStudio(
   // Панель прислала отпечаток данных, с которыми она работала. Если сейчас
   // они другие — кто-то успел раньше, и запись поверх стёрла бы чужое.
   // Отказываемся и говорим об этом прямо; разбирается панель.
+  const snapshot = await readAllData();
   if (expectedRevision) {
-    const now = fingerprint(await readAllData());
-    if (now !== expectedRevision) throw new Error(STALE_STATE);
+    if (snapshotFingerprint(snapshot) !== expectedRevision) throw new Error(STALE_STATE);
   }
   const json = (data: unknown) => Buffer.from(`${JSON.stringify(data, null, 2)}\n`);
+  const articleItems = state.articles?.items ?? [];
   const files: FileWrite[] = [
     { path: FILES.portfolio, content: json({ categories: state.categories }) },
     { path: FILES.tags, content: json({ items: state.tags }) },
@@ -350,10 +498,29 @@ export async function saveStudio(
       content: json({
         enabled: Boolean(state.articles?.enabled),
         articles: state.articles?.articles ?? {},
-        items: state.articles?.items ?? [],
+        items: catalogArticleItems(articleItems),
       }),
     },
   ];
+
+  const blogMap = new Map<string, string>();
+  snapshot.blogSlugs.forEach((slug, index) => blogMap.set(slug, snapshot.blogRaws[index] ?? ""));
+  for (const item of articleItems) {
+    if (!isSafeArticleSlug(item.slug) || typeof item.body !== "string") continue;
+    const previousRaw = blogMap.get(item.slug) ?? "";
+    if (previousRaw) {
+      try {
+        const prev = parseFrontmatter(previousRaw);
+        if (prev.data.title === item.title && prev.body === item.body.trim()) continue;
+      } catch {
+        // файл странный — перезапишем собранным markdown
+      }
+    }
+    const nextRaw = markdownFromItem(item, previousRaw || undefined);
+    files.push({ path: blogFile(item.slug), content: Buffer.from(nextRaw) });
+    blogMap.set(item.slug, nextRaw);
+  }
+
   const deletions = await withPosters(toRepoPaths(deleteSrcs));
   if (process.env.GITHUB_TOKEN) {
     await writeGithub(files, message, deletions);
@@ -367,7 +534,10 @@ export async function saveStudio(
   // Новый отпечаток — тот, что панель будет присылать со следующим
   // сохранением. Считаем по тому, что записали, а не перечитываем: у GitHub
   // свежая запись видна не мгновенно.
-  return { revision: fingerprint(files.map((file) => file.content.toString("utf8"))) };
+  const jsonRaws = files.filter((file) => file.path.startsWith("src/data/")).map((file) => file.content.toString("utf8"));
+  const blogSlugs = [...blogMap.keys()].sort();
+  const blogRaws = blogSlugs.map((slug) => blogMap.get(slug) ?? "");
+  return { revision: snapshotFingerprint({ jsonRaws, blogSlugs, blogRaws }) };
 }
 
 export async function saveUpload(filename: string, data: Buffer) {

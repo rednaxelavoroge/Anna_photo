@@ -1,7 +1,7 @@
 import { BlogCover } from "@/components/BlogCover";
 import { JsonLd } from "@/components/JsonLd";
 import { RelatedPosts } from "@/components/RelatedPosts";
-import { formatPostDate, getPost, getPostSlugs, getRelatedPosts, isArticleVisible, isBlogEnabled } from "@/lib/blog";
+import { formatPostDate, getPost, getPostSlugs, getRelatedPosts, isArticleListed } from "@/lib/blog";
 import { MarkdownBody } from "@/lib/markdown";
 import { articleJsonLd, breadcrumbJsonLd, graphJsonLd, pageMetadata } from "@/lib/seo";
 import type { Metadata } from "next";
@@ -22,7 +22,6 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  if (!isArticleVisible(slug)) return {};
   const post = getPost(slug);
   if (!post) return {};
   return pageMetadata({
@@ -33,12 +32,13 @@ export async function generateMetadata({
     type: "article",
     publishedTime: post.date,
     image: post.cover,
+    // Не в списке — открывается по ссылке, но в поиск не кладём.
+    noIndex: !isArticleListed(slug),
   });
 }
 
 export default async function BlogPostPage({ params }: { params: Promise<Params> }) {
   const { slug } = await params;
-  if (!isArticleVisible(slug)) notFound();
   const post = getPost(slug);
   if (!post) notFound();
 

@@ -15,6 +15,7 @@ targetQueries:
   - сказочная фотосессия для детей Ереван
   - фотосессия Алиса в стране чудес
   - детская студийная фотосессия Армения
+portfolioHref: /portfolio/children
 aboutHref: /about
 ---
 

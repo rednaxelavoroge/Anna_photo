@@ -14,6 +14,7 @@ targetQueries:
   - как выбрать детского фотографа
   - детский фотограф Ереван
   - ньюборн фотограф как выбрать
+portfolioHref: /portfolio
 aboutHref: /about
 ---
 

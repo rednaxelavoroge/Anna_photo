@@ -15,6 +15,7 @@ targetQueries:
   - заказать фотосессию Ереван
   - детский фотограф Армения контакты
   - фотограф Анна Манасарян Москва
+portfolioHref: /portfolio
 contactsHref: /contacts
 ---
 

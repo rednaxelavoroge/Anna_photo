@@ -1,6 +1,8 @@
 import { AlbumGrid } from "@/components/AlbumGrid";
+import { JsonLd } from "@/components/JsonLd";
 import { getAlbum, getCategories, getCategory } from "@/lib/content";
 import { getPhotos } from "@/lib/photos";
+import { breadcrumbJsonLd, graphJsonLd, imageGalleryJsonLd, pageMetadata } from "@/lib/seo";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -21,10 +23,11 @@ export async function generateMetadata({
   const { category: categorySlug, album: albumSlug } = await params;
   const album = getAlbum(categorySlug, albumSlug);
   if (!album) return {};
-  return {
+  return pageMetadata({
     title: album.title,
     description: album.description,
-  };
+    path: `/portfolio/${categorySlug}/${album.slug}`,
+  });
 }
 
 export default async function AlbumPage({ params }: { params: Promise<Params> }) {
@@ -34,9 +37,26 @@ export default async function AlbumPage({ params }: { params: Promise<Params> })
   if (!category || !album) notFound();
 
   const photos = getPhotos(categorySlug, albumSlug);
+  const path = `/portfolio/${category.slug}/${album.slug}`;
 
   return (
     <article className="px-5 pt-28 pb-20 md:px-8">
+      <JsonLd
+        data={graphJsonLd([
+          breadcrumbJsonLd([
+            { name: "Главная", path: "/" },
+            { name: "Портфолио", path: "/portfolio" },
+            { name: category.menu, path: `/portfolio/${category.slug}` },
+            { name: album.menu, path },
+          ]),
+          imageGalleryJsonLd({
+            name: album.title,
+            description: album.description,
+            path,
+            photos,
+          }),
+        ])}
+      />
       <p className="eyebrow">
         <Link href="/portfolio">Портфолио</Link>
         <span className="mx-3 text-line">/</span>

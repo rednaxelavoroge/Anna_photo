@@ -1,7 +1,11 @@
 import { AlbumGrid } from "@/components/AlbumGrid";
 import { CoverArt } from "@/components/CoverArt";
+import { GuideCta } from "@/components/GuideCta";
+import { JsonLd } from "@/components/JsonLd";
+import { CATEGORY_GUIDES } from "@/lib/blog";
 import { getCategories, getCategory } from "@/lib/content";
 import { getPhotos } from "@/lib/photos";
+import { breadcrumbJsonLd, graphJsonLd, imageGalleryJsonLd, pageMetadata } from "@/lib/seo";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -20,11 +24,12 @@ export async function generateMetadata({
   const { category: slug } = await params;
   const category = getCategory(slug);
   if (!category) return {};
-  return {
+  return pageMetadata({
     title: category.title,
     description: category.description,
+    path: `/portfolio/${category.slug}`,
     keywords: category.keywords,
-  };
+  });
 }
 
 export default async function CategoryPage({ params }: { params: Promise<Params> }) {
@@ -33,9 +38,25 @@ export default async function CategoryPage({ params }: { params: Promise<Params>
   if (!category) notFound();
 
   const photos = getPhotos(slug);
+  const path = `/portfolio/${category.slug}`;
 
   return (
     <article className="px-5 pt-28 pb-20 md:px-8">
+      <JsonLd
+        data={graphJsonLd([
+          breadcrumbJsonLd([
+            { name: "Главная", path: "/" },
+            { name: "Портфолио", path: "/portfolio" },
+            { name: category.menu, path },
+          ]),
+          imageGalleryJsonLd({
+            name: category.title,
+            description: category.description,
+            path,
+            photos,
+          }),
+        ])}
+      />
       <p className="eyebrow">
         <Link href="/portfolio">Портфолио</Link>
         <span className="mx-3 text-line">/</span>
@@ -52,6 +73,7 @@ export default async function CategoryPage({ params }: { params: Promise<Params>
           {category.cta.label}
         </Link>
       ) : null}
+      <GuideCta slugs={CATEGORY_GUIDES[category.slug] ?? []} />
 
       {category.albums.length > 0 ? (
         <div className="mt-16 grid gap-px bg-line md:grid-cols-2 lg:grid-cols-3">

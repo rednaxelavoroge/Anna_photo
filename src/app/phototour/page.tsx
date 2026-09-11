@@ -1,20 +1,32 @@
 import { CoverArt } from "@/components/CoverArt";
+import { GuideCta } from "@/components/GuideCta";
+import { JsonLd } from "@/components/JsonLd";
 import { getSite } from "@/lib/content";
+import { breadcrumbJsonLd, graphJsonLd, pageMetadata } from "@/lib/seo";
 import type { Metadata } from "next";
 import Link from "next/link";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Фототур в Армению",
   description:
     "Фототур в Армению: travel-съёмка для гостей Еревана. Не обучение, а путешествие с фотографом.",
+  path: "/phototour",
   keywords: ["фототур в Армению", "фотосессия для туристов Ереван", "travel фотограф Армения"],
-};
+});
 
 export default function PhototourPage() {
   const { phototour, contacts } = getSite();
 
   return (
     <article className="pt-20">
+      <JsonLd
+        data={graphJsonLd([
+          breadcrumbJsonLd([
+            { name: "Главная", path: "/" },
+            { name: "Фототур", path: "/phototour" },
+          ]),
+        ])}
+      />
       <div className="grid min-h-[80svh] md:grid-cols-2">
         <div className="flex flex-col justify-center px-5 py-16 md:px-12">
           <p className="eyebrow">{phototour.eyebrow}</p>
@@ -32,6 +44,10 @@ export default function PhototourPage() {
               Кадры Армении
             </Link>
           </div>
+          <GuideCta
+            slugs={["semejnaya-fotosessiya-v-erevane", "kak-zapisatsya-na-fotosessiyu-armeniya-moskva"]}
+            label="Для гостей"
+          />
         </div>
         <div className="min-h-[50svh] bg-void">
           <CoverArt slug="phototour" title={phototour.title} />

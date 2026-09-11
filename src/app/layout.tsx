@@ -1,40 +1,57 @@
+import { JsonLd } from "@/components/JsonLd";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SmoothScroll } from "@/components/SmoothScroll";
 import { getSite } from "@/lib/content";
+import { graphJsonLd, personJsonLd, professionalServiceJsonLd, websiteJsonLd } from "@/lib/seo";
+import { getSiteUrl } from "@/lib/site-url";
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 const site = getSite();
 
-function resolveBaseUrl(): URL {
-  const explicit = process.env.NEXT_PUBLIC_SITE_URL;
-  if (explicit) return new URL(explicit);
-  const vercel = process.env.VERCEL_PROJECT_PRODUCTION_URL;
-  if (vercel) return new URL(`https://${vercel}`);
-  return new URL(site.domain);
-}
-
 export const metadata: Metadata = {
-  metadataBase: resolveBaseUrl(),
+  metadataBase: new URL(`${getSiteUrl()}/`),
   title: {
     default: `${site.owner} — детский и семейный фотограф в Армении`,
     template: `%s — ${site.brand}`,
   },
   description:
-    "Фотосессия новорождённых, детская и семейная съёмка в Армении. Воркшопы, travel и фототур в Ереван.",
+    "Фотосессия новорождённых, детская и семейная съёмка в Армении. Воркшопы, travel и фототур в Ереван. Съёмки в Ереване; связь также из Москвы.",
+  applicationName: site.brand,
+  authors: [{ name: site.owner, url: getSiteUrl() }],
+  creator: site.owner,
+  publisher: site.brand,
   keywords: [
     "фотограф Армения",
     "детский фотограф Ереван",
     "фотосессия новорождённых в Армении",
     "семейная фотосессия в Армении",
+    "Анна Манасарян",
   ],
   openGraph: {
     type: "website",
     locale: "ru_RU",
+    url: "/",
     siteName: site.brand,
-    title: `${site.owner} — фотограф`,
+    title: `${site.owner} — детский и семейный фотограф в Армении`,
     description: site.tagline,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${site.owner} — детский и семейный фотограф в Армении`,
+    description: site.tagline,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
   },
 };
 
@@ -46,6 +63,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ru">
       <body>
+        <JsonLd data={graphJsonLd([websiteJsonLd(), personJsonLd(), professionalServiceJsonLd()])} />
         <SmoothScroll />
         <a
           href="#main"

@@ -1,16 +1,16 @@
 {
-  "enabled": true,
+  "enabled": false,
   "articles": {
-    "bezopasnaya-syomka-novorozhdennyh": true,
-    "fotosessiya-malyshej-1-12-mesyacev": true,
-    "fotosessiya-v-armyanskih-nacionalnyh-kostyumah": true,
-    "kak-podgotovit-rebyonka-k-fotosessii": true,
-    "kak-vybrat-detskogo-fotografa": true,
-    "kak-zapisatsya-na-fotosessiyu-armeniya-moskva": true,
-    "podgotovka-k-fotosessii-novorozhdennogo": true,
-    "semejnaya-fotosessiya-v-erevane": true,
-    "sezonnye-fotosessii-v-armenii": true,
-    "skazochnye-fotosessii-dlya-detej": true
+    "bezopasnaya-syomka-novorozhdennyh": false,
+    "fotosessiya-malyshej-1-12-mesyacev": false,
+    "fotosessiya-v-armyanskih-nacionalnyh-kostyumah": false,
+    "kak-podgotovit-rebyonka-k-fotosessii": false,
+    "kak-vybrat-detskogo-fotografa": false,
+    "kak-zapisatsya-na-fotosessiyu-armeniya-moskva": false,
+    "podgotovka-k-fotosessii-novorozhdennogo": false,
+    "semejnaya-fotosessiya-v-erevane": false,
+    "sezonnye-fotosessii-v-armenii": false,
+    "skazochnye-fotosessii-dlya-detej": false
   },
   "items": [
     {

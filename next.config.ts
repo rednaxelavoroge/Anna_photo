@@ -28,7 +28,7 @@ const nextConfig: NextConfig = {
   ...(isPanel ? { output: "standalone" as const } : {}),
   outputFileTracingRoot: path.join(__dirname),
   outputFileTracingIncludes: {
-    "/api/admin/**/*": ["./src/data/**/*.json"],
+    "/api/admin/**/*": ["./src/data/**/*.json", "./content/blog/**"],
     "/blog/**": ["./content/blog/**"],
   },
   images: isExport || isPanel

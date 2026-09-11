@@ -6,6 +6,16 @@ export type BlogArticleSetting = {
   date: string;
   draft: boolean;
   cover?: string;
+  /** Текст статьи из markdown. В articles.json не пишется — только в панели и в content/blog. */
+  body?: string;
+  description?: string;
+  tags?: string[];
+  relatedSlugs?: string[];
+  targetQueries?: string[];
+  portfolioHref?: string;
+  aboutHref?: string;
+  contactsHref?: string;
+  coverAlt?: string;
 };
 
 export type BlogSettings = {
@@ -31,10 +41,19 @@ export function isArticleEnabled(slug: string): boolean {
   return Boolean(getBlogSettings().articles?.[slug]);
 }
 
-export function isArticleVisible(slug: string): boolean {
+/**
+ * Статья в публичных списках: карточки /blog, меню, футер, sitemap, «ещё гиды».
+ * Выключенная статья по прямой ссылке /blog/[slug] всё равно открывается.
+ */
+export function isArticleListed(slug: string): boolean {
   const settings = getBlogSettings();
   if (!settings.enabled) return false;
   return Boolean(settings.articles?.[slug]);
+}
+
+/** @deprecated Используйте isArticleListed — это про список, а не про доступ к URL. */
+export function isArticleVisible(slug: string): boolean {
+  return isArticleListed(slug);
 }
 
 export function formatPostDate(date: string) {

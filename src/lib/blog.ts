@@ -4,6 +4,7 @@ import { parseFrontmatter, type BlogFrontmatter } from "@/lib/frontmatter";
 import {
   getBlogSettings,
   isArticleEnabled,
+  isArticleListed,
   isArticleVisible,
   isBlogEnabled,
   formatPostDate,
@@ -14,6 +15,7 @@ import {
 export {
   getBlogSettings,
   isArticleEnabled,
+  isArticleListed,
   isArticleVisible,
   isBlogEnabled,
   formatPostDate,
@@ -53,16 +55,16 @@ export function getAllPosts(): BlogPost[] {
     .sort((a, b) => b.date.localeCompare(a.date) || a.slug.localeCompare(b.slug));
 }
 
-/** Возвращает только видимые (разрешённые) статьи для публичного сайта. */
+/** Только статьи из публичного списка. Прямой URL живёт отдельно — см. getPost. */
 export function getPosts(): BlogPost[] {
   if (!isBlogEnabled()) return [];
-  return getAllPosts().filter((post) => isArticleVisible(post.slug));
+  return getAllPosts().filter((post) => isArticleListed(post.slug));
 }
 
 export function getRelatedPosts(post: BlogPost): BlogPost[] {
   if (!isBlogEnabled()) return [];
   return post.relatedSlugs
-    .filter((slug) => isArticleVisible(slug))
+    .filter((slug) => isArticleListed(slug))
     .map((slug) => getPost(slug))
     .filter((item): item is BlogPost => Boolean(item));
 }

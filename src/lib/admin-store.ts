@@ -190,6 +190,7 @@ export async function loadStudio(): Promise<StudioState> {
             title: post.title,
             date: post.date,
             draft: Boolean(post.draft),
+            cover: post.cover,
           });
         }
       }

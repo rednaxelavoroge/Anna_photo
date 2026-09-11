@@ -1,3 +1,4 @@
+import { BlogCover } from "@/components/BlogCover";
 import { JsonLd } from "@/components/JsonLd";
 import { RelatedPosts } from "@/components/RelatedPosts";
 import { formatPostDate, getPost, getPostSlugs, getRelatedPosts, isArticleVisible, isBlogEnabled } from "@/lib/blog";
@@ -31,6 +32,7 @@ export async function generateMetadata({
     keywords: post.targetQueries,
     type: "article",
     publishedTime: post.date,
+    image: post.cover,
   });
 }
 
@@ -54,6 +56,7 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
       date: post.date,
       tags: [...post.tags, ...post.targetQueries],
       draft: post.draft,
+      image: post.cover,
     }),
   ];
 
@@ -75,6 +78,17 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
           Это черновик гида. Его можно читать и индексировать, но формулировки ещё живые: Анна пройдёт текст
           перед тем, как считать его окончательным.
         </p>
+      ) : null}
+
+      {post.cover ? (
+        <div className="mt-8 max-w-4xl md:mt-10">
+          <BlogCover
+            src={post.cover}
+            alt={post.coverAlt || post.title}
+            aspect="aspect-[16/10] md:aspect-[21/10]"
+            priority
+          />
+        </div>
       ) : null}
 
       <div className="mt-10 max-w-2xl">

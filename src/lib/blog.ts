@@ -42,7 +42,8 @@ export function getPost(slug: string): BlogPost | undefined {
   if (!fs.existsSync(file)) return undefined;
   const raw = fs.readFileSync(file, "utf8");
   const { data, body } = parseFrontmatter(raw);
-  return { ...data, slug, body };
+  const cover = data.cover || data.image;
+  return { ...data, cover, slug, body };
 }
 
 export function getAllPosts(): BlogPost[] {

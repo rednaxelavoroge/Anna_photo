@@ -13,6 +13,7 @@ export type PageMetaInput = {
   publishedTime?: string;
   modifiedTime?: string;
   noIndex?: boolean;
+  image?: string;
 };
 
 export function personId() {
@@ -36,6 +37,7 @@ export function pageMetadata({
   publishedTime,
   modifiedTime,
   noIndex,
+  image,
 }: PageMetaInput): Metadata {
   const site = getSite();
   const url = absoluteUrl(path);
@@ -70,6 +72,7 @@ export function pageMetadata({
       siteName: site.brand,
       title: branded,
       description,
+      ...(image ? { images: [{ url: absoluteUrl(image) }] } : {}),
       ...(type === "article"
         ? {
             publishedTime,
@@ -82,6 +85,7 @@ export function pageMetadata({
       card: "summary_large_image",
       title: branded,
       description,
+      ...(image ? { images: [absoluteUrl(image)] } : {}),
     },
   };
 }
@@ -203,6 +207,7 @@ export function articleJsonLd(input: {
   updated?: string;
   tags: string[];
   draft?: boolean;
+  image?: string;
 }) {
   return {
     "@type": "Article",
@@ -213,6 +218,7 @@ export function articleJsonLd(input: {
     mainEntityOfPage: absoluteUrl(input.path),
     datePublished: input.date,
     dateModified: input.updated ?? input.date,
+    ...(input.image ? { image: absoluteUrl(input.image) } : {}),
     author: { "@id": personId() },
     publisher: { "@id": personId() },
     keywords: input.tags.join(", "),

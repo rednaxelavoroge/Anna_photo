@@ -1,4 +1,5 @@
 import aboutVideosFile from "@/data/about-videos.json";
+import articlesFile from "@/data/articles.json";
 import backstageFile from "@/data/backstage.json";
 import galleriesFile from "@/data/galleries.json";
 import photosFile from "@/data/photo-tags.json";
@@ -6,6 +7,7 @@ import portfolioFile from "@/data/portfolio.json";
 import publicationsFile from "@/data/publications.json";
 import siteFile from "@/data/site.json";
 import tagsFile from "@/data/tags.json";
+import { getPost, getPostSlugs, type BlogArticleSetting, type BlogSettings } from "@/lib/blog";
 import type {
   AboutVideo,
   Category,
@@ -49,6 +51,7 @@ export type StudioState = {
   aboutVideos: AboutVideo[];
   publications: Publication[];
   pressLinks: PressLink[];
+  articles: BlogSettings;
 };
 
 /** Файлы в папках, которых панель ещё не знает — можно подобрать одной кнопкой. */
@@ -67,6 +70,7 @@ const FILES = {
   galleries: "src/data/galleries.json",
   aboutVideos: "src/data/about-videos.json",
   publications: "src/data/publications.json",
+  articles: "src/data/articles.json",
 };
 
 // Экспортируются, чтобы приёмник роликов брал те же репозиторий и ветку,
@@ -108,6 +112,7 @@ const BUNDLED: Record<string, string> = {
   [FILES.galleries]: JSON.stringify(galleriesFile),
   [FILES.aboutVideos]: JSON.stringify(aboutVideosFile),
   [FILES.publications]: JSON.stringify(publicationsFile),
+  [FILES.articles]: JSON.stringify(articlesFile),
 };
 
 async function readText(rel: string) {
@@ -157,12 +162,13 @@ async function readAllData() {
     readText(FILES.galleries).catch(() => JSON.stringify({ reviews: [], workshops: [], press: [] })),
     readText(FILES.aboutVideos).catch(() => JSON.stringify({ items: [] })),
     readText(FILES.publications).catch(() => JSON.stringify({ items: [], links: [] })),
+    readText(FILES.articles).catch(() => JSON.stringify({ enabled: false, articles: {}, items: [] })),
   ]);
 }
 
 export async function loadStudio(): Promise<StudioState> {
   const raws = await readAllData();
-  const [portfolioRaw, tagsRaw, photosRaw, siteRaw, backstageRaw, galleriesRaw, videosRaw, publicationsRaw] = raws;
+  const [portfolioRaw, tagsRaw, photosRaw, siteRaw, backstageRaw, galleriesRaw, videosRaw, publicationsRaw, articlesRaw] = raws;
   const portfolio = JSON.parse(portfolioRaw) as { categories: Category[] };
   const tags = JSON.parse(tagsRaw) as { items: Tag[] };
   const photos = JSON.parse(photosRaw) as { items: PhotoItem[] };
@@ -171,6 +177,27 @@ export async function loadStudio(): Promise<StudioState> {
   const galleries = JSON.parse(galleriesRaw) as Partial<Galleries>;
   const videos = JSON.parse(videosRaw) as { items: AboutVideo[] };
   const publications = JSON.parse(publicationsRaw) as { items?: Publication[]; links?: PressLink[] };
+  const articles = JSON.parse(articlesRaw) as Partial<BlogSettings>;
+  const articleItems: BlogArticleSetting[] = [...(articles.items ?? [])];
+  const knownSlugs = new Set(articleItems.map((i) => i.slug));
+  try {
+    for (const slug of getPostSlugs()) {
+      if (!knownSlugs.has(slug)) {
+        const post = getPost(slug);
+        if (post) {
+          articleItems.push({
+            slug: post.slug,
+            title: post.title,
+            date: post.date,
+            draft: Boolean(post.draft),
+          });
+        }
+      }
+    }
+  } catch {
+    // Если fs недоступна, остаёмся на articleItems из сохранённого JSON
+  }
+
   return {
     revision: fingerprint(raws),
     categories: portfolio.categories,
@@ -197,6 +224,11 @@ export async function loadStudio(): Promise<StudioState> {
     aboutVideos: videos.items ?? [],
     publications: publications.items ?? [],
     pressLinks: publications.links ?? [],
+    articles: {
+      enabled: Boolean(articles.enabled),
+      articles: articles.articles ?? {},
+      items: articleItems,
+    },
   };
 }
 
@@ -312,6 +344,14 @@ export async function saveStudio(
     { path: FILES.galleries, content: json(state.galleries) },
     { path: FILES.aboutVideos, content: json({ items: state.aboutVideos }) },
     { path: FILES.publications, content: json({ items: state.publications, links: state.pressLinks }) },
+    {
+      path: FILES.articles,
+      content: json({
+        enabled: Boolean(state.articles?.enabled),
+        articles: state.articles?.articles ?? {},
+        items: state.articles?.items ?? [],
+      }),
+    },
   ];
   const deletions = await withPosters(toRepoPaths(deleteSrcs));
   if (process.env.GITHUB_TOKEN) {

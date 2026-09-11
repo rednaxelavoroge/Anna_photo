@@ -29,6 +29,7 @@ const nextConfig: NextConfig = {
   outputFileTracingRoot: path.join(__dirname),
   outputFileTracingIncludes: {
     "/api/admin/**/*": ["./src/data/**/*.json"],
+    "/blog/**": ["./content/blog/**"],
   },
   images: isExport || isPanel
     ? { unoptimized: true }

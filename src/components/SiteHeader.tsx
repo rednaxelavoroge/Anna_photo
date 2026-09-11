@@ -2,6 +2,7 @@
 
 import { ThemeSwitch } from "@/components/ThemeSwitch";
 import { getSite } from "@/lib/content";
+import { isBlogEnabled } from "@/lib/articles";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -11,7 +12,9 @@ import { useEffect, useState } from "react";
 //
 // «Фототуры» отдельным пунктом больше нет: заказчица попросила убрать его
 // внутрь «Путешествий», рядом с Арменией и Италией.
-const NAV = [
+//
+// «Статьи» появляются в меню только тогда, когда Анна включает главный переключатель в панели.
+const BASE_NAV = [
   { href: "/portfolio", label: "Портфолио" },
   { href: "/training", label: "Обучение" },
   { href: "/backstage", label: "Бэкстейдж" },
@@ -22,6 +25,16 @@ const NAV = [
 
 export function SiteHeader() {
   const site = getSite();
+  const showBlog = isBlogEnabled();
+  const nav = [
+    { href: "/portfolio", label: "Портфолио" },
+    { href: "/training", label: "Обучение" },
+    { href: "/backstage", label: "Бэкстейдж" },
+    { href: "/reviews", label: "Отзывы" },
+    { href: "/about", label: "Обо мне" },
+    ...(showBlog ? [{ href: "/blog", label: "Статьи" }] : []),
+    { href: "/contacts", label: "Контакты" },
+  ];
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -67,7 +80,7 @@ export function SiteHeader() {
           </Link>
 
           <nav aria-label="Основная навигация" className="hidden items-center gap-8 text-[11px] tracking-[0.18em] uppercase lg:flex">
-            {NAV.map((item) => (
+            {nav.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
@@ -108,7 +121,7 @@ export function SiteHeader() {
             </button>
           </div>
           <nav className="flex flex-col gap-6 pt-10">
-            {NAV.map((item) => (
+            {nav.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}

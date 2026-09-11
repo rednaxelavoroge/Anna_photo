@@ -92,17 +92,16 @@ export function parseFrontmatter(raw: string): { data: BlogFrontmatter; body: st
 }
 
 function yamlString(value: string) {
-  if (
+  const needsQuote =
     value === "" ||
     value !== value.trim() ||
-    /^(true|false|null|~|[0-9]+)$/i.test(value) ||
-    /[:#{}[\],&*?|>!%@`]/.test(value) ||
+    /^(true|false|null|~|-?[0-9]+(?:\.[0-9]+)?)$/i.test(value) ||
+    value.includes(": ") ||
+    value.includes(" #") ||
     value.includes("\n") ||
-    value.includes('"')
-  ) {
-    return JSON.stringify(value);
-  }
-  return value;
+    value.includes('"') ||
+    /^[&*?|>!%@`'[\]{},#]/.test(value);
+  return needsQuote ? JSON.stringify(value) : value;
 }
 
 function yamlList(key: string, values: string[]) {

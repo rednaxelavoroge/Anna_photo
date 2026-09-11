@@ -1,9 +1,11 @@
 import { getCategories, getSite } from "@/lib/content";
+import { isBlogEnabled } from "@/lib/articles";
 import Link from "next/link";
 
 export function SiteFooter() {
   const site = getSite();
   const categories = getCategories();
+  const showBlog = isBlogEnabled();
 
   return (
     <footer className="border-t border-line bg-paper">
@@ -20,6 +22,7 @@ export function SiteFooter() {
             <Link href="/backstage">Бэкстейдж</Link>
             <Link href="/reviews">Отзывы</Link>
             <Link href="/about">Обо мне</Link>
+            {showBlog ? <Link href="/blog">Статьи</Link> : null}
             <Link href="/contacts">Контакты</Link>
           </div>
         </div>

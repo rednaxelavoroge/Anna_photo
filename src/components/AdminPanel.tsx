@@ -1,6 +1,7 @@
 "use client";
 
 import { AboutTab } from "@/components/admin/AboutTab";
+import { ArticlesTab } from "@/components/admin/ArticlesTab";
 import { CategoriesTab } from "@/components/admin/CategoriesTab";
 import { ContactsTab } from "@/components/admin/ContactsTab";
 import { GalleryTab } from "@/components/admin/GalleryTab";
@@ -16,7 +17,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-type Tab = "photos" | "categories" | "tags" | "backstage" | "reviews" | "training" | "about" | "phototour" | "contacts";
+type Tab = "photos" | "categories" | "tags" | "backstage" | "reviews" | "training" | "about" | "articles" | "phototour" | "contacts";
 
 const TABS: { id: Tab; label: string }[] = [
   { id: "photos", label: "Кадры" },
@@ -26,6 +27,7 @@ const TABS: { id: Tab; label: string }[] = [
   { id: "reviews", label: "Отзывы" },
   { id: "training", label: "Обучение" },
   { id: "about", label: "Обо мне и СМИ" },
+  { id: "articles", label: "Статьи" },
   { id: "phototour", label: "Фототуры" },
   { id: "contacts", label: "Контакты" },
 ];
@@ -262,6 +264,7 @@ export function AdminPanel() {
     tags: state.tags.length,
     backstage: state.backstage.length,
     reviews: state.galleries.reviews.length,
+    articles: state.articles?.items?.length,
   };
 
   return (
@@ -386,6 +389,7 @@ export function AdminPanel() {
       ) : null}
       {tab === "training" ? <TrainingTab {...props} /> : null}
       {tab === "about" ? <AboutTab {...props} /> : null}
+      {tab === "articles" ? <ArticlesTab {...props} /> : null}
       {tab === "phototour" ? <PhototourTab {...props} /> : null}
       {tab === "contacts" ? <ContactsTab {...props} /> : null}
     </div>

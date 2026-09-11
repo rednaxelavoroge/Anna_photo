@@ -38,6 +38,8 @@ on:
       - "src/components/AdminPanel.tsx"
       - "src/components/admin/**"
       - "src/lib/admin-*"
+      - "src/lib/articles.ts"
+      - "src/data/articles.json"
       - "src/lib/use-video-upload.ts"
       - "src/lib/upload-previews.ts"
       - "src/lib/preview.ts"

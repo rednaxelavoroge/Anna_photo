@@ -43,6 +43,11 @@ export async function PUT(request: Request) {
     aboutVideos: rest.aboutVideos ?? [],
     publications: rest.publications ?? [],
     pressLinks: rest.pressLinks ?? [],
+    articles: {
+      enabled: Boolean(rest.articles?.enabled),
+      articles: rest.articles?.articles ?? {},
+      items: rest.articles?.items ?? [],
+    },
   };
   /*
     Проверка перед записью. Раньше сервер смотрел только, что три списка

@@ -9,6 +9,9 @@ export type BlogFrontmatter = {
   portfolioHref?: string;
   aboutHref?: string;
   contactsHref?: string;
+  cover?: string;
+  image?: string;
+  coverAlt?: string;
 };
 
 const STRING_KEYS = new Set([
@@ -18,6 +21,9 @@ const STRING_KEYS = new Set([
   "portfolioHref",
   "aboutHref",
   "contactsHref",
+  "cover",
+  "image",
+  "coverAlt",
 ]);
 
 const BOOL_KEYS = new Set(["draft"]);

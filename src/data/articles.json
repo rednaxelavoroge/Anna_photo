@@ -17,61 +17,71 @@
       "slug": "podgotovka-k-fotosessii-novorozhdennogo",
       "title": "Как подготовиться к фотосессии новорождённого до 20 дней",
       "date": "2026-09-08",
-      "draft": false
+      "draft": false,
+      "cover": "/photos/newborn/neonati-1-41.jpg"
     },
     {
       "slug": "kak-zapisatsya-na-fotosessiyu-armeniya-moskva",
       "title": "Как записаться на фотосессию — Армения и Москва",
       "date": "2026-09-08",
-      "draft": false
+      "draft": false,
+      "cover": "/photos/uploads/1788717226444-familia-22.jpg"
     },
     {
       "slug": "bezopasnaya-syomka-novorozhdennyh",
       "title": "Безопасная съёмка новорождённого — что важно родителям",
       "date": "2026-09-01",
-      "draft": false
+      "draft": false,
+      "cover": "/photos/newborn/neonati-2.jpg"
     },
     {
       "slug": "fotosessiya-malyshej-1-12-mesyacev",
       "title": "Фотосессия малышей 1–12 месяцев — когда ехать",
       "date": "2026-08-20",
-      "draft": false
+      "draft": false,
+      "cover": "/photos/babies/bambini-1.jpg"
     },
     {
       "slug": "semejnaya-fotosessiya-v-erevane",
       "title": "Семейная фотосессия в Ереване и Армении",
       "date": "2026-08-12",
-      "draft": false
+      "draft": false,
+      "cover": "/photos/family/familia-1.jpg"
     },
     {
       "slug": "fotosessiya-v-armyanskih-nacionalnyh-kostyumah",
       "title": "Фотосессия в армянских национальных костюмах",
       "date": "2026-07-30",
-      "draft": false
+      "draft": false,
+      "cover": "/photos/armenian-costumes/nazionali-1.jpg"
     },
     {
       "slug": "kak-podgotovit-rebyonka-k-fotosessii",
       "title": "Как подготовить ребёнка к фотосессии",
       "date": "2026-07-18",
-      "draft": false
+      "draft": false,
+      "cover": "/photos/children/child-1.jpg"
     },
     {
       "slug": "kak-vybrat-detskogo-fotografa",
       "title": "Как выбрать детского фотографа",
       "date": "2026-07-05",
-      "draft": false
+      "draft": false,
+      "cover": "/photos/children/child-3.jpg"
     },
     {
       "slug": "sezonnye-fotosessii-v-armenii",
       "title": "Сезонные фотосессии в Армении — цветение, осень, новый год",
       "date": "2026-06-22",
-      "draft": false
+      "draft": false,
+      "cover": "/photos/uploads/1788718128899-fiori-11.jpg"
     },
     {
       "slug": "skazochnye-fotosessii-dlya-detej",
       "title": "Сказочные студийные проекты для детей",
       "date": "2026-06-10",
-      "draft": false
+      "draft": false,
+      "cover": "/photos/children/child-12.jpg"
     }
   ]
 }

@@ -5,6 +5,7 @@ export type BlogArticleSetting = {
   title: string;
   date: string;
   draft: boolean;
+  cover?: string;
 };
 
 export type BlogSettings = {

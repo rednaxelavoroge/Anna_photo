@@ -113,6 +113,13 @@ export function ArticlesTab({ state, setState, persist, busy }: TabProps) {
                     onChange={() => toggleArticle(item.slug)}
                     className="mt-1 h-4 w-4 shrink-0 rounded-sm border-line accent-ink"
                   />
+                  {item.cover ? (
+                    <img
+                      src={item.cover}
+                      alt=""
+                      className="hidden h-12 w-16 shrink-0 rounded-xs border border-line object-cover sm:block"
+                    />
+                  ) : null}
                   <div>
                     <label
                       htmlFor={`article-${item.slug}`}

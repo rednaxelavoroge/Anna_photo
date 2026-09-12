@@ -1,5 +1,6 @@
 "use client";
 
+import { AnalyticsConsent } from "@/components/AnalyticsConsent";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SmoothScroll } from "@/components/SmoothScroll";
@@ -23,6 +24,7 @@ export function SiteChrome({ children }: { children: ReactNode }) {
       <SiteHeader />
       <main id="main">{children}</main>
       <SiteFooter />
+      <AnalyticsConsent />
     </>
   );
 }

@@ -37,8 +37,19 @@ export function SiteFooter() {
           </div>
         </div>
       </div>
-      <div className="border-t border-line px-5 py-5 text-[11px] tracking-[0.16em] text-muted uppercase md:px-8">
-        © {new Date().getFullYear()} {site.owner}. Все кадры принадлежат автору.
+      <div className="flex flex-col gap-3 border-t border-line px-5 py-5 text-[11px] tracking-[0.16em] text-muted uppercase md:flex-row md:items-center md:justify-between md:px-8">
+        <div>© {new Date().getFullYear()} {site.owner}. Все кадры принадлежат автору.</div>
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+          <Link href="/privacy" className="hover:text-ink transition">
+            Конфиденциальность
+          </Link>
+          <Link href="/cookies" className="hover:text-ink transition">
+            Cookies
+          </Link>
+          <Link href="/legal/booking" className="hover:text-ink transition">
+            Условия съёмки
+          </Link>
+        </div>
       </div>
     </footer>
   );

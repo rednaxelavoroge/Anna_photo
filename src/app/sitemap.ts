@@ -19,8 +19,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/training",
     "/reviews",
     "/contacts",
-    "/phototour",
     ...(showBlog ? ["/blog"] : []),
+    "/privacy",
+    "/cookies",
+    "/legal/booking",
   ];
   const categories = getCategories().map((category) => `/portfolio/${category.slug}`);
   const tagPages = getCategories().flatMap((category) =>

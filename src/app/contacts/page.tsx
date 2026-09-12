@@ -64,6 +64,18 @@ export default function ContactsPage() {
           </li>
         ) : null}
       </ul>
+
+      <div className="mt-20 border-t border-line pt-10">
+        <p className="eyebrow">Информация для клиентов</p>
+        <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted">
+          Перед записью на съёмку вы можете ознакомиться с памяткой: безопасность малышей, конфиденциальность и
+          публикация кадров в портфолио — в разделе{" "}
+          <a href="/legal/booking" className="underline hover:text-ink">
+            Условия записи и съёмки
+          </a>
+          .
+        </p>
+      </div>
     </article>
   );
 }

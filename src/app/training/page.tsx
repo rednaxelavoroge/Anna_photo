@@ -1,6 +1,7 @@
 import { AlbumGrid } from "@/components/AlbumGrid";
 import { SiteVideo } from "@/components/SiteVideo";
 import { getSite } from "@/lib/content";
+import { mergeKeywords } from "@/lib/keywords";
 import { getGalleryPhotos } from "@/lib/photos";
 import type { Metadata } from "next";
 
@@ -8,7 +9,11 @@ export const metadata: Metadata = {
   title: "Обучение фотографии — 45 воркшопов",
   description:
     "Обучение фотографии: индивидуальные, групповые и онлайн-обучения Анны Манасарян, 45 авторских воркшопов в Москве.",
-  keywords: ["обучение фотографии Армения", "воркшоп фотографии Москва", "мастер-класс фотограф Ереван"],
+  keywords: mergeKeywords([
+    "обучение фотографии Армения",
+    "воркшоп фотографии Москва",
+    "мастер-класс фотограф Ереван",
+  ]),
 };
 
 /**

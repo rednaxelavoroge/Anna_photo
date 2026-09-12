@@ -1,6 +1,7 @@
 import { formatPostDate, getPosts, isBlogEnabled } from "@/lib/blog";
 import { BlogCover } from "@/components/BlogCover";
 import { JsonLd } from "@/components/JsonLd";
+import { mergeKeywords } from "@/lib/keywords";
 import { breadcrumbJsonLd, graphJsonLd, pageMetadata } from "@/lib/seo";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -11,7 +12,11 @@ export const metadata: Metadata = pageMetadata({
   description:
     "Гиды Анны Манасарян: подготовка к ньюборн-съёмке, дети, семья в Ереване, запись в Армении и Москве. Не портфолио — тексты к съёмке.",
   path: "/blog",
-  keywords: ["гиды фотосессия Армения", "как подготовиться к детской фотосессии", "ньюборн Ереван советы"],
+  keywords: mergeKeywords([
+    "гиды фотосессия Армения",
+    "как подготовиться к детской фотосессии",
+    "ньюборн Ереван советы",
+  ]),
 });
 
 export default function BlogIndexPage() {

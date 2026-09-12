@@ -14,6 +14,8 @@ export function generateStaticParams() {
   return getCategories().map((item) => ({ category: item.slug }));
 }
 
+import { mergeKeywords } from "@/lib/keywords";
+
 export async function generateMetadata({
   params,
 }: {
@@ -25,7 +27,7 @@ export async function generateMetadata({
   return {
     title: category.title,
     description: category.description,
-    keywords: category.keywords,
+    keywords: mergeKeywords(category.keywords),
   };
 }
 

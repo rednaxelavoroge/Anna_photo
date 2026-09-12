@@ -1,5 +1,6 @@
 import { CoverArt } from "@/components/CoverArt";
 import { getCategories } from "@/lib/content";
+import { mergeKeywords } from "@/lib/keywords";
 import { getPhotos } from "@/lib/photos";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -8,12 +9,12 @@ export const metadata: Metadata = {
   title: "Портфолио фотографа в Армении",
   description:
     "Разделы съёмок: новорождённые, малыши, дети, семья, национальные костюмы, животные, сезон, коммерция, travel и ИИ-проекты.",
-  keywords: [
+  keywords: mergeKeywords([
     "портфолио фотографа Армения",
     "фотосессия новорождённых в Армении",
     "детская фотосессия в Армении",
     "семейная фотосессия в Армении",
-  ],
+  ]),
 };
 
 /**

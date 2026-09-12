@@ -1,11 +1,12 @@
 import { getSite } from "@/lib/content";
+import { mergeKeywords } from "@/lib/keywords";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Контакты",
   description:
     "Связаться с Анной Манасарян: WhatsApp в Армении и России, почта, Instagram. Фотосессии, обучение, фототуры.",
-  keywords: ["фотограф контакты", "заказать фотосессию в Армении", "Анна Манасарян WhatsApp"],
+  keywords: mergeKeywords(["фотограф контакты", "заказать фотосессию в Армении", "Анна Манасарян WhatsApp"]),
 };
 
 const digits = (value: string) => value.replace(/\D/g, "");

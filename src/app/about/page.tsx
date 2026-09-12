@@ -6,6 +6,7 @@ import { SiteVideo } from "@/components/SiteVideo";
 import { YoutubeGrid } from "@/components/YoutubeGrid";
 import { getAboutVideos, getPressLinks, getPublications, getSite } from "@/lib/content";
 import { getPressPhotos } from "@/lib/photos";
+import { mergeKeywords } from "@/lib/keywords";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
   title: "О фотографе Анне Манасарян",
   description:
     "Детский и семейный фотограф в Ереване. Новорождённые, дети, семьи, travel и обучение.",
-  keywords: ["фотограф Анна Манасарян", "детский фотограф Ереван", "семейный фотограф Армения"],
+  keywords: mergeKeywords(["фотограф Анна Манасарян", "детский фотограф Ереван", "семейный фотограф Армения"]),
 };
 
 export default function AboutPage() {

@@ -1,6 +1,7 @@
 import { PhotoTape } from "@/components/PhotoTape";
 import { PortfolioNav } from "@/components/PortfolioNav";
 import { getCategories } from "@/lib/content";
+import { mergeKeywords } from "@/lib/keywords";
 import { getLibraryPhotos } from "@/lib/photos";
 import type { Metadata } from "next";
 
@@ -8,12 +9,12 @@ export const metadata: Metadata = {
   title: "Все кадры — портфолио фотографа в Армении",
   description:
     "Сплошная лента всех съёмок: новорождённые, малыши, дети, семья, национальные костюмы, животные, сезон, коммерция, travel и ИИ-проекты.",
-  keywords: [
+  keywords: mergeKeywords([
     "портфолио фотографа Армения",
     "фотосессия новорождённых в Армении",
     "детская фотосессия в Армении",
     "семейная фотосессия в Армении",
-  ],
+  ]),
 };
 
 /**

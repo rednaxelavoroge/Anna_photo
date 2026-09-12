@@ -34,6 +34,8 @@ function isTagPage(category: string, album: string) {
   return Boolean(getCategory(category)) && getTagPhotos(category, album).length > 0;
 }
 
+import { mergeKeywords } from "@/lib/keywords";
+
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { category: slug, album } = await params;
   if (!isTagPage(slug, album)) return {};
@@ -42,7 +44,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   return {
     title: `${category.menu} — ${tag?.name ?? album}`,
     description: category.description,
-    keywords: category.keywords,
+    keywords: mergeKeywords(category.keywords),
   };
 }
 

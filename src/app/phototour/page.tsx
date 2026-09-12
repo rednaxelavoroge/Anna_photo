@@ -2,6 +2,7 @@ import { CoverArt } from "@/components/CoverArt";
 import { PortfolioNav } from "@/components/PortfolioNav";
 import { TagStrip } from "@/components/TagStrip";
 import { getCategories, getSite } from "@/lib/content";
+import { mergeKeywords } from "@/lib/keywords";
 import { getCategoryTags, getPhotos } from "@/lib/photos";
 import { PHOTOTOUR_CATEGORY, extrasFor } from "@/lib/portfolio-extras";
 import type { Metadata } from "next";
@@ -11,7 +12,13 @@ export const metadata: Metadata = {
   title: "Фототуры",
   description:
     "Фототуры с Анной Манасарян: Италия, Армения, Испания, Грузия. Не обучение, а путешествие с фотографом и ваша съёмка в дороге.",
-  keywords: ["фототур", "фототур в Армению", "фототур Италия", "фототур Грузия", "travel фотограф"],
+  keywords: mergeKeywords([
+    "фототур",
+    "фототур в Армению",
+    "фототур Италия",
+    "фототур Грузия",
+    "travel фотограф",
+  ]),
 };
 
 /**

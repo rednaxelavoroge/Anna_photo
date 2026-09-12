@@ -4,6 +4,8 @@ import { getSite } from "@/lib/content";
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
+import { MULTILINGUAL_KEYWORDS } from "@/lib/keywords";
+
 const site = getSite();
 const DEMO_URL =
   process.env.NAMECHEAP_EXPORT === "1"
@@ -24,12 +26,7 @@ export const metadata: Metadata = {
     template: `%s — ${site.brand}`,
   },
   description: descriptionDefault,
-  keywords: [
-    "фотограф Армения",
-    "детский фотограф Ереван",
-    "фотосессия новорождённых в Армении",
-    "семейная фотосессия в Армении",
-  ],
+  keywords: MULTILINGUAL_KEYWORDS,
   openGraph: {
     type: "website",
     locale: "ru_RU",

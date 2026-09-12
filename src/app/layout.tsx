@@ -1,4 +1,3 @@
-import { Analytics } from "@/components/Analytics";
 import { SiteChrome } from "@/components/SiteChrome";
 import { ThemeScript } from "@/components/ThemeScript";
 import { getSite } from "@/lib/content";
@@ -88,7 +87,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <ThemeScript />
         <SiteChrome>{children}</SiteChrome>
-        <Analytics />
       </body>
     </html>
   );

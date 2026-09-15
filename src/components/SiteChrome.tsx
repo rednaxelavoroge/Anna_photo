@@ -24,7 +24,7 @@ export function SiteChrome({ children }: { children: ReactNode }) {
       <SiteHeader />
       <main id="main">{children}</main>
       <SiteFooter />
-      <AnalyticsConsent />
+      {/* AnalyticsConsent законсервирован */}
     </>
   );
 }

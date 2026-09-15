@@ -5,8 +5,8 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Политика использования файлов cookie",
   description:
-    "Информация об использовании файлов cookie и систем аналитики на сайте фотографа Анны Манасарян (annamanasaryan.com).",
-  keywords: ["cookies", "файлы cookie", "Google Analytics", "Яндекс Метрика", "Анна Манасарян"],
+    "Информация об использовании технических файлов cookie на сайте фотографа Анны Манасарян (annamanasaryan.com).",
+  keywords: ["cookies", "файлы cookie", "технические cookie", "конфиденциальность", "Анна Манасарян"],
 };
 
 export default function CookiesPage() {
@@ -36,50 +36,19 @@ export default function CookiesPage() {
             <div className="border border-line bg-snow p-5">
               <h3 className="font-display text-base text-ink">1. Обязательные (технические) файлы</h3>
               <p className="mt-2 text-sm text-ink/80">
-                Необходимы для базового функционирования сайта: переключения и сохранения цветовой темы
-                оформления (бежевая, белая, серая, тёмная) и фиксации вашего решения относительно согласия
-                на аналитические счётчики. Без этих файлов сайт не сможет корректно отображаться в
-                выбранном вами виде. Эти файлы не собирают маркетинговых данных и не требуют согласия.
+                Необходимы для базового функционирования сайта: переключения и сохранения выбранной цветовой темы
+                оформления интерфейса (бежевая, белая, серая, тёмная). Без этих файлов сайт не сможет корректно
+                отображаться в выбранном вами виде. Эти файлы сохраняются исключительно на вашем устройстве, не
+                собирают маркетинговых или персональных данных и не требуют согласия.
               </p>
             </div>
 
             <div className="border border-line bg-snow p-5">
               <h3 className="font-display text-base text-ink">2. Статистические (аналитические) файлы</h3>
               <p className="mt-2 text-sm text-ink/80">
-                Подключаются <strong>исключительно после вашего согласия</strong> в баннере на сайте:
-              </p>
-              <ul className="mt-3 list-disc space-y-2 pl-5 text-sm">
-                <li>
-                  <strong>Google Analytics 4 (Google LLC)</strong>: ID <code>G-R2RHW37V4F</code>. Используется
-                  для оценки общей посещаемости, просмотра разделов портфолио, с включенной функцией
-                  анонимизации IP-адресов.{" "}
-                  <a
-                    href="https://policies.google.com/technologies/cookies"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="underline hover:text-ink"
-                  >
-                    Политика Google в отношении файлов cookie
-                  </a>
-                  .
-                </li>
-                <li>
-                  <strong>Яндекс.Метрика (ООО «Яндекс»)</strong>: ID <code>112477910</code>. Помогает понять,
-                  насколько удобно посетителям ориентироваться в сериях фотографий и находить контакты.{" "}
-                  <a
-                    href="https://yandex.ru/legal/confidential/"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="underline hover:text-ink"
-                  >
-                    Политика конфиденциальности Яндекса
-                  </a>
-                  .
-                </li>
-              </ul>
-              <p className="mt-3 text-sm text-ink/80">
-                До момента нажатия кнопки «Принять все» ни один из этих счётчиков не запускается и запросы к
-                сторонним серверам не отправляются.
+                В настоящее время внешние системы веб-аналитики (Google Analytics, Яндекс.Метрика) на сайте{" "}
+                <strong>полностью отключены</strong>. Сайт не использует сторонние аналитические cookies,
+                пиксели отслеживания и маркетинговые скрипты. Никакие запросы к серверам аналитики не отправляются.
               </p>
             </div>
           </div>
@@ -88,25 +57,13 @@ export default function CookiesPage() {
         <section>
           <h2 className="font-display text-xl text-ink md:text-2xl">Управление вашим выбором</h2>
           <p className="mt-3">
-            Вы в любой момент можете изменить своё решение относительно аналитических файлов cookie
-            непосредственно на этом сайте:
+            Поскольку внешние аналитические счётчики и маркетинговые cookies на сайте отключены, сайт не собирает
+            профили посетителей. Вы можете в любой момент полностью отключить или очистить сохранённые cookies
+            в настройках вашего веб-браузера.
           </p>
           <div className="mt-4">
             <CookieSettingsButton />
           </div>
-          <p className="mt-4">
-            Также вы можете полностью отключить поддержку cookies в настройках вашего веб-браузера или
-            установить официальный браузерный компонент{" "}
-            <a
-              href="https://yandex.ru/support/metrica/general/opt-out.html"
-              target="_blank"
-              rel="noreferrer"
-              className="underline hover:text-ink"
-            >
-              Блокировщик Яндекс.Метрики
-            </a>
-            .
-          </p>
         </section>
 
         <section>

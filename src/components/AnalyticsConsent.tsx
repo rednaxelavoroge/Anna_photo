@@ -3,9 +3,20 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+/**
+ * КОНСЕРВАЦИЯ АНАЛИТИКИ:
+ * По запросу внешние счетчики (Яндекс.Метрика и Google Analytics)
+ * полностью отключены на сайте. Никакие сторонние скрипты не загружаются,
+ * баннер согласия не отображается, cookies третьих сторон не устанавливаются.
+ * 
+ * Чтобы возобновить работу аналитики в любой момент:
+ * Установите ENABLE_ANALYTICS = true.
+ */
+export const ENABLE_ANALYTICS = false;
+
 const CONSENT_STORAGE_KEY = "anna_cookie_consent";
-const GA_ID = "G-R2RHW37V4F";
-const METRIKA_ID = "112477910";
+export const GA_ID = "G-R2RHW37V4F";
+export const METRIKA_ID = "112477910";
 
 declare global {
   interface Window {
@@ -19,6 +30,7 @@ declare global {
 }
 
 function loadAnalytics() {
+  if (!ENABLE_ANALYTICS) return;
   if (typeof window === "undefined") return;
 
   // 1. Google Analytics 4
@@ -66,6 +78,8 @@ export function AnalyticsConsent() {
   const [showBanner, setShowBanner] = useState(false);
 
   useEffect(() => {
+    if (!ENABLE_ANALYTICS) return;
+
     try {
       const saved = localStorage.getItem(CONSENT_STORAGE_KEY) as "accepted" | "rejected" | null;
       if (saved === "accepted") {
@@ -106,7 +120,7 @@ export function AnalyticsConsent() {
     setShowBanner(false);
   };
 
-  if (!showBanner) return null;
+  if (!ENABLE_ANALYTICS || !showBanner) return null;
 
   return (
     <aside
@@ -153,6 +167,7 @@ export function AnalyticsConsent() {
 }
 
 export function openCookieBanner() {
+  if (!ENABLE_ANALYTICS) return;
   if (typeof window !== "undefined") {
     window.dispatchEvent(new CustomEvent("open-cookie-banner"));
   }
